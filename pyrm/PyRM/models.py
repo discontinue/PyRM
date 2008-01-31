@@ -30,6 +30,7 @@ MWST = (
 )
 
 GESCHLECHTER = (
+    ('F', '[Firma]'),
     ('M', 'männlich'),
     ('W', 'weiblich'),
 )
@@ -88,7 +89,7 @@ class Kunde(models.Model):
     anzeigen = models.BooleanField(
         help_text="Name der Person mit anzeigen, wenn es eine Firma ist?"
     )
-    firma = models.ForeignKey(Firma)
+    firma = models.ForeignKey(Firma, null=True, blank=True)
     strasse = models.CharField(max_length=30)
     plz = models.PositiveIntegerField()
     ort = models.ForeignKey(Ort)
@@ -101,7 +102,7 @@ class Kunde(models.Model):
         verbose_name_plural = "Kunden"
 
     def __unicode__(self):
-        return " - ".join((self.firma.name, unicode(self.person)))
+        return self.person
 
 
 class Konto(models.Model):
@@ -128,14 +129,14 @@ class Konto(models.Model):
 
 
 class RechnungsPosition(models.Model):
-    konto = models.ForeignKey(Konto)
     anzahl = models.PositiveIntegerField()
     beschreibung = models.TextField()
     einzelpreis = models.FloatField()
+    rechnung = models.ForeignKey("Rechnung", related_name="positionen")
 
     class Admin:
         list_display = (
-            "konto", "anzahl", "beschreibung", "einzelpreis"
+            "anzahl", "beschreibung", "einzelpreis", "rechnung"
         )
 #        list_display_links = ("shortcut",)
 
@@ -146,11 +147,17 @@ class RechnungsPosition(models.Model):
     def __unicode__(self):
         return self.beschreibung
 
+
 class Rechnung(models.Model):
     rechnungnummer = models.IntegerField()
+    bestellnummer = models.CharField(max_length=128, null=True, blank=True)
+    konto = models.ForeignKey(Konto, related_name="konto")
+    ggkto = models.ForeignKey(
+        Konto, related_name="gegenkonto", help_text="Gegenkonto"
+    )
     kunde = models.ForeignKey(Kunde)
-    positionen = models.ManyToManyField(RechnungsPosition)
-    lieferdatum = models.DateField()
+#    positionen = models.ManyToManyField(RechnungsPosition)
+    lieferdatum = models.DateField(null=True, blank=True)
 
     class Admin:
         pass
