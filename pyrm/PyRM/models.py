@@ -51,6 +51,9 @@ class Ort(models.Model):
 
 
 class Firma(models.Model):
+    """
+    gewerbliche Auslandskunden mit gültiger UID arbeitest du mit Netto-VKP ohne die MwSt dazuzurechnen. Dafür muss dann aber auch auf der Rechnung drauf stehen, dass es sich um so einen Kunden handelt.
+    """
     name = models.CharField(max_length=30)
     zusatz = models.TextField(blank=True,
         help_text="Für zusätze auf jeder Rechnung wie z.B. LieferrantenNr."
@@ -109,8 +112,8 @@ class Konto(models.Model):
     """
     http://bk.buhl.de/wiki/index.php/Kontenplan_SKR04
     """
-    datev_nummer = models.PositiveIntegerField()
-    name = models.CharField(max_length=30)
+    datev_nummer = models.PositiveIntegerField(primary_key=True)
+    name = models.CharField(max_length=150)
     kontoart = models.CharField(max_length=1, choices=KONTOARTEN)
     mwst = models.CharField(max_length=1, choices=MWST, null=True, blank=True)
 
@@ -149,15 +152,24 @@ class RechnungsPosition(models.Model):
 
 
 class Rechnung(models.Model):
-    rechnungnummer = models.IntegerField()
+    """
+    mahnstufe ?
+    """
+    rechnungnummer = models.IntegerField(primary_key=True)
     bestellnummer = models.CharField(max_length=128, null=True, blank=True)
+    datum = models.DateField()
     konto = models.ForeignKey(Konto, related_name="konto")
     ggkto = models.ForeignKey(
         Konto, related_name="gegenkonto", help_text="Gegenkonto"
     )
     kunde = models.ForeignKey(Kunde)
-#    positionen = models.ManyToManyField(RechnungsPosition)
     lieferdatum = models.DateField(null=True, blank=True)
+    valuta = models.DateField(null=True, blank=True,
+        help_text="Datum der Buchung laut Kontoauszug."
+    )
+    summe = models.FloatField(
+        help_text="Wird automatisch aus den Rechnungspositionen erechnet."
+    )
 
     class Admin:
         pass
