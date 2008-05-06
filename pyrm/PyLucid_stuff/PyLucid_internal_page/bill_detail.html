@@ -14,6 +14,8 @@
   <dd>{{ bill.lieferdatum }}</dd>
   <dt>valuta</dt>
   <dd>{{ bill.valuta }}</dd>
+  <dt>summe</dt>
+  <dd>{{ bill.summe }}</dd>
 </dl>
 
 <fieldset><legend><strong>positionen</strong></legend>
@@ -22,14 +24,20 @@
     <th>Anzahl</th>
     <th>Text</th>
     <th>Betrag</th>
+    <th>Summe</th>
   </tr>
 {% for line in positionen %}
   <tr>
     <td>{{ line.anzahl }}</td>
     <td>{{ line.beschreibung }}</td>
     <td>{{ line.einzelpreis }}</td>
+    <td>{{ line.summe }}</td>
   </tr>
 {% endfor %}
+  <tr>
+  <td colspan="3"><i>gesammt</i></td>
+  <td>{{ bill.summe }}</td>
+  </tr>
 </table>
 </fieldset>
 

@@ -167,8 +167,8 @@ class PyRM_plugin(PyLucidBasePlugin):
             self.page_msg.red("Error:", e)
             return
 
-        # Alle Positionen der Rechnung ermitteln
-        positionen = bill.positionen.all()
+        # Alle Positionen der Rechnung ermitteln, mit summen Attribut
+        positionen = bill.positionen.all_with_summ()
 
         context = {
             "bill": bill,
@@ -187,15 +187,10 @@ class PyRM_plugin(PyLucidBasePlugin):
             rechnung.save()
             self.page_msg.green("Rechnung '%s' erstellt." % rechnung.id)
 
-            for count, txt, price in form_data["positionen"]:
-                p = RechnungsPosition(
-                    anzahl = count,
-                    beschreibung = txt,
-                    einzelpreis = price,
-                    rechnung = rechnung,
-                )
-                p.save()
-                self.page_msg.green("Position '%s' erstellt." % txt)
+            RechnungsPosition.objects.create_all(
+                form_data["positionen"], rechnung
+            )
+            self.page_msg.green("Rechnungs Positionen erstellt.")
         except Exception, e:
             self.page_msg.red("Fehler:", e)
             transaction.rollback()

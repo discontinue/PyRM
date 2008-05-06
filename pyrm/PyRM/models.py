@@ -131,7 +131,45 @@ class Konto(models.Model):
         return self.name
 
 
+class RechnungsPositionManager(models.Manager):
+    def all_with_summ(self):
+        """
+        Liefert alle Positionen zurück, fügt das Attribute 'summe' hinzu.
+        """
+        # Alle Positionen
+        positionen = self.get_query_set()
+
+        # Summe ausrechnen und Attribute anhängen
+        for position in positionen:
+            position.summe = position.anzahl * position.einzelpreis
+
+        return positionen
+
+    def create_all(self, positionen, rechnung):
+        """
+        -Speichert alle Positionen zu einer Rechnung.
+        -Aktualisiert Rechnung.summe
+        """
+        preis_summe = 0
+        for anzahl, txt, preis in positionen:
+            preis_summe += anzahl * preis
+
+            # Erstellt einen neuen Eintrag
+            position = self.model(
+                anzahl = anzahl,
+                beschreibung = txt,
+                einzelpreis = preis,
+                rechnung = rechnung,
+            )
+            position.save()
+
+        # Rechnung Summe aktualisieren
+        rechnung.summe = preis_summe
+        rechnung.save()
+
 class RechnungsPosition(models.Model):
+    objects = RechnungsPositionManager()
+
     anzahl = models.PositiveIntegerField()
     beschreibung = models.TextField()
     einzelpreis = models.FloatField()
@@ -149,6 +187,7 @@ class RechnungsPosition(models.Model):
 
     def __unicode__(self):
         return self.beschreibung
+
 
 class RechnungManager(models.Manager):
     def create(self, data_dict):
@@ -195,6 +234,10 @@ class Rechnung(models.Model):
     lieferdatum = models.DateField(null=True, blank=True)
     valuta = models.DateField(null=True, blank=True,
         help_text="Datum der Buchung laut Kontoauszug."
+    )
+    summe = models.FloatField(
+        help_text="Wird automatisch aus den Rechnungspositionen erechnet.",
+        null=True, blank=True
     )
 
     class Admin:
