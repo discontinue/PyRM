@@ -22,7 +22,7 @@ from django import newforms as forms
 
 from PyLucid.system.BasePlugin import PyLucidBasePlugin
 
-from PyRM.models import Kunde, RechnungsPosition, Rechnung
+from PyRM.models import Konto, Kunde, RechnungsPosition, Rechnung
 
 
 class CreateBillForm(forms.Form):
@@ -41,7 +41,7 @@ class CreateBillForm(forms.Form):
     lieferdatum = forms.DateTimeField()
 
 
-class PyRM(PyLucidBasePlugin):
+class PyRM_plugin(PyLucidBasePlugin):
 
     def summary(self):
         """

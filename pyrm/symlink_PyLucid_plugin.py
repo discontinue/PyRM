@@ -15,6 +15,9 @@ import os, shutil
 PYLUCID_PATH = "~/workspace/PyLucid_trunk/pylucid"
 
 
+LINK_FILES = ("standalone_PyRM_linux.sh", "PyRM_create_PyLucid_pages.py")
+
+
 class Path(object):
     def __init__(self, pylucid_path):
         self.own = os.getcwd()
@@ -27,7 +30,7 @@ class Path(object):
 
         self.pylucid_app = self.PyLucid_path("PyRM")
         self.pylucid_plugin = self.PyLucid_path(
-            "PyLucid", "plugins_external", "PyRM"
+            "PyLucid", "plugins_external", "PyRM_plugin"
         )
         self.pylucid_ipage = self.PyLucid_path(
             "media", "PyLucid", "internal_page", "PyRM"
@@ -39,7 +42,7 @@ class Path(object):
                 "The path '%s' seems to be wrong! Please change PYLUCID_PATH."
             ) % self.base
             raise WrongPath(msg)
-        
+
     #__________________________________________________________________________
     # BUILD PATHS
 
@@ -77,7 +80,8 @@ def delete_all(path):
     unlink(path.pylucid_plugin)
     unlink(path.pylucid_ipage)
     unlink(path.PyLucid_path("PyRM_settings.py"))
-    unlink(path.PyLucid_path("standalone_PyRM_linux.sh"))
+    for filename in LINK_FILES:
+        unlink(path.PyLucid_path(filename))
 
 
 def create_all(path):
@@ -92,19 +96,17 @@ def create_all(path):
         print
 
     link(os.symlink, path.PyRM_path("PyRM"), path.pylucid_app)
-    link(os.symlink,
-        path.PyRM_PyLucid_path("PyLucid_plugin"), path.pylucid_plugin
-    )
+    link(os.symlink, path.PyRM_PyLucid_path("PyRM_plugin"), path.pylucid_plugin)
     link(os.symlink,
         path.PyRM_PyLucid_path("PyLucid_internal_page"), path.pylucid_ipage
     )
-    
-    filename = "standalone_PyRM_linux.sh"
-    link(os.link,
-        path.PyRM_PyLucid_path(filename),
-        path.PyLucid_path(filename)
-    )
-    
+
+    for filename in LINK_FILES:
+        link(os.link,
+            path.PyRM_PyLucid_path(filename),
+            path.PyLucid_path(filename)
+        )
+
     link(os.link,
         path.PyRM_PyLucid_path("django_merged_settings.py"),
         path.PyLucid_path("PyRM_settings.py")
