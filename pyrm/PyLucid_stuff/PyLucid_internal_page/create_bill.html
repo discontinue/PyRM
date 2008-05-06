@@ -1,0 +1,35 @@
+{% if preview %}
+<fieldset id="preview"><legend><strong>test</strong></legend>
+<table border="1">
+  <tr>
+    <th>Anzahl</th>
+    <th>Text</th>
+    <th>Betrag</th>
+  </tr>
+{% for line in preview %}
+  <tr>
+    <td>{{ line.0 }}</td>
+    <td>{{ line.1 }}</td>
+    <td>{{ line.2 }}</td>
+  </tr>
+{% endfor %}
+</table>
+</fieldset>
+{% endif %}
+
+<fieldset><legend><strong>Rechnung erstellen</strong></legend>
+<form method="post" action=".">
+<ul id="input_fields">
+    {% for field in form %}
+        <li title="{{ field.help_text }}" class="{{ field.html_name }}">
+        <label for="{{ field.auto_id }}">{{ field.label }} :</label>
+        {{ field }}
+        <span class="field_help_text">{{ field.help_text }}</span>
+        {% if field.errors %}<li class="field_errors">{{ field.errors }}</li>{% endif %}
+    </li>
+    {% endfor %}
+</ul>
+<input type="submit" name="save" value="{% trans 'speichern' %}" />
+<input type="submit" name="preview" value="{% trans 'test' %}" />
+</form>
+</fieldset>

@@ -1,0 +1,36 @@
+<fieldset><legend><strong>Rechnungen Nr.{{ bill.id }}</strong></legend>
+<dl>
+  <dt>bestellnummer</dt>
+  <dd>{{ bill.bestellnummer }}</dd>
+  <dt>datum</dt>
+  <dd>{{ bill.datum }}</dd>
+  <dt>konto</dt>
+  <dd>{{ bill.konto }}</dd>
+  <dt>ggkto</dt>
+  <dd>{{ bill.ggkto }}</dd>
+  <dt>kunde</dt>
+  <dd>{{ bill.kunde }}</dd>
+  <dt>lieferdatum</dt>
+  <dd>{{ bill.lieferdatum }}</dd>
+  <dt>valuta</dt>
+  <dd>{{ bill.valuta }}</dd>
+</dl>
+
+<fieldset><legend><strong>positionen</strong></legend>
+<table border="1">
+  <tr>
+    <th>Anzahl</th>
+    <th>Text</th>
+    <th>Betrag</th>
+  </tr>
+{% for line in positionen %}
+  <tr>
+    <td>{{ line.anzahl }}</td>
+    <td>{{ line.beschreibung }}</td>
+    <td>{{ line.einzelpreis }}</td>
+  </tr>
+{% endfor %}
+</table>
+</fieldset>
+
+</fieldset>

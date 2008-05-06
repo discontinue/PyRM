@@ -21,5 +21,6 @@ plugin_manager_data = {
     "summary" : global_rights,
     "customers" : global_rights,
     "bills" : global_rights,
+    "bill_detail" : global_rights,
     "create_bill" : global_rights,
 }

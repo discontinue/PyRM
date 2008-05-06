@@ -1,0 +1,8 @@
+<fieldset><legend><strong>Letzten {{ limit }} Rechnungen (insgesamt {{ count }} vorhanden)</strong></legend>
+<ul>
+{% for bill in bills %}
+<li><a href="{{ bill.link }}">{{ bill }}</a></li>
+</li>
+{% endfor %}
+</ul>
+</fieldset>

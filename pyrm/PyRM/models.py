@@ -150,25 +150,51 @@ class RechnungsPosition(models.Model):
     def __unicode__(self):
         return self.beschreibung
 
+class RechnungManager(models.Manager):
+    def create(self, data_dict):
+        """
+        Create a new entry, use only key-values from the data_dict if a field
+        exist.
+        """
+#        for i in dir(self.model._meta):
+#            print i, getattr(self.model._meta, i, "---")
+
+        # Build a list of all existing fieldnames
+        field_names = [f.name for f in self.model._meta.fields]
+
+        kwargs = {}
+        for key in data_dict:
+            if not key in field_names:
+                # skip non existing field
+                continue
+            kwargs[key] = data_dict[key]
+
+        obj = self.model(**kwargs)
+        obj.save()
+        if not isinstance(obj, models.Model):
+            raise AttributeError(obj)
+        return obj
 
 class Rechnung(models.Model):
     """
     mahnstufe ?
     """
-    rechnungnummer = models.IntegerField(primary_key=True)
+    objects = RechnungManager()
+
+    id = models.AutoField(primary_key=True)
     bestellnummer = models.CharField(max_length=128, null=True, blank=True)
     datum = models.DateField()
-    konto = models.ForeignKey(Konto, related_name="konto")
-    ggkto = models.ForeignKey(
-        Konto, related_name="gegenkonto", help_text="Gegenkonto"
+    konto = models.ForeignKey(
+        Konto, related_name="konto", null=True, blank=True
     )
-    kunde = models.ForeignKey(Kunde)
+    ggkto = models.ForeignKey(
+        Konto, related_name="gegenkonto", help_text="Gegenkonto",
+        null=True, blank=True
+    )
+    kunde = models.ForeignKey(Kunde, null=True, blank=True)
     lieferdatum = models.DateField(null=True, blank=True)
     valuta = models.DateField(null=True, blank=True,
         help_text="Datum der Buchung laut Kontoauszug."
-    )
-    summe = models.FloatField(
-        help_text="Wird automatisch aus den Rechnungspositionen erechnet."
     )
 
     class Admin:
@@ -177,7 +203,8 @@ class Rechnung(models.Model):
     class Meta:
         verbose_name = "Rechnung"
         verbose_name_plural = "Rechnungen"
+        ordering = ['-id']
 
     def __unicode__(self):
-        return self.rechnungnummer
+        return u"Rechnung Nr.%s" % self.id
 

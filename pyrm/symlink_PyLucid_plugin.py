@@ -15,7 +15,7 @@ import os, shutil
 PYLUCID_PATH = "~/workspace/PyLucid_trunk/pylucid"
 
 
-LINK_FILES = ("standalone_PyRM_linux.sh", "PyRM_create_PyLucid_pages.py")
+LINK_FILES = ("standalone_PyRM_linux.sh", "PyRM_PyLucid_setup.py")
 
 
 class Path(object):
@@ -33,7 +33,7 @@ class Path(object):
             "PyLucid", "plugins_external", "PyRM_plugin"
         )
         self.pylucid_ipage = self.PyLucid_path(
-            "media", "PyLucid", "internal_page", "PyRM"
+            "media", "PyLucid", "internal_page", "PyRM_plugin"
         )
 
     def check(self):
