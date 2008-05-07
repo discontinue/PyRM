@@ -9,11 +9,25 @@ legend {
     background-color: #FFF;
 }
 /* -------------------------------------------------------------------------- */
-#page_preview {
+#preview {
     background-color: #EEE;
 }
-#page_preview, #page_preview legend {
+#preview, #preview legend {
     border-color: #A00;
+}
+#preview table {
+    border: 1px solid #888;
+    border-spacing: 0px;
+    background-color: #FFF;
+}
+#preview table td {
+    padding: 3px;
+    margin: 3px;
+}
+#preview pre {
+    padding: 0;
+    margin: 0;
+    border: 0;
 }
 /* -------------------------------------------------------------------------- */
 #create_bill_form ul {

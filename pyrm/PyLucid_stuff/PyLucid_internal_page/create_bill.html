@@ -3,13 +3,13 @@
 <table border="1">
   <tr>
     <th>Anzahl</th>
-    <th>Text</th>
-    <th>Betrag</th>
+    <th>Beschreibung</th>
+    <th>Einzelpreis</th>
   </tr>
 {% for line in preview %}
   <tr>
     <td>{{ line.0 }}</td>
-    <td>{{ line.1 }}</td>
+    <td><pre>{{ line.1 }}</pre></td>
     <td>{{ line.2 }}</td>
   </tr>
 {% endfor %}

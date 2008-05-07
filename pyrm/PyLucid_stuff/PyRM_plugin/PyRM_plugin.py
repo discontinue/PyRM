@@ -36,52 +36,55 @@ DATE_FORMAT = _(u"%d.%m.%Y")
 # Anzahl der Rechnungen in der Übersicht
 DISPLAY_BILL_LIMIT = 5
 
-
-POSITION_RE = re.compile(
-    r"""
-        ^          # Anfang jeder neuen Zeile
-        (\d+?)     # Positions Anzahl
-        [ x]+      # Leerzeichen und "x" (optional)
-        (.*?)      # Positions Text
-        [ a]+      # Leerzeichen und "a" (optional)
-        (\d+?)     # Positions Preis
-        [^\d]{0,2} # Ein bis zwei nicht Zahlen (z.B. '€')
-        $          # Zeilenende
-        (?x)
-    """
-)
 PARSE_ERROR = "Kann Rechnungspositionen nicht parsen! Fehler in Zeile '%s': %s"
+RE_TR = re.compile(r".*?<tr>(.*?)</tr>.*?(?isx)")
+RE_TD = re.compile(r".*?<td>(.*?)</td>.*?(?isx)")
 
 class PositionenField(forms.CharField):
 #    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
 #        self.max_length, self.min_length = max_length, min_length
 #        super(CharField, self).__init__(*args, **kwargs)
     def clean(self, value):
+        """
+        Parse the tinymce table
+        """
         # Validates max_length and min_length
         value = super(PositionenField, self).clean(value)
 
-        value = value.replace("\r\n", "\n").replace("\r", "\n")
-        value = value.strip()
         result = []
-        for line in value.splitlines():
-            matches = POSITION_RE.findall(line)
-            if matches == []:
-                raise ValidationError(PARSE_ERROR % (escape(line), "RE empty"))
 
-            try:
-                anzahl, txt, preis = matches[0]
-            except ValueError, e:
-                raise ValidationError(PARSE_ERROR % (escape(line), e))
+        trs = RE_TR.findall(value)[1:]
+        for tr in trs:
+            tr = tr.replace("&nbsp;", " ")
 
-            try:
+            cells = RE_TD.findall(tr)
+            cells = [i.strip() for i in cells]
+            if cells==["","",""]:
+                # Skip empty lines
+                continue
+
+            anzahl, txt, preis = cells
+
+            # Remove html text paragraph formatter
+            txt = txt.replace("<p>", "")
+            txt = txt.replace("</p>", "\n")
+            txt = txt.replace("<br />", "\n")
+            txt = re.sub("[\r\n]+", "\n", txt)
+            txt = txt.strip()
+
+            if anzahl == "":
+                anzahl = 0
+            else:
                 anzahl = int(anzahl)
+
+            if preis == "":
+                preis = 0
+            else:
                 preis = int(preis)
-            except TypeError, e:
-                raise ValidationError(PARSE_ERROR % (escape(line), e))
 
             result.append((anzahl, txt, preis,))
-
         return result
+
 
 
 BILL_TABLE = """<table width="100%" border="1">
@@ -229,6 +232,7 @@ class PyRM_plugin(PyLucidBasePlugin):
                 form_data = form.cleaned_data
                 if "preview" in self.request.POST:
                     context["preview"] = form_data["positionen"]
+                    self.page_msg(repr(form_data["positionen"]))
                 else:
                     return self._save_new_bill(form_data)
         else:
