@@ -17,3 +17,6 @@ INSTALLED_APPS = (
     "PyLucid",
     "PyRM"
 )
+
+# Don't use the cache
+CACHE_BACKEND = "dummy:///"

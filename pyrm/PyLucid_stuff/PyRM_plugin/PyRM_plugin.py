@@ -17,7 +17,7 @@
 
 __version__= "$Rev: $"
 
-import re, datetime
+import posixpath, re, datetime
 
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
@@ -25,6 +25,7 @@ from django.newforms.util import ValidationError
 from django import newforms as forms
 from django.db import transaction
 
+from PyLucid.tools.utils import escape
 from PyLucid.system.BasePlugin import PyLucidBasePlugin
 
 from PyRM.models import Konto, Kunde, RechnungsPosition, Rechnung
@@ -65,23 +66,39 @@ class PositionenField(forms.CharField):
         for line in value.splitlines():
             matches = POSITION_RE.findall(line)
             if matches == []:
-                raise ValidationError(PARSE_ERROR % (line, "RE empty"))
+                raise ValidationError(PARSE_ERROR % (escape(line), "RE empty"))
 
             try:
                 anzahl, txt, preis = matches[0]
             except ValueError, e:
-                raise ValidationError(PARSE_ERROR % (line, e))
+                raise ValidationError(PARSE_ERROR % (escape(line), e))
 
             try:
                 anzahl = int(anzahl)
                 preis = int(preis)
             except TypeError, e:
-                raise ValidationError(PARSE_ERROR % (line, e))
+                raise ValidationError(PARSE_ERROR % (escape(line), e))
 
             result.append((anzahl, txt, preis,))
 
         return result
 
+
+BILL_TABLE = """<table width="100%" border="1">
+<tbody>
+<tr><th>Anzahl</th><th>Beschreibung</th><th>Einzelpreis</th></tr>
+<tr>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>"""
 
 class CreateBillForm(forms.Form):
     """
@@ -105,12 +122,8 @@ class CreateBillForm(forms.Form):
     positionen = PositionenField(
         min_length = 10,
         widget=forms.Textarea(attrs={'rows': '10'}),
-        initial=(
-            "1x BeispielPosition eins a 5€\n"
-            "2x Noch eine Position a 10€\n"
-            "4x die letzte Position a 20€\n"
-        ),
-        help_text=_("Die eizelnen Rechnungspositionen"),
+        initial=BILL_TABLE,
+        help_text=_("Die eizelnen Rechnungspositionen 2"),
     )
 
 
@@ -222,9 +235,30 @@ class PyRM_plugin(PyLucidBasePlugin):
             form = CreateBillForm()
 
         context["form"] = form
+
+        self._add_tiny_mce(js_filename="create_bill_tinymce")
+
         self._render_template("create_bill", context)#, debug=True)
 
-
+    def _add_tiny_mce(self, js_filename):
+        """
+        Activate TinyMCE and load the init js script (js_filename), too.
+        """
+        # url to e.g. /media/PyLucid/tiny_mce/tiny_mce.js
+        tiny_mce_url = posixpath.join(
+            self.URLs["PyLucid_media_url"], "tiny_mce", "tiny_mce.js"
+        )
+        # url to e.g. .../internal_page/PyRM_plugin/js_filename.js
+        use_tiny_mce_url = self.internal_page.get_url(
+            js_filename, slug="js"
+        )
+        # Add external media files
+        for url in (tiny_mce_url, use_tiny_mce_url):
+            # Add tiny_mce.js to
+            self.context["js_data"].append({
+                "plugin_name": self.plugin_name,
+                "url": url,
+            })
 
 
 

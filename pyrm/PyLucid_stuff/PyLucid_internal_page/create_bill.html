@@ -18,7 +18,7 @@
 {% endif %}
 
 <fieldset><legend><strong>Rechnung erstellen</strong></legend>
-<form method="post" action=".">
+<form method="post" action="." id="create_bill_form">
 <ul id="input_fields">
     {% for field in form %}
         <li title="{{ field.help_text }}" class="{{ field.html_name }}">

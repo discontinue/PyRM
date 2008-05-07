@@ -1,0 +1,56 @@
+fieldset {
+    padding: 3px;
+    margin: 3px;
+    border: 1px solid #000;
+}
+legend {
+    padding: 2px;
+    border: 1px solid #000;
+    background-color: #FFF;
+}
+/* -------------------------------------------------------------------------- */
+#page_preview {
+    background-color: #EEE;
+}
+#page_preview, #page_preview legend {
+    border-color: #A00;
+}
+/* -------------------------------------------------------------------------- */
+#create_bill_form ul {
+    list-style-type:none;
+    padding: 0px;
+}
+#create_bill_form li {
+    padding: 4px;
+}
+/* -------------------------------------------------------------------------- */
+#input_fields label, #input_fields input, #input_fields select {
+    /* make all fields except the textarea a little bit smaller */
+    font-size: 0.8em;
+}
+#input_fields .field_help_text {
+    font-size:0.7em;
+}
+#input_fields label {
+    float: left;
+    padding-right: 4px;
+    text-align: right;
+    width: 9em;
+}
+#input_fields input, #input_fields select {
+    width: 35%;
+}
+#input_fields .field_help_text {
+    /* setup the help text for keywords and description */
+    /* put the help text for bigger input field in the second line */
+    display: block;
+    padding-left: 14em;
+}
+#input_fields .positionen label, #input_fields .positionen .field_help_text {
+    /* hide label and help_text around the textarea */
+    display:none;
+}
+.errorlist {
+    /* newforms errors */
+    border: 1px solid red;
+}
