@@ -16,6 +16,8 @@
 """
 from django.db import models
 
+#______________________________________________________________________________
+
 KONTOARTEN = (
     ("A", "Aktivkonto"),
     ("P", "Passivkonto"),
@@ -35,8 +37,10 @@ GESCHLECHTER = (
     ('W', 'weiblich'),
 )
 
+#______________________________________________________________________________
 
 class Ort(models.Model):
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=30)
 
     class Admin:
@@ -49,15 +53,52 @@ class Ort(models.Model):
     def __unicode__(self):
         return self.name
 
+#______________________________________________________________________________
 
 class Firma(models.Model):
     """
-    gewerbliche Auslandskunden mit gültiger UID arbeitest du mit Netto-VKP ohne die MwSt dazuzurechnen. Dafür muss dann aber auch auf der Rechnung drauf stehen, dass es sich um so einen Kunden handelt.
+
     """
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=30)
-    zusatz = models.TextField(blank=True,
-        help_text="Für zusätze auf jeder Rechnung wie z.B. LieferrantenNr."
+
+    telefon = PhoneNumberField(blank=True, null=True)
+    mobile = PhoneNumberField(blank=True, null=True)
+
+    strasse = models.CharField(max_length=30, blank=True, null=True)
+    plz = models.PositiveIntegerField(blank=True, null=True)
+    ort = models.ForeignKey(Ort, blank=True, null=True)
+
+    lieferrantennr = models.CharField(max_length=30,
+        help_text=(
+            "Lieferrantennummer bei dieser Firma, falls vorhanden."
+            " Wird auf jeder Rechnung aufgeführt"
+        )
     )
+    UStIdNr = models.CharField(max_length=30,
+        help_text="Umsatzsteuer-Identifikationsnummer"
+    )
+
+    #__________________________________________________________________________
+    # Konto daten
+
+    kontonr = models.CharField(blank=True, null=True,
+        help_text = "Bank Kontonummer",
+    )
+    blz = models.CharField(blank=True, null=True,
+        help_text = "Bankleitzahl",
+    ) # http://de.wikipedia.org/wiki/Bankleitzahl
+    iban = models.CharField(blank=True, null=True,
+        help_text = "International Bank Account Number",
+    ) # http://de.wikipedia.org/wiki/International_Bank_Account_Number
+    bic = models.CharField(blank=True, null=True,
+        help_text = "BIC bzw. Bank Identifier Code (auch SWIFT-Adresse)",
+    ) # http://de.wikipedia.org/wiki/SWIFT
+
+    #__________________________________________________________________________
+
+    notizen = models.TextField(blank=True, null=True)
+
     class Admin:
         pass
 
@@ -68,11 +109,43 @@ class Firma(models.Model):
     def __unicode__(self):
         return self.name
 
+#______________________________________________________________________________
 
 class Person(models.Model):
+    id = models.AutoField(primary_key=True)
+
     vorname = models.CharField(max_length=30)
     nachname = models.CharField(max_length=30)
+    geschlecht = models.CharField(max_length=1, choices=GESCHLECHTER)
+
+    strasse = models.CharField(max_length=30, blank=True, null=True)
+    plz = models.PositiveIntegerField(blank=True, null=True)
+    ort = models.ForeignKey(Ort, blank=True, null=True)
+
     email = models.EmailField(blank=True)
+    telefon = models.PhoneNumberField(blank=True, null=True)
+    mobile = models.PhoneNumberField(blank=True, null=True)
+    webseite = models.URLField(blank=True, null=True)
+
+    #__________________________________________________________________________
+    # Konto daten
+
+    kontonr = models.CharField(blank=True, null=True,
+        help_text = "Bank Kontonummer",
+    )
+    blz = models.CharField(blank=True, null=True,
+        help_text = "Bankleitzahl",
+    ) # http://de.wikipedia.org/wiki/Bankleitzahl
+    iban = models.CharField(blank=True, null=True,
+        help_text = "International Bank Account Number",
+    ) # http://de.wikipedia.org/wiki/International_Bank_Account_Number
+    bic = models.CharField(blank=True, null=True,
+        help_text = "BIC bzw. Bank Identifier Code (auch SWIFT-Adresse)",
+    ) # http://de.wikipedia.org/wiki/SWIFT
+
+    #__________________________________________________________________________
+
+    notizen = models.TextField(blank=True, null=True)
 
     class Admin:
         pass
@@ -84,18 +157,29 @@ class Person(models.Model):
     def __unicode__(self):
         return " ".join((self.vorname, self.nachname))
 
+#______________________________________________________________________________
 
 class Kunde(models.Model):
-    kundennummer = models.IntegerField()
-    geschlecht = models.CharField(max_length=1, choices=GESCHLECHTER)
-    person = models.ForeignKey(Person)
+    id = models.AutoField(primary_key=True,
+        help_text="ID - Kundennummer"
+    )
+    person = models.ForeignKey(Person, null=True, blank=True)
     anzeigen = models.BooleanField(
         help_text="Name der Person mit anzeigen, wenn es eine Firma ist?"
     )
     firma = models.ForeignKey(Firma, null=True, blank=True)
-    strasse = models.CharField(max_length=30)
-    plz = models.PositiveIntegerField()
-    ort = models.ForeignKey(Ort)
+
+    lieferstop_datum = models.DateField()
+    lieferstop_grund = models.TextField(blank=True, null=True)
+
+    zahlungsziel = PositiveIntegerField(null=True, blank=True,
+        help_text="Zahlungseingangsdauer in Tagen"
+    )
+    mahnfrist = PositiveIntegerField(null=True, blank=True,
+        help_text="Frist in Tagen."
+    )
+
+    notizen = models.TextField(blank=True, null=True)
 
     class Admin:
         pass
@@ -107,6 +191,22 @@ class Kunde(models.Model):
     def __unicode__(self):
         return self.person
 
+#______________________________________________________________________________
+
+class Lieferant(models.Model):
+    id = models.AutoField(primary_key=True,
+        help_text="ID - Lieferranten Nummer"
+    )
+    person = models.ForeignKey(Person, null=True, blank=True)
+    firma = models.ForeignKey(Firma, null=True, blank=True)
+
+    zahlungsziel = PositiveIntegerField(null=True, blank=True,
+        help_text="Zahlungseingangsdauer in Tagen"
+    )
+
+    notizen = models.TextField(blank=True, null=True)
+
+#______________________________________________________________________________
 
 class Konto(models.Model):
     """
@@ -130,6 +230,7 @@ class Konto(models.Model):
     def __unicode__(self):
         return self.name
 
+#______________________________________________________________________________
 
 class RechnungsPositionManager(models.Manager):
     def all_with_summ(self):
@@ -170,9 +271,12 @@ class RechnungsPositionManager(models.Manager):
 class RechnungsPosition(models.Model):
     objects = RechnungsPositionManager()
 
+    id = models.AutoField(primary_key=True)
+
     anzahl = models.PositiveIntegerField()
     beschreibung = models.TextField()
     einzelpreis = models.FloatField()
+
     rechnung = models.ForeignKey("Rechnung", related_name="positionen")
 
     class Admin:
@@ -188,6 +292,7 @@ class RechnungsPosition(models.Model):
     def __unicode__(self):
         return self.beschreibung
 
+#______________________________________________________________________________
 
 class RechnungManager(models.Manager):
     def create(self, data_dict):
@@ -220,7 +325,10 @@ class Rechnung(models.Model):
     """
     objects = RechnungManager()
 
-    id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True,
+        help_text="ID - Rechnungsnummer"
+    )
+
     bestellnummer = models.CharField(max_length=128, null=True, blank=True)
     datum = models.DateField()
     konto = models.ForeignKey(
@@ -231,10 +339,25 @@ class Rechnung(models.Model):
         null=True, blank=True
     )
     kunde = models.ForeignKey(Kunde, null=True, blank=True)
-    lieferdatum = models.DateField(null=True, blank=True)
+
+    anschrift = models.TextField(
+        help_text="Komplette Anschrift",
+    )
+
+    lieferdatum = models.DateField(null=True, blank=True,
+        help_text="Zeitpunkt der Leistungserbringung"
+    )
+    versand = models.DateField(null=True, blank=True,
+        help_text="Versanddatum der Rechnung."
+    )
+
     valuta = models.DateField(null=True, blank=True,
         help_text="Datum der Buchung laut Kontoauszug."
     )
+    mahnstufe = PositiveIntegerField(default=0,
+        help_text="Anzahl der verschickten Mahnungen."
+    )
+
     summe = models.FloatField(
         help_text="Wird automatisch aus den Rechnungspositionen erechnet.",
         null=True, blank=True
