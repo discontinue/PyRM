@@ -62,8 +62,8 @@ class Firma(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=30)
 
-    telefon = PhoneNumberField(blank=True, null=True)
-    mobile = PhoneNumberField(blank=True, null=True)
+    telefon = models.PhoneNumberField(blank=True, null=True)
+    mobile = models.PhoneNumberField(blank=True, null=True)
 
     strasse = models.CharField(max_length=30, blank=True, null=True)
     plz = models.PositiveIntegerField(blank=True, null=True)
@@ -172,10 +172,10 @@ class Kunde(models.Model):
     lieferstop_datum = models.DateField()
     lieferstop_grund = models.TextField(blank=True, null=True)
 
-    zahlungsziel = PositiveIntegerField(null=True, blank=True,
+    zahlungsziel = models.PositiveIntegerField(null=True, blank=True,
         help_text="Zahlungseingangsdauer in Tagen"
     )
-    mahnfrist = PositiveIntegerField(null=True, blank=True,
+    mahnfrist = models.PositiveIntegerField(null=True, blank=True,
         help_text="Frist in Tagen."
     )
 
@@ -200,7 +200,7 @@ class Lieferant(models.Model):
     person = models.ForeignKey(Person, null=True, blank=True)
     firma = models.ForeignKey(Firma, null=True, blank=True)
 
-    zahlungsziel = PositiveIntegerField(null=True, blank=True,
+    zahlungsziel = models.PositiveIntegerField(null=True, blank=True,
         help_text="Zahlungseingangsdauer in Tagen"
     )
 
@@ -354,7 +354,7 @@ class Rechnung(models.Model):
     valuta = models.DateField(null=True, blank=True,
         help_text="Datum der Buchung laut Kontoauszug."
     )
-    mahnstufe = PositiveIntegerField(default=0,
+    mahnstufe = models.PositiveIntegerField(default=0,
         help_text="Anzahl der verschickten Mahnungen."
     )
 
