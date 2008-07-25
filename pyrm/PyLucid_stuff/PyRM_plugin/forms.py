@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-    PyRM - PyLucid plugin
-    ~~~~~~~~~~~~~~~~~~~~~
+    PyRM - forms
+    ~~~~~~~~~~~~
 
     http://sourceforge.net/projects/pyrm/
 
@@ -17,84 +17,119 @@
 
 __version__= "$Rev: $"
 
-# Python
 import posixpath, re, datetime
 
-# django
 from django import forms
 from django.db import transaction
 from django.utils.encoding import smart_str
-from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
-# PyLucid
 from PyLucid.tools.utils import escape
 from PyLucid.system.BasePlugin import PyLucidBasePlugin
 
-# PyRM
 from PyRM.models import Konto, Kunde, RechnungsPosition, Rechnung
 
-# PyRM plugin
-from PyLucid.plugins_external.PyRM_plugin.forms import CreateBillForm
+# Datumsformat bei Rechnungserstellung
+DATE_FORMAT = _(u"%d.%m.%Y")
+
+# Anzahl der Rechnungen in der Übersicht
+DISPLAY_BILL_LIMIT = 5
+
+PARSE_ERROR = "Kann Rechnungspositionen nicht parsen! Fehler in Zeile '%s': %s"
+RE_TR = re.compile(r".*?<tr>(.*?)</tr>.*?(?isx)")
+RE_TD = re.compile(r".*?<td>(.*?)</td>.*?(?isx)")
+
+class PositionenField(forms.CharField):
+#    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
+#        self.max_length, self.min_length = max_length, min_length
+#        super(CharField, self).__init__(*args, **kwargs)
+    def clean(self, value):
+        """
+        Parse the tinymce table
+        """
+        # Validates max_length and min_length
+        value = super(PositionenField, self).clean(value)
+
+        result = []
+
+        trs = RE_TR.findall(value)[1:]
+        for tr in trs:
+            tr = tr.replace("&nbsp;", " ")
+
+            cells = RE_TD.findall(tr)
+            cells = [i.strip() for i in cells]
+            if cells==["","",""]:
+                # Skip empty lines
+                continue
+
+            anzahl, txt, preis = cells
+
+            # Remove html text paragraph formatter
+            txt = txt.replace("<p>", "")
+            txt = txt.replace("</p>", "\n")
+            txt = txt.replace("<br />", "\n")
+            txt = re.sub("[\r\n]+", "\n", txt)
+            txt = txt.strip()
+
+            if anzahl == "":
+                anzahl = 0
+            else:
+                anzahl = int(anzahl)
+
+            if preis == "":
+                preis = 0
+            else:
+                preis = int(preis)
+
+            result.append((anzahl, txt, preis,))
+        return result
 
 
-## Datumsformat bei Rechnungserstellung
-#DATE_FORMAT = _(u"%d.%m.%Y")
-#
-## Anzahl der Rechnungen in der Übersicht
-#DISPLAY_BILL_LIMIT = 5
-#
-#PARSE_ERROR = "Kann Rechnungspositionen nicht parsen! Fehler in Zeile '%s': %s"
-#RE_TR = re.compile(r".*?<tr>(.*?)</tr>.*?(?isx)")
-#RE_TD = re.compile(r".*?<td>(.*?)</td>.*?(?isx)")
+
+BILL_TABLE = """<table width="100%" border="1">
+<tbody>
+<tr><th>Anzahl</th><th>Beschreibung</th><th>Einzelpreis</th></tr>
+<tr>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>"""
+
+class CreateBillForm(forms.Form):
+    """
+    Form for creating a bill.
+    http://www.djangoproject.com/documentation/newforms/
+    """
+    bestellnummer = forms.IntegerField(required=False)
+    datum = forms.DateField(
+        initial=datetime.date.today().strftime(smart_str(DATE_FORMAT)),
+        input_formats=[DATE_FORMAT]
+    )
+
+    kunde = forms.ModelChoiceField(Konto.objects.all(), required=False)
+    ggkto = forms.ModelChoiceField(Konto.objects.all(), required=False)
+
+    lieferdatum = forms.DateField(input_formats=DATE_FORMAT, required=False)
+
+#    anzahl = forms.IntegerField()
+#    beschreibung = forms.CharField()
+#    einzelpreis = forms.IntegerField()
+    positionen = PositionenField(
+        min_length = 10,
+        widget=forms.Textarea(attrs={'rows': '10'}),
+        initial=BILL_TABLE,
+        help_text=_("Die eizelnen Rechnungspositionen 2"),
+    )
 
 
 class PyRM_plugin(PyLucidBasePlugin):
-
-    def install(self):
-        """
-        Erstellt die nötigen Seite in PyLucid.
-        """
-        from PyLucid.models import Page
-
-        # Default Einstellungen für alle Seiten
-        defaults = {
-            "template"      : self.current_page.template,
-            "style"         : self.current_page.style,
-            "markup"        : 0, # html
-            "createby"      : self.request.user,
-            "lastupdateby"  : self.request.user,
-        }
-
-        PyRM_root_page, _ = Page.objects.get_or_create(
-            name    = "PyRM",
-            content = "{% lucidTag PyRM_plugin.summary %}",
-            parent  = None, # Root
-            ** defaults
-        )
-        PyRM_root_page.save()
-
-        page_infos = (
-            ("Rechnung erstellen", "create_bill"),
-            ("Rechnungs Übersicht", "bills"),
-            ("Kunden", "customers"),
-        )
-
-        for page_name, method_name in page_infos:
-            page, _ = Page.objects.get_or_create(
-                name    = page_name,
-                content = "{%% lucidTag PyRM_plugin.%s %%}" % method_name,
-                parent  = PyRM_root_page,
-                ** defaults
-            )
-            page.save()
-
-        self.page_msg("Alle PyRM Seiten erstellt.")
-
-        # refresh_curent_page
-        self.current_page.id = PyRM_root_page.id
-        self.current_page = self.context["PAGE"] = PyRM_root_page
-
 
     def summary(self):
         """

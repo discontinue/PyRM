@@ -15,6 +15,7 @@
     :license: GNU GPL v3, see LICENSE.txt for more details.
 """
 from django.db import models
+from django.contrib import admin
 
 #______________________________________________________________________________
 
@@ -43,15 +44,17 @@ class Ort(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=30)
 
-    class Admin:
-        pass
-
     class Meta:
         verbose_name = "Ort"
         verbose_name_plural = "Orte"
 
     def __unicode__(self):
         return self.name
+
+class OrtAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(Ort, OrtAdmin)
 
 #______________________________________________________________________________
 
@@ -99,15 +102,18 @@ class Firma(models.Model):
 
     notizen = models.TextField(blank=True, null=True)
 
-    class Admin:
-        pass
-
     class Meta:
         verbose_name = "Firma"
         verbose_name_plural = "Firmen"
 
     def __unicode__(self):
         return self.name
+
+
+class FirmaAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(Firma, FirmaAdmin)
 
 #______________________________________________________________________________
 
@@ -147,15 +153,18 @@ class Person(models.Model):
 
     notizen = models.TextField(blank=True, null=True)
 
-    class Admin:
-        pass
-
     class Meta:
         verbose_name = "Person"
         verbose_name_plural = "Personen"
 
     def __unicode__(self):
         return " ".join((self.vorname, self.nachname))
+
+
+class PersonAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(Person, PersonAdmin)
 
 #______________________________________________________________________________
 
@@ -181,15 +190,18 @@ class Kunde(models.Model):
 
     notizen = models.TextField(blank=True, null=True)
 
-    class Admin:
-        pass
-
     class Meta:
         verbose_name = "Kunde"
         verbose_name_plural = "Kunden"
 
     def __unicode__(self):
         return self.person
+
+
+class KundeAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(Kunde, KundeAdmin)
 
 #______________________________________________________________________________
 
@@ -206,6 +218,11 @@ class Lieferant(models.Model):
 
     notizen = models.TextField(blank=True, null=True)
 
+
+class LieferantAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(Lieferant, LieferantAdmin)
 #______________________________________________________________________________
 
 class Konto(models.Model):
@@ -217,18 +234,21 @@ class Konto(models.Model):
     kontoart = models.CharField(max_length=1, choices=KONTOARTEN)
     mwst = models.CharField(max_length=1, choices=MWST, null=True, blank=True)
 
-    class Admin:
-        list_display = (
-            "datev_nummer", "kontoart", "mwst", "name"
-        )
-#        list_display_links = ("shortcut",)
-
     class Meta:
         verbose_name = "Konto"
         verbose_name_plural = "Konten"
 
     def __unicode__(self):
         return self.name
+
+
+class KontoAdmin(admin.ModelAdmin):
+    list_display = (
+        "datev_nummer", "kontoart", "mwst", "name"
+    )
+#        list_display_links = ("shortcut",)
+
+admin.site.register(Konto, KontoAdmin)
 
 #______________________________________________________________________________
 
@@ -279,18 +299,20 @@ class RechnungsPosition(models.Model):
 
     rechnung = models.ForeignKey("Rechnung", related_name="positionen")
 
-    class Admin:
-        list_display = (
-            "anzahl", "beschreibung", "einzelpreis", "rechnung"
-        )
-#        list_display_links = ("shortcut",)
-
     class Meta:
         verbose_name = "Rechnungs Position"
         verbose_name_plural = "Rechnungs Positionen"
 
     def __unicode__(self):
         return self.beschreibung
+
+class RechnungsPositionAdmin(admin.ModelAdmin):
+    list_display = (
+        "anzahl", "beschreibung", "einzelpreis", "rechnung"
+    )
+#        list_display_links = ("shortcut",)
+
+admin.site.register(RechnungsPosition, RechnungsPositionAdmin)
 
 #______________________________________________________________________________
 
@@ -363,9 +385,6 @@ class Rechnung(models.Model):
         null=True, blank=True
     )
 
-    class Admin:
-        pass
-
     class Meta:
         verbose_name = "Rechnung"
         verbose_name_plural = "Rechnungen"
@@ -374,3 +393,7 @@ class Rechnung(models.Model):
     def __unicode__(self):
         return u"Rechnung Nr.%s" % self.id
 
+class RechnungAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(Rechnung, RechnungAdmin)
