@@ -21,6 +21,8 @@ __version__= "$Rev: $"
 import posixpath, re, datetime
 
 # django
+from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django import forms
 from django.db import transaction
 from django.utils.encoding import smart_str
@@ -37,6 +39,8 @@ from PyRM.models import Konto, Kunde, RechnungsPosition, Rechnung
 # PyRM plugin
 from PyLucid.plugins_external.PyRM_plugin.forms import CreateBillForm
 
+if "PyRM" not in settings.INSTALLED_APPS:
+    raise ImproperlyConfigured("PyRM is not in settings.INSTALLED_APPS!")
 
 ## Datumsformat bei Rechnungserstellung
 #DATE_FORMAT = _(u"%d.%m.%Y")
@@ -54,6 +58,8 @@ class PyRM_plugin(PyLucidBasePlugin):
     def install(self):
         """
         Erstellt die nötigen Seite in PyLucid.
+
+        Macht eigentlich auch PyRM_PyLucid_setup.py !!!
         """
         from PyLucid.models import Page
 

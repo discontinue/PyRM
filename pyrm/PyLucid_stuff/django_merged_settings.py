@@ -15,6 +15,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     "PyLucid",
+    "PyLucid.system.PyLucidPlugins",
     "PyRM"
 )
 

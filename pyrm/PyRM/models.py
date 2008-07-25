@@ -58,19 +58,64 @@ admin.site.register(Ort, OrtAdmin)
 
 #______________________________________________________________________________
 
-class Firma(models.Model):
+class FirmaPersonBaseModel(models.Model):
     """
-
+    Alle gemeinsamen Felder bei Firma/Peron Model.
     """
-    id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=30)
-
+    #__________________________________________________________________________
+    email = models.EmailField(blank=True)
     telefon = models.PhoneNumberField(blank=True, null=True)
     mobile = models.PhoneNumberField(blank=True, null=True)
 
     strasse = models.CharField(max_length=30, blank=True, null=True)
     plz = models.PositiveIntegerField(blank=True, null=True)
     ort = models.ForeignKey(Ort, blank=True, null=True)
+
+    notizen = models.TextField(blank=True, null=True)
+
+    #__________________________________________________________________________
+    # Konto daten
+
+    kontonr = models.CharField(
+
+        max_length=128, # FIXME
+        blank=True, null=True,
+        help_text = "Bank Kontonummer",
+    )
+
+    # Bankleitzahl
+    # http://de.wikipedia.org/wiki/Bankleitzahl
+    # zwei Dreierblöcken und einem Zweierblock
+    # bsp.: "123 456 78"
+    blz = models.CharField(
+        max_length=10, # 8 Zahlen + zwei Leerzeichen
+        blank=True, null=True,
+        help_text = "Bankleitzahl",
+    )
+
+    # IBAN
+    # http://de.wikipedia.org/wiki/International_Bank_Account_Number
+    # Unterschiedliche Länge!
+    iban = models.CharField(
+        max_length=38, # max. 31 Ziffern + 7 Leerzeichen
+        blank=True, null=True,
+        help_text = "International Bank Account Number",
+    )
+
+    # SWIFT-BIC
+    # http://de.wikipedia.org/wiki/SWIFT
+    bic = models.CharField(
+        max_length=11, # max. 11 Ziffern (keine Leerzeichen)
+        blank=True, null=True,
+        help_text = "BIC bzw. Bank Identifier Code (auch SWIFT-Adresse)",
+    )
+
+#______________________________________________________________________________
+
+class Firma(FirmaPersonBaseModel):
+    id = models.AutoField(primary_key=True)
+
+    name = models.CharField(max_length=30)
 
     lieferrantennr = models.CharField(max_length=30,
         help_text=(
@@ -81,22 +126,6 @@ class Firma(models.Model):
     UStIdNr = models.CharField(max_length=30,
         help_text="Umsatzsteuer-Identifikationsnummer"
     )
-
-    #__________________________________________________________________________
-    # Konto daten
-
-    kontonr = models.CharField(blank=True, null=True,
-        help_text = "Bank Kontonummer",
-    )
-    blz = models.CharField(blank=True, null=True,
-        help_text = "Bankleitzahl",
-    ) # http://de.wikipedia.org/wiki/Bankleitzahl
-    iban = models.CharField(blank=True, null=True,
-        help_text = "International Bank Account Number",
-    ) # http://de.wikipedia.org/wiki/International_Bank_Account_Number
-    bic = models.CharField(blank=True, null=True,
-        help_text = "BIC bzw. Bank Identifier Code (auch SWIFT-Adresse)",
-    ) # http://de.wikipedia.org/wiki/SWIFT
 
     #__________________________________________________________________________
 
@@ -117,41 +146,14 @@ admin.site.register(Firma, FirmaAdmin)
 
 #______________________________________________________________________________
 
-class Person(models.Model):
+class Person(FirmaPersonBaseModel):
     id = models.AutoField(primary_key=True)
 
     vorname = models.CharField(max_length=30)
     nachname = models.CharField(max_length=30)
     geschlecht = models.CharField(max_length=1, choices=GESCHLECHTER)
 
-    strasse = models.CharField(max_length=30, blank=True, null=True)
-    plz = models.PositiveIntegerField(blank=True, null=True)
-    ort = models.ForeignKey(Ort, blank=True, null=True)
-
-    email = models.EmailField(blank=True)
-    telefon = models.PhoneNumberField(blank=True, null=True)
-    mobile = models.PhoneNumberField(blank=True, null=True)
-    webseite = models.URLField(blank=True, null=True)
-
     #__________________________________________________________________________
-    # Konto daten
-
-    kontonr = models.CharField(blank=True, null=True,
-        help_text = "Bank Kontonummer",
-    )
-    blz = models.CharField(blank=True, null=True,
-        help_text = "Bankleitzahl",
-    ) # http://de.wikipedia.org/wiki/Bankleitzahl
-    iban = models.CharField(blank=True, null=True,
-        help_text = "International Bank Account Number",
-    ) # http://de.wikipedia.org/wiki/International_Bank_Account_Number
-    bic = models.CharField(blank=True, null=True,
-        help_text = "BIC bzw. Bank Identifier Code (auch SWIFT-Adresse)",
-    ) # http://de.wikipedia.org/wiki/SWIFT
-
-    #__________________________________________________________________________
-
-    notizen = models.TextField(blank=True, null=True)
 
     class Meta:
         verbose_name = "Person"
@@ -343,7 +345,6 @@ class RechnungManager(models.Manager):
 
 class Rechnung(models.Model):
     """
-    mahnstufe ?
     """
     objects = RechnungManager()
 

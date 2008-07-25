@@ -14,35 +14,66 @@
     -install PyRM plugin
 """
 
-import os
+import sys, os
 from pprint import pprint
 
 os.environ["DJANGO_SETTINGS_MODULE"] = "PyRM_settings"
+from django.conf import settings
+
+print
+print "WICHTIG:"
+print "Es werden alle Daten der aktuellen installation gelöscht!!!"
+print
+print "Verwendet werden:"
+print "setting modul.:", os.environ["DJANGO_SETTINGS_MODULE"]
+print "Datenbank.....:", settings.DATABASE_NAME
+print
+try:
+    raw_input("weiter mit ENTER, abbruch mit Strg-C...")
+except KeyboardInterrupt:
+    sys.exit(0)
+
 
 from django.core import management
 
 import PyRM_settings
 
-from PyLucid.models import Page, Plugin
-from PyLucid.system.detect_page import get_default_page
+from PyLucid.models import Template, Style, Page, Plugin
+from django.contrib.auth.models import User
+#from PyLucid.system.detect_page import get_default_page
 from PyLucid.system.plugin_manager import install_plugin, auto_install_plugins
 
+sys.path.insert(0, "..") # Add PyLucid root
+from tests.utils.FakeRequest import FakePageMsg
 
-class PageMaker(object):
-    def __init__(self, default_page):
-        default_data = default_page.__dict__
-        for key in ("id", "lastupdatetime", "createtime", "parent_id",):
-            del(default_data[key])
-        default_data["markup"] = 2 # TinyTextile
-        self.default_data = default_data
 
-    def create_page(self, data):
-        page_data = self.default_data.copy()
-        page_data.update(data)
-        pprint(page_data)
-        p = Page(**page_data)
-        p.save()
-        return p
+#print Template.objects.all()
+#print Style.objects.all()
+#print User.objects.all()
+try:
+    a_user = User.objects.get(is_superuser=True)[0]
+except:
+    a_user = User.objects.all()[0]
+
+print "Nutzt User:", a_user
+
+
+# Default Einstellungen für alle Seiten
+PAGE_DEFAULTS = {
+    "template"      : Template.objects.get(name = "small_white"),
+    "style"         : Style.objects.get(name = "small_white"),
+    "markup"        : 0, # html
+    "createby"      : a_user,
+    "lastupdateby"  : a_user,
+}
+
+def create_page(data):
+    page_data = PAGE_DEFAULTS.copy()
+    page_data.update(data)
+    pprint(page_data)
+    p = Page(**page_data)
+    p.save()
+    return p
 
 
 def delete_PyRM_tables():
@@ -57,45 +88,41 @@ def syncdb():
 
 
 def create_pages():
-    pages = Page.objects.all()
-    print pages
-
-    # Get default page data
-    default_page = get_default_page(request=None)
-    p = PageMaker(default_page)
-
     print "Delete all pages...",
     Page.objects.all().delete()
     print "OK"
 
     print "Create pages..."
-    index_page = p.create_page({
+    index_page = create_page({
+        "name":u"PyRM Login",
+        "title": u"Python Rechnungsmanager - Login",
+        "content": "{{ login_link }}",
+    })
+    PyRM_root = create_page({
         "name":u"PyRM",
         "title": u"Python Rechnungsmanager",
-        "content": (
-            u"h2. PyRM\n\n"
-            "{% lucidTag sub_menu %}"
-        ),
+        "content": "{% lucidTag sub_menu %}",
+        "parent": index_page,
     })
-    p.create_page({
+    create_page({
         "name":u"Übersicht",
         "content":"{% lucidTag PyRM_plugin.summary %}",
-        "parent": index_page,
+        "parent": PyRM_root,
     })
-    p.create_page({
+    create_page({
         "name":u"Kunden",
         "content":"{% lucidTag PyRM_plugin.customers %}",
-        "parent": index_page,
+        "parent": PyRM_root,
     })
-    page = p.create_page({
+    page = create_page({
         "name":u"Rechnungen",
         "content":"{% lucidTag PyRM_plugin.bills %}",
-        "parent": index_page,
+        "parent": PyRM_root,
     })
-    page = p.create_page({
-        "name":u"erstellen",
+    page = create_page({
+        "name":u"Rechnung erstellen",
         "content":"{% lucidTag PyRM_plugin.create_bill %}",
-        "parent": page,
+        "parent": PyRM_root,
     })
 
 
@@ -103,16 +130,20 @@ def create_pages():
     print pages
 
 def setup_Plugins():
+    fake_page_msg  = FakePageMsg()
+    
     # install all internal plugin
-    auto_install_plugins(debug=True, extra_verbose=True)
+    auto_install_plugins(debug=False, page_msg = fake_page_msg, verbosity=0)
 
     # install PyRM plugin
     install_plugin(
         package_name = "PyLucid.plugins_external",
-        plugin_name = "PyRM_plugin",
-        debug = True,
-        active = True,
-        extra_verbose=True
+        plugin_name  = "PyRM_plugin",
+
+        page_msg  = fake_page_msg,
+        verbosity = 2,
+        user      = a_user,
+        active    = True
     )
 
 
