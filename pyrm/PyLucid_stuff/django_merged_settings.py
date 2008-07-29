@@ -1,6 +1,14 @@
 
 from PyLucid.settings import *
 
+DEBUG = True
+#DEBUG = False
+
+#TEMPLATE_DEBUG = False
+TEMPLATE_DEBUG = True
+
+INTERNAL_IPS = ("localhost", "127.0.0.1", "192.168.7.3")
+
 # Database connection info.
 DATABASE_ENGINE = 'sqlite3'    # 'postgresql', 'mysql', 'sqlite3' or 'ado_mssql'.
 DATABASE_NAME = 'PyRM.db3'     # Or path to database file if using sqlite3.
@@ -21,3 +29,9 @@ INSTALLED_APPS = (
 
 # Don't use the cache
 CACHE_BACKEND = "dummy:///"
+
+#______________________________________________________________________________
+# PyRM
+
+DEFAULT_ZAHLUNGSZIEL = 7
+DEFAULT_MAHNFRIST = 30

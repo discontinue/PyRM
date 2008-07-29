@@ -46,7 +46,7 @@ if "PyRM" not in settings.INSTALLED_APPS:
 #DATE_FORMAT = _(u"%d.%m.%Y")
 #
 ## Anzahl der Rechnungen in der Übersicht
-#DISPLAY_BILL_LIMIT = 5
+DISPLAY_BILL_LIMIT = 5
 #
 #PARSE_ERROR = "Kann Rechnungspositionen nicht parsen! Fehler in Zeile '%s': %s"
 #RE_TR = re.compile(r".*?<tr>(.*?)</tr>.*?(?isx)")
@@ -55,51 +55,51 @@ if "PyRM" not in settings.INSTALLED_APPS:
 
 class PyRM_plugin(PyLucidBasePlugin):
 
-    def install(self):
-        """
-        Erstellt die nötigen Seite in PyLucid.
-
-        Macht eigentlich auch PyRM_PyLucid_setup.py !!!
-        """
-        from PyLucid.models import Page
-
-        # Default Einstellungen für alle Seiten
-        defaults = {
-            "template"      : self.current_page.template,
-            "style"         : self.current_page.style,
-            "markup"        : 0, # html
-            "createby"      : self.request.user,
-            "lastupdateby"  : self.request.user,
-        }
-
-        PyRM_root_page, _ = Page.objects.get_or_create(
-            name    = "PyRM",
-            content = "{% lucidTag PyRM_plugin.summary %}",
-            parent  = None, # Root
-            ** defaults
-        )
-        PyRM_root_page.save()
-
-        page_infos = (
-            ("Rechnung erstellen", "create_bill"),
-            ("Rechnungs Übersicht", "bills"),
-            ("Kunden", "customers"),
-        )
-
-        for page_name, method_name in page_infos:
-            page, _ = Page.objects.get_or_create(
-                name    = page_name,
-                content = "{%% lucidTag PyRM_plugin.%s %%}" % method_name,
-                parent  = PyRM_root_page,
-                ** defaults
-            )
-            page.save()
-
-        self.page_msg("Alle PyRM Seiten erstellt.")
-
-        # refresh_curent_page
-        self.current_page.id = PyRM_root_page.id
-        self.current_page = self.context["PAGE"] = PyRM_root_page
+#    def install(self):
+#        """
+#        Erstellt die nötigen Seite in PyLucid.
+#
+#        Macht eigentlich auch PyRM_PyLucid_setup.py !!!
+#        """
+#        from PyLucid.models import Page
+#
+#        # Default Einstellungen für alle Seiten
+#        defaults = {
+#            "template"      : self.current_page.template,
+#            "style"         : self.current_page.style,
+#            "markup"        : 0, # html
+#            "createby"      : self.request.user,
+#            "lastupdateby"  : self.request.user,
+#        }
+#
+#        PyRM_root_page, _ = Page.objects.get_or_create(
+#            name    = "PyRM",
+#            content = "{% lucidTag PyRM_plugin.summary %}",
+#            parent  = None, # Root
+#            ** defaults
+#        )
+#        PyRM_root_page.save()
+#
+#        page_infos = (
+#            ("Rechnung erstellen", "create_bill"),
+#            ("Rechnungs Übersicht", "bills"),
+#            ("Kunden", "customers"),
+#        )
+#
+#        for page_name, method_name in page_infos:
+#            page, _ = Page.objects.get_or_create(
+#                name    = page_name,
+#                content = "{%% lucidTag PyRM_plugin.%s %%}" % method_name,
+#                parent  = PyRM_root_page,
+#                ** defaults
+#            )
+#            page.save()
+#
+#        self.page_msg("Alle PyRM Seiten erstellt.")
+#
+#        # refresh_curent_page
+#        self.current_page.id = PyRM_root_page.id
+#        self.current_page = self.context["PAGE"] = PyRM_root_page
 
 
     def summary(self):
@@ -108,7 +108,7 @@ class PyRM_plugin(PyLucidBasePlugin):
         """
         # Change the global page title:
         self.context["PAGE"].title = _(u"PyRM - Übersicht")
-
+#        raise SyntaxError("TEST")
         self.page_msg(u"Übersicht")
 
     def customers(self):

@@ -93,25 +93,19 @@ def create_pages():
     print "OK"
 
     print "Create pages..."
-    index_page = create_page({
-        "name":u"PyRM Login",
-        "title": u"Python Rechnungsmanager - Login",
-        "content": "{{ login_link }}",
-    })
     PyRM_root = create_page({
         "name":u"PyRM",
         "title": u"Python Rechnungsmanager",
-        "content": "{% lucidTag sub_menu %}",
-        "parent": index_page,
-    })
-    create_page({
-        "name":u"Übersicht",
-        "content":"{% lucidTag PyRM_plugin.summary %}",
-        "parent": PyRM_root,
+        "content": "{% lucidTag PyRM_plugin.summary %}",
     })
     create_page({
         "name":u"Kunden",
-        "content":"{% lucidTag PyRM_plugin.customers %}",
+        "content": (
+            '<a href="/_admin/PyRM/kunde/">'
+            'kunden im django admin panel bearbeiten'
+            '</a>\n'
+            '{% lucidTag PyRM_plugin.customers %}'
+        ),
         "parent": PyRM_root,
     })
     page = create_page({
@@ -131,7 +125,7 @@ def create_pages():
 
 def setup_Plugins():
     fake_page_msg  = FakePageMsg()
-    
+
     # install all internal plugin
     auto_install_plugins(debug=False, page_msg = fake_page_msg, verbosity=0)
 

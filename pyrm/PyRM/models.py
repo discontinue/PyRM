@@ -14,6 +14,7 @@
     :copyleft: 2008 by Jens Diemer
     :license: GNU GPL v3, see LICENSE.txt for more details.
 """
+from django.conf import settings
 from django.db import models
 from django.contrib import admin
 
@@ -170,6 +171,29 @@ admin.site.register(Person, PersonAdmin)
 
 #______________________________________________________________________________
 
+class Skonto(models.Model):
+    """
+    Definiert ein Zahlungsziel und das damit verbundene Skonto
+    """
+    zahlungsziel = models.PositiveIntegerField(
+        help_text="Zahlungseingangsdauer in Tagen"
+    )
+    skonto = models.FloatField(
+        help_text="Skonto (in Prozent)"
+    )
+    def __unicode__(self):
+        return u"%s Tag(e) - %s Prozent" % (self.zahlungsziel, self.skonto)
+
+    class Meta:
+        ordering = ("zahlungsziel", "skonto")
+
+class SkontoAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(Skonto, SkontoAdmin)
+
+#______________________________________________________________________________
+
 class Kunde(models.Model):
     id = models.AutoField(primary_key=True,
         help_text="ID - Kundennummer"
@@ -180,15 +204,18 @@ class Kunde(models.Model):
     )
     firma = models.ForeignKey(Firma, null=True, blank=True)
 
-    lieferstop_datum = models.DateField()
+    lieferstop_datum = models.DateField(blank=True, null=True)
     lieferstop_grund = models.TextField(blank=True, null=True)
 
-    zahlungsziel = models.PositiveIntegerField(null=True, blank=True,
-        help_text="Zahlungseingangsdauer in Tagen"
+    zahlungsziel = models.PositiveIntegerField(
+        default = settings.DEFAULT_ZAHLUNGSZIEL,
+        help_text="max. Zahlungseingangsdauer in Tagen"
     )
-    mahnfrist = models.PositiveIntegerField(null=True, blank=True,
+    mahnfrist = models.PositiveIntegerField(
+        default = settings.DEFAULT_MAHNFRIST,
         help_text="Frist in Tagen."
     )
+    skonto = models.ManyToManyField(Skonto, verbose_name="Skonto liste")
 
     notizen = models.TextField(blank=True, null=True)
 
@@ -197,7 +224,10 @@ class Kunde(models.Model):
         verbose_name_plural = "Kunden"
 
     def __unicode__(self):
-        return self.person
+        if self.firma:
+            return u"%s - %s" % (self.firma, self.person)
+        else:
+            return u"%s" % self.person
 
 
 class KundeAdmin(admin.ModelAdmin):
