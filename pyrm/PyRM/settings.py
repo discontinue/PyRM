@@ -1,4 +1,17 @@
-# Django settings for {{ project_name }} project.
+# -*- coding: utf-8 -*-
+
+#______________________________________________________________________________
+# PyRM
+
+DEFAULT_ZAHLUNGSZIEL = 7
+DEFAULT_MAHNFRIST = 30
+DEFAULT_LAND = "Deutschland"
+
+ADMIN_URL_PREFIX = "admin"
+
+#______________________________________________________________________________
+# DJANGO STUFF
+
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG

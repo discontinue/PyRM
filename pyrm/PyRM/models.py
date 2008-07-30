@@ -43,17 +43,21 @@ GESCHLECHTER = (
 
 class Ort(models.Model):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=128)
+    land = models.CharField(max_length=128, default=settings.DEFAULT_LAND)
 
     class Meta:
         verbose_name = "Ort"
         verbose_name_plural = "Orte"
+        ordering = ("name", "land")
 
     def __unicode__(self):
         return self.name
 
 class OrtAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("id", "name", "land")
+    list_display_links = ("name",)
+    list_filter = ("land",)
 
 admin.site.register(Ort, OrtAdmin)
 
@@ -68,7 +72,8 @@ class FirmaPersonBaseModel(models.Model):
     telefon = models.PhoneNumberField(blank=True, null=True)
     mobile = models.PhoneNumberField(blank=True, null=True)
 
-    strasse = models.CharField(max_length=30, blank=True, null=True)
+    strasse = models.CharField(max_length=128, blank=True, null=True)
+    strassen_zusatz = models.CharField(max_length=128, blank=True, null=True)
     plz = models.PositiveIntegerField(blank=True, null=True)
     ort = models.ForeignKey(Ort, blank=True, null=True)
 
@@ -110,6 +115,9 @@ class FirmaPersonBaseModel(models.Model):
         blank=True, null=True,
         help_text = "BIC bzw. Bank Identifier Code (auch SWIFT-Adresse)",
     )
+    class Meta:
+        # http://www.djangoproject.com/documentation/model-api/#abstract-base-classes
+        abstract = True # Abstract base classes
 
 #______________________________________________________________________________
 
@@ -129,8 +137,6 @@ class Firma(FirmaPersonBaseModel):
     )
 
     #__________________________________________________________________________
-
-    notizen = models.TextField(blank=True, null=True)
 
     class Meta:
         verbose_name = "Firma"
@@ -159,6 +165,7 @@ class Person(FirmaPersonBaseModel):
     class Meta:
         verbose_name = "Person"
         verbose_name_plural = "Personen"
+        unique_together = (("vorname", "nachname"),)
 
     def __unicode__(self):
         return " ".join((self.vorname, self.nachname))
@@ -173,18 +180,28 @@ admin.site.register(Person, PersonAdmin)
 
 class Skonto(models.Model):
     """
-    Definiert ein Zahlungsziel und das damit verbundene Skonto
+    Prozentualer Preisnachlass auf den Rechnungsbetrag bei Zahlung innerhalb
+    des Zahlungsziels.
     """
     zahlungsziel = models.PositiveIntegerField(
         help_text="Zahlungseingangsdauer in Tagen"
     )
     skonto = models.FloatField(
-        help_text="Skonto (in Prozent)"
+        help_text="Prozentualer Preisnachlass"
+    )
+    netto = models.BooleanField(
+        default=False,
+        help_text=(
+            "Skonto auf Netto-Umsatz (ohne Umsatzsteuer)"
+            " oder auf Brutto-Umsatz?"
+        )
     )
     def __unicode__(self):
         return u"%s Tag(e) - %s Prozent" % (self.zahlungsziel, self.skonto)
 
     class Meta:
+        verbose_name = "Skonto"
+        verbose_name_plural = "Skonto Einträge"
         ordering = ("zahlungsziel", "skonto")
 
 class SkontoAdmin(admin.ModelAdmin):
@@ -225,7 +242,10 @@ class Kunde(models.Model):
 
     def __unicode__(self):
         if self.firma:
-            return u"%s - %s" % (self.firma, self.person)
+            if self.anzeigen:
+                return u"%s - %s" % (self.firma, self.person)
+            else:
+                return u"%s" % self.firma
         else:
             return u"%s" % self.person
 
@@ -250,6 +270,10 @@ class Lieferant(models.Model):
 
     notizen = models.TextField(blank=True, null=True)
 
+    class Meta:
+        verbose_name = "Lieferant"
+        verbose_name_plural = "Lieferanten"
+        ordering = ("firma", "person")
 
 class LieferantAdmin(admin.ModelAdmin):
     pass
