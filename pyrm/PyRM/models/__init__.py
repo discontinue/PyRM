@@ -15,7 +15,12 @@
     :license: GNU GPL v3, see LICENSE.txt for more details.
 """
 
-from models.konten import Konto
-from models.stammdaten import Ort, Person, Firma, Kunde, Lieferant
-from models.AusgangsRechnung import AusgangsRechnung, AusgangsPosten
-from models.EingangsRechnung import EingangsRechnung, EingangsPosten
+MWST = (
+    (7, 7),
+    (19, 19),
+)
+
+#from konten import Konto
+#from stammdaten import Ort, Person, Firma, Kunde, Lieferant
+#from AusgangsRechnung import AusgangsRechnung, AusgangsPosten
+#from EingangsRechnung import EingangsRechnung, EingangsPosten

@@ -33,6 +33,13 @@ try:
 except KeyboardInterrupt:
     sys.exit(0)
 
+print "Lösche Datei '%s'..." % settings.DATABASE_NAME,
+try:
+    os.remove(settings.DATABASE_NAME) # SQLite Datei löschen
+except OSError, err:
+    print "Fehler:", err
+else:
+    print "OK"
 
 from django.core import management
 
@@ -47,35 +54,6 @@ sys.path.insert(0, "..") # Add PyLucid root
 from tests.utils.FakeRequest import FakePageMsg
 
 
-#print Template.objects.all()
-#print Style.objects.all()
-#print User.objects.all()
-try:
-    a_user = User.objects.get(is_superuser=True)[0]
-except:
-    a_user = User.objects.all()[0]
-
-print "Nutzt User:", a_user
-
-
-# Default Einstellungen für alle Seiten
-PAGE_DEFAULTS = {
-    "template"      : Template.objects.get(name = "small_white"),
-    "style"         : Style.objects.get(name = "small_white"),
-    "markup"        : 0, # html
-    "createby"      : a_user,
-    "lastupdateby"  : a_user,
-}
-
-def create_page(data):
-    page_data = PAGE_DEFAULTS.copy()
-    page_data.update(data)
-    pprint(page_data)
-    p = Page(**page_data)
-    p.save()
-    return p
-
-
 def delete_PyRM_tables():
     print "Delete all tables..."
     management.call_command('reset', "PyRM", verbosity=2, interactive=False)
@@ -86,42 +64,71 @@ def syncdb():
     management.call_command('syncdb', verbosity=1, interactive=False)
     print "-"*80
 
+#------------------------------------------------------------------------------
 
-def create_pages():
-    print "Delete all pages...",
-    Page.objects.all().delete()
-    print "OK"
+class PageCreator(object):
+    def __init__(self, user):
+        #print Template.objects.all()
+        #print Style.objects.all()
+        #print User.objects.all()
+        
+        print "Nutzt User:", user
+        
+        # Default Einstellungen für alle Seiten
+        self.defaults = {
+            "template"      : Template.objects.get(name = "small_white"),
+            "style"         : Style.objects.get(name = "small_white"),
+            "markup"        : 0, # html
+            "createby"      : user,
+            "lastupdateby"  : user,
+        }
+        
+        self.create_pages()
+    
+    def create_page(self, data):    
+        page_data = self.defaults.copy()
+        page_data.update(data)
+        pprint(page_data)
+        p = Page(**page_data)
+        p.save()
+        return p
 
-    print "Create pages..."
-    PyRM_root = create_page({
-        "name":u"PyRM",
-        "title": u"Python Rechnungsmanager",
-        "content": "{% lucidTag PyRM_plugin.summary %}",
-    })
-    create_page({
-        "name":u"Kunden",
-        "content": (
-            '<a href="/_admin/PyRM/kunde/">'
-            'kunden im django admin panel bearbeiten'
-            '</a>\n'
-            '{% lucidTag PyRM_plugin.customers %}'
-        ),
-        "parent": PyRM_root,
-    })
-    page = create_page({
-        "name":u"Rechnungen",
-        "content":"{% lucidTag PyRM_plugin.bills %}",
-        "parent": PyRM_root,
-    })
-    page = create_page({
-        "name":u"Rechnung erstellen",
-        "content":"{% lucidTag PyRM_plugin.create_bill %}",
-        "parent": PyRM_root,
-    })
+    def create_pages(self):
+        print "Delete all pages...",
+        Page.objects.all().delete()
+        print "OK"
+    
+        print "Create pages..."
+        PyRM_root = self.create_page({
+            "name":u"PyRM",
+            "title": u"Python Rechnungsmanager",
+            "content": "{% lucidTag PyRM_plugin.summary %}",
+        })
+        self.create_page({
+            "name":u"Kunden",
+            "content": (
+                '<a href="/_admin/PyRM/kunde/">'
+                'kunden im django admin panel bearbeiten'
+                '</a>\n'
+                '{% lucidTag PyRM_plugin.customers %}'
+            ),
+            "parent": PyRM_root,
+        })
+        page = self.create_page({
+            "name":u"Rechnungen",
+            "content":"{% lucidTag PyRM_plugin.bills %}",
+            "parent": PyRM_root,
+        })
+        page = self.create_page({
+            "name":u"Rechnung erstellen",
+            "content":"{% lucidTag PyRM_plugin.create_bill %}",
+            "parent": PyRM_root,
+        })
+    
+        pages = Page.objects.all()
+        print pages
 
-
-    pages = Page.objects.all()
-    print pages
+#------------------------------------------------------------------------------
 
 def setup_Plugins():
     fake_page_msg  = FakePageMsg()
@@ -140,9 +147,25 @@ def setup_Plugins():
         active    = True
     )
 
+def create_user(username, password, email, is_staff, is_superuser):
+    """
+    Create a user and return the instance.
+    """
+    user = User.objects.create_user(username, email, password)
+    user.is_staff = is_staff
+    user.is_superuser = is_superuser
+    user.save()
+    return user
 
 if __name__ == "__main__":
-    delete_PyRM_tables()
+    #delete_PyRM_tables()
     syncdb()
-    create_pages()
+    user = create_user(
+        username="test",
+        password="12345678",
+        email="",
+        is_staff=True,
+        is_superuser=True,
+    )
+    PageCreator(user)
     setup_Plugins()

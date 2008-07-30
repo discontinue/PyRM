@@ -19,6 +19,7 @@ global_rights = {
 
 plugin_manager_data = {
     "summary" : global_rights,
+#    "summary" : {"must_login":False, "must_admin":False},
     "customers" : global_rights,
     "bills" : global_rights,
     "bill_detail" : global_rights,
