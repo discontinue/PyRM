@@ -55,7 +55,10 @@ class Ort(models.Model):
         ordering = ("name", "land")
 
     def __unicode__(self):
-        return self.name
+        if self.land == settings.DEFAULT_LAND:
+            return self.name
+        else:
+            return "%s (%s)" % (self.name, self.land)
 
 #______________________________________________________________________________
 

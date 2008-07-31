@@ -34,7 +34,7 @@ project_directory = setup_environ(settings)
 
 from django.core import management
 
-print settings.INSTALLED_APPS
+assert("PyRM" in settings.INSTALLED_APPS)
 
 #print "Delete all tables..."
 #management.call_command('reset', "PyRM", verbosity=2, interactive=False)
