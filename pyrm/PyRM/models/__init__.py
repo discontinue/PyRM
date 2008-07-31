@@ -20,7 +20,7 @@ MWST = (
     (19, 19),
 )
 
-#from konten import Konto
-#from stammdaten import Ort, Person, Firma, Kunde, Lieferant
-#from AusgangsRechnung import AusgangsRechnung, AusgangsPosten
-#from EingangsRechnung import EingangsRechnung, EingangsPosten
+from konten import Konto
+from stammdaten import Ort, Person, Firma, Kunde, Lieferant
+from AusgangsRechnung import AusgangsRechnung, AusgangsPosten
+from EingangsRechnung import EingangsRechnung, EingangsPosten

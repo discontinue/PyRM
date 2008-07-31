@@ -35,6 +35,7 @@ class EingangsPosten(models.Model):
         #related_name="eingangs_posten",
     )
     class Meta:
+        app_label = "PyRM"
         verbose_name = "Eingangsrechnung-Position"
         verbose_name_plural = "Eingangsrechnung-Positionen"
 
@@ -60,6 +61,7 @@ class EingangsRechnung(models.Model):
     )
 
     class Meta:
+        app_label = "PyRM"
         verbose_name = "Eingangsrechnung"
         verbose_name_plural = "Eingangsrechnungen"
         ordering = ['-id']

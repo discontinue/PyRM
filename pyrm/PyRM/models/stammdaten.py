@@ -49,6 +49,7 @@ class Ort(models.Model):
     land = models.CharField(max_length=128, default=settings.DEFAULT_LAND)
 
     class Meta:
+        app_label = "PyRM"
         verbose_name = "Ort"
         verbose_name_plural = "Orte"
         ordering = ("name", "land")
@@ -126,6 +127,7 @@ class FirmaPersonBaseModel(models.Model):
         ),
     )
     class Meta:
+        app_label = "PyRM"
         # http://www.djangoproject.com/documentation/model-api/#abstract-base-classes
         abstract = True # Abstract base classes
 
@@ -149,6 +151,7 @@ class Firma(FirmaPersonBaseModel):
     #__________________________________________________________________________
 
     class Meta:
+        app_label = "PyRM"
         verbose_name = "Firma"
         verbose_name_plural = "Firmen"
 
@@ -173,6 +176,7 @@ class Person(FirmaPersonBaseModel):
     #__________________________________________________________________________
 
     class Meta:
+        app_label = "PyRM"
         verbose_name = "Person"
         verbose_name_plural = "Personen"
         unique_together = (("vorname", "nachname"),)
@@ -211,6 +215,7 @@ class Skonto(models.Model):
         return u"%s Tag(e) - %s Prozent" % (self.zahlungsziel, self.skonto)
 
     class Meta:
+        app_label = "PyRM"
         verbose_name = "Skonto"
         verbose_name_plural = "Skonto Einträge"
         ordering = ("zahlungsziel", "skonto")
@@ -260,6 +265,7 @@ class Kunde(models.Model):
     notizen = models.TextField(blank=True, null=True)
 
     class Meta:
+        app_label = "PyRM"
         verbose_name = "Kunde"
         verbose_name_plural = "Kunden"
 
@@ -302,6 +308,7 @@ class Lieferant(models.Model):
     notizen = models.TextField(blank=True, null=True)
 
     class Meta:
+        app_label = "PyRM"
         verbose_name = "Lieferant"
         verbose_name_plural = "Lieferanten"
         ordering = ("firma", "person")

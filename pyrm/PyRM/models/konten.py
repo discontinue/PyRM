@@ -38,6 +38,7 @@ class Konto(models.Model):
     mwst = models.CharField(max_length=1, choices=MWST, null=True, blank=True)
 
     class Meta:
+        app_label = "PyRM"
         verbose_name = "Konto"
         verbose_name_plural = "Konten"
 

@@ -19,8 +19,6 @@ from django.conf import settings
 from django.db import models
 from django.contrib import admin
 
-print "IMPORT XXX"
-
 #______________________________________________________________________________
 
 class AusgangsPostenManager(models.Manager):
@@ -76,6 +74,7 @@ class AusgangsPosten(models.Model):
     )
 
     class Meta:
+        app_label = "PyRM"
         verbose_name = "Ausgangsrechnung-Position"
         verbose_name_plural = "Ausgangsrechnung-Positionen"
 
@@ -164,6 +163,7 @@ class AusgangsRechnung(models.Model):
     )
 
     class Meta:
+        app_label = "PyRM"
         verbose_name = "Ausgangsrechnung"
         verbose_name_plural = "Ausgangsrechnungen"
         ordering = ['-id']
