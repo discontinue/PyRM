@@ -81,7 +81,7 @@ class BaseModel(models.Model):
     """
     Basis Klasse für Person, Firma, Kunde und Lieferrant.
     """
-    erstellt = models.DateTimeField(
+    erstellt_am = models.DateTimeField(
         auto_now_add=True, help_text="Zeitpunkt der Erstellung",
     )
     erstellt_von = models.ForeignKey(
@@ -89,7 +89,7 @@ class BaseModel(models.Model):
         help_text="Benutzer der diesen Eintrag erstellt hat.",
         related_name="%(class)s_erstellt_von"
     )
-    geaendert = models.DateTimeField(
+    geaendert_am = models.DateTimeField(
         auto_now=True, help_text="Zeitpunkt der letzten Änderung",
     )
     geaendert_von = models.ForeignKey(
