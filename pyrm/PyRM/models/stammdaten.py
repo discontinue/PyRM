@@ -27,6 +27,7 @@
 from django.db import models
 from django.conf import settings
 from django.contrib import admin
+from django.contrib.auth.models import User
 
 #______________________________________________________________________________
 
@@ -87,6 +88,21 @@ class FirmaPersonBaseModel(models.Model):
     strassen_zusatz = models.CharField(max_length=128, blank=True, null=True)
     plz = models.PositiveIntegerField(blank=True, null=True)
     ort = models.ForeignKey(Ort, blank=True, null=True)
+
+    erstellt = models.DateTimeField(
+        auto_now_add=True, help_text="Zeitpunkt der Erstellung",
+    )
+    geaendert = models.DateTimeField(
+        auto_now=True, help_text="Zeitpunkt der letzten Änderung",
+    )
+    erstellt_von = models.ForeignKey(
+        User, editable=False, related_name="page_createby",
+        help_text="Benutzer der diesen Eintrag erstellt hat.",
+    )
+    geaendert_von = models.ForeignKey(
+        User, editable=False, related_name="page_lastupdateby",
+        help_text="Benutzer der diesen Eintrag zuletzt geändert hat.",
+    )
 
     notizen = models.TextField(blank=True, null=True)
 
@@ -256,7 +272,7 @@ class Kunde(models.Model):
     )
     firma = models.ForeignKey(Firma, null=True, blank=True)
 
-    seid = models.DateField(auto_now_add=True)
+    seid = models.DateField(auto_now_add=True, null=True, blank=True)
 
     lieferrantennr = models.CharField(max_length=128,
         help_text=(
