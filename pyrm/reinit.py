@@ -36,9 +36,9 @@ from django.core import management
 
 assert("PyRM" in settings.INSTALLED_APPS)
 
-#print "Delete all tables..."
-#management.call_command('reset', "PyRM", verbosity=2, interactive=False)
-#print "-"*80
+print "Delete all tables..."
+management.call_command('reset', "PyRM", verbosity=2, interactive=False)
+print "-"*80
 
 print "syncdb..."
 management.call_command('syncdb', verbosity=1, interactive=False)

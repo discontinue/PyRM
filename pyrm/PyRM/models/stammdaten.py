@@ -81,11 +81,13 @@ class BaseModel(models.Model):
     """
     Basis Klasse für Person, Firma, Kunde und Lieferrant.
     """
+    id = models.AutoField(primary_key=True)
+
     erstellt_am = models.DateTimeField(
         auto_now_add=True, help_text="Zeitpunkt der Erstellung",
     )
     erstellt_von = models.ForeignKey(
-        User, editable=False,
+        User, editable=False, blank=True, null=True,
         help_text="Benutzer der diesen Eintrag erstellt hat.",
         related_name="%(class)s_erstellt_von"
     )
@@ -93,7 +95,7 @@ class BaseModel(models.Model):
         auto_now=True, help_text="Zeitpunkt der letzten Änderung",
     )
     geaendert_von = models.ForeignKey(
-        User, editable=False,
+        User, editable=False, blank=True, null=True,
         help_text="Benutzer der diesen Eintrag zuletzt geändert hat.",
         related_name="%(class)s_geaendert_von"
     )
@@ -103,10 +105,13 @@ class BaseModel(models.Model):
     def save(self):
         current_user = threadlocals.get_current_user()
         self.geaendert_von = current_user
-        # If the object already existed, it will already have an id
-        if self.id == None:
+
+        if self.erstellt_von == None:
             # This is a new object
             self.erstellt_von = current_user
+
+        id = self.id
+        erstellt_von = self.erstellt_von
 
         super(BaseModel,self).save()
 
@@ -183,8 +188,6 @@ class FirmaPersonBaseModel(BaseModel):
 #______________________________________________________________________________
 
 class Firma(FirmaPersonBaseModel):
-    id = models.AutoField(primary_key=True)
-
     name1 = models.CharField(max_length=80, help_text="Name der Firma1")
     name2 = models.CharField(
         max_length=80, null=True, blank=True, help_text="Name der Firma2"
@@ -221,8 +224,6 @@ admin.site.register(Firma, FirmaAdmin)
 #______________________________________________________________________________
 
 class Person(FirmaPersonBaseModel):
-    id = models.AutoField(primary_key=True)
-
     vorname = models.CharField(max_length=30, blank=True, null=True)
     nachname = models.CharField(max_length=30)
 
@@ -297,8 +298,8 @@ class Kunde(BaseModel):
     """
     Firmen- und Privat-Kunden für Ausgangsrechnungen.
     """
-    id = models.AutoField(primary_key=True,
-        help_text="ID - Kundennummer"
+    nummer = models.IntegerField(
+        unique=True, help_text="Kundennummer Nummer"
     )
     person = models.ForeignKey(Person, null=True, blank=True)
     anzeigen = models.BooleanField(
@@ -354,8 +355,8 @@ class Lieferant(BaseModel):
     """
     Lieferanten für die Eingansrechnungen
     """
-    id = models.AutoField(primary_key=True,
-        help_text="ID - Lieferranten Nummer"
+    nummer = models.IntegerField(
+        unique=True, help_text="Lieferranten Nummer"
     )
     kundenummer =  models.CharField(
         max_length=128, null=True, blank=True,

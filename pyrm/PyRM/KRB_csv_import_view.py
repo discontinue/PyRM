@@ -106,7 +106,7 @@ def kundenliste():
             anzeigen = False
 
         kunde = Kunde(
-            id = kundennummer,
+            nummer = kundennummer,
             person = person,
             firma = firma,
             anzeigen = anzeigen,
