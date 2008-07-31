@@ -31,7 +31,6 @@ from django.contrib import admin
 #______________________________________________________________________________
 
 GESCHLECHTER = (
-    ('F', '[Firma]'),
     ('M', 'männlich'),
     ('W', 'weiblich'),
 )
@@ -53,6 +52,7 @@ class Ort(models.Model):
         verbose_name = "Ort"
         verbose_name_plural = "Orte"
         ordering = ("name", "land")
+        unique_together = (("name", "land"),)
 
     def __unicode__(self):
         if self.land == settings.DEFAULT_LAND:
@@ -76,8 +76,11 @@ class FirmaPersonBaseModel(models.Model):
     """
     Basis Klasse für Personen und Firmen mit allen gemeinsamen Felder.
     """
-    email = models.EmailField(blank=True)
+    internet = models.URLField(verify_exists=False, blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
+
     telefon = models.PhoneNumberField(blank=True, null=True)
+    fax = models.PhoneNumberField(blank=True, null=True)
     mobile = models.PhoneNumberField(blank=True, null=True)
 
     strasse = models.CharField(max_length=128, blank=True, null=True)
@@ -91,7 +94,6 @@ class FirmaPersonBaseModel(models.Model):
     # Konto daten
 
     kontonr = models.CharField(
-
         max_length=128, # FIXME
         blank=True, null=True,
         help_text = "Bank Kontonummer",
@@ -172,9 +174,14 @@ admin.site.register(Firma, FirmaAdmin)
 class Person(FirmaPersonBaseModel):
     id = models.AutoField(primary_key=True)
 
-    vorname = models.CharField(max_length=30)
+    vorname = models.CharField(max_length=30, blank=True, null=True)
     nachname = models.CharField(max_length=30)
-    geschlecht = models.CharField(max_length=1, choices=GESCHLECHTER)
+
+    geschlecht = models.CharField(
+        blank=True, null=True, max_length=1, choices=GESCHLECHTER
+    )
+
+    geburtstag = models.DateField(blank=True, null=True)
 
     #__________________________________________________________________________
 
@@ -185,11 +192,16 @@ class Person(FirmaPersonBaseModel):
         unique_together = (("vorname", "nachname"),)
 
     def __unicode__(self):
-        return " ".join((self.vorname, self.nachname))
+        if self.vorname:
+            return " ".join((self.vorname, self.nachname))
+        else:
+            return self.nachname
 
 
 class PersonAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("vorname", "nachname", "strasse", "plz", "ort")
+    list_display_links = ("vorname", "nachname")
+    list_filter = ("ort",)
 
 admin.site.register(Person, PersonAdmin)
 
@@ -244,6 +256,8 @@ class Kunde(models.Model):
         help_text="Name der Person mit anzeigen, wenn es eine Firma ist?"
     )
     firma = models.ForeignKey(Firma, null=True, blank=True)
+
+    seid = models.DateField(auto_now_add=True)
 
     lieferrantennr = models.CharField(max_length=128,
         help_text=(
