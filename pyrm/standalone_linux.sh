@@ -1,22 +1,11 @@
 #!/bin/sh
 
-#export DJANGO_SETTINGS_MODULE=PyLucid.settings
-
 # use the local django packages
 export PYTHONPATH=${PWD}
 
-while :
-do
-    echo 'Starting django development server...'
+addr=`ifconfig eth0 | awk '/inet Adr/ {split ($2,A,":"); print A[2]":8000"}'`
+echo "X ${addr} X"
 
-    python ./django/bin/django-admin.py runserver --settings=PyRM.settings $*
+echo 'Starting django development server...'
+python ./manage.py runserver ${addr}
 
-    ping localhost -n 1>NUL
-
-    echo ''
-    echo 'restart des Servers mit ENTER...'
-    read
-done
-
-echo 'ENTER zum Beenden.'
-read
