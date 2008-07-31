@@ -141,10 +141,9 @@ class FirmaPersonBaseModel(models.Model):
 class Firma(FirmaPersonBaseModel):
     id = models.AutoField(primary_key=True)
 
-    name = models.CharField(max_length=30, help_text="Name der Firma (kurz)")
-    volle_bezeichnung = models.CharField(
-         help_text="Volle Firmenbezeichnung",
-         max_length=128, null=True, blank=True
+    name1 = models.CharField(max_length=80, help_text="Name der Firma1")
+    name2 = models.CharField(
+        max_length=80, null=True, blank=True, help_text="Name der Firma2"
     )
 
     # http://de.wikipedia.org/wiki/Umsatzsteuer-Identifikationsnummer
@@ -161,7 +160,7 @@ class Firma(FirmaPersonBaseModel):
         verbose_name_plural = "Firmen"
 
     def __unicode__(self):
-        return self.name
+        return self.name1
 
 
 class FirmaAdmin(admin.ModelAdmin):
