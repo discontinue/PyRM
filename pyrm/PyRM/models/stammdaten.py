@@ -24,10 +24,14 @@
     :license: GNU GPL v3, see LICENSE.txt for more details.
 """
 
+# django
 from django.db import models
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import User
+
+# PyRM
+from PyRM.middleware import threadlocals
 
 #______________________________________________________________________________
 
@@ -73,7 +77,48 @@ admin.site.register(Ort, OrtAdmin)
 
 #______________________________________________________________________________
 
-class FirmaPersonBaseModel(models.Model):
+class BaseModel(models.Model):
+    """
+    Basis Klasse für Person, Firma, Kunde und Lieferrant.
+    """
+    erstellt = models.DateTimeField(
+        auto_now_add=True, help_text="Zeitpunkt der Erstellung",
+    )
+    erstellt_von = models.ForeignKey(
+        User, editable=False,
+        help_text="Benutzer der diesen Eintrag erstellt hat.",
+        related_name="%(class)s_erstellt_von"
+    )
+    geaendert = models.DateTimeField(
+        auto_now=True, help_text="Zeitpunkt der letzten Änderung",
+    )
+    geaendert_von = models.ForeignKey(
+        User, editable=False,
+        help_text="Benutzer der diesen Eintrag zuletzt geändert hat.",
+        related_name="%(class)s_geaendert_von"
+    )
+
+    notizen = models.TextField(blank=True, null=True)
+
+    def save(self):
+        current_user = threadlocals.get_current_user()
+        self.geaendert_von = current_user
+        # If the object already existed, it will already have an id
+        if self.id == None:
+            # This is a new object
+            self.erstellt_von = current_user
+
+        super(BaseModel,self).save()
+
+
+    class Meta:
+        app_label = "PyRM"
+        # http://www.djangoproject.com/documentation/model-api/#abstract-base-classes
+        abstract = True # Abstract base classes
+
+#______________________________________________________________________________
+
+class FirmaPersonBaseModel(BaseModel):
     """
     Basis Klasse für Personen und Firmen mit allen gemeinsamen Felder.
     """
@@ -88,23 +133,6 @@ class FirmaPersonBaseModel(models.Model):
     strassen_zusatz = models.CharField(max_length=128, blank=True, null=True)
     plz = models.PositiveIntegerField(blank=True, null=True)
     ort = models.ForeignKey(Ort, blank=True, null=True)
-
-    erstellt = models.DateTimeField(
-        auto_now_add=True, help_text="Zeitpunkt der Erstellung",
-    )
-    geaendert = models.DateTimeField(
-        auto_now=True, help_text="Zeitpunkt der letzten Änderung",
-    )
-    erstellt_von = models.ForeignKey(
-        User, editable=False, related_name="page_createby",
-        help_text="Benutzer der diesen Eintrag erstellt hat.",
-    )
-    geaendert_von = models.ForeignKey(
-        User, editable=False, related_name="page_lastupdateby",
-        help_text="Benutzer der diesen Eintrag zuletzt geändert hat.",
-    )
-
-    notizen = models.TextField(blank=True, null=True)
 
     #__________________________________________________________________________
     # Konto daten
@@ -164,7 +192,8 @@ class Firma(FirmaPersonBaseModel):
 
     # http://de.wikipedia.org/wiki/Umsatzsteuer-Identifikationsnummer
     # Niederlande, Schweden haben 12 Ziffern
-    UStIdNr = models.CharField(max_length=12,
+    UStIdNr = models.CharField(
+        max_length=12, null=True, blank=True,
         help_text="Umsatzsteuer-Identifikationsnummer (ohne Leerzeichen)"
     )
 
@@ -180,7 +209,12 @@ class Firma(FirmaPersonBaseModel):
 
 
 class FirmaAdmin(admin.ModelAdmin):
-    pass
+    list_display = (
+        "name1", "plz", "ort",
+        "erstellt_von", "erstellt", "geaendert_von", "geaendert",
+    )
+    list_display_links = ("name1",)
+    list_filter = ("ort",)
 
 admin.site.register(Firma, FirmaAdmin)
 
@@ -223,7 +257,7 @@ admin.site.register(Person, PersonAdmin)
 
 #______________________________________________________________________________
 
-class Skonto(models.Model):
+class Skonto(BaseModel):
     """
     Prozentualer Preisnachlass auf den Rechnungsbetrag bei Zahlung innerhalb
     des Zahlungsziels.
@@ -259,7 +293,7 @@ admin.site.register(Skonto, SkontoAdmin)
 #______________________________________________________________________________
 
 
-class Kunde(models.Model):
+class Kunde(BaseModel):
     """
     Firmen- und Privat-Kunden für Ausgangsrechnungen.
     """
@@ -294,8 +328,6 @@ class Kunde(models.Model):
     )
     skonto = models.ManyToManyField(Skonto, verbose_name="Skonto liste")
 
-    notizen = models.TextField(blank=True, null=True)
-
     class Meta:
         app_label = "PyRM"
         verbose_name = "Kunde"
@@ -318,7 +350,7 @@ admin.site.register(Kunde, KundeAdmin)
 
 #______________________________________________________________________________
 
-class Lieferant(models.Model):
+class Lieferant(BaseModel):
     """
     Lieferanten für die Eingansrechnungen
     """
@@ -336,8 +368,6 @@ class Lieferant(models.Model):
         help_text="Zahlungseingangsdauer in Tagen"
     )
     skonto = models.ManyToManyField(Skonto, verbose_name="Skonto liste")
-
-    notizen = models.TextField(blank=True, null=True)
 
     class Meta:
         app_label = "PyRM"

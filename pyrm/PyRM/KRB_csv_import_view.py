@@ -24,7 +24,7 @@ def get_kunden_obj(line):
         ort = Ort(name=ort_name, land="Frankreich")
         ort.save()
         firma = Firma(
-            name = daten[0],
+            name1 = daten[0],
             strasse = daten[2],
             strassen_zusatz = daten[3],
             plz = int(plz),
@@ -71,7 +71,7 @@ def get_kunden_obj(line):
         person.save()
 
     if line["Firma"] != "":
-        firma, created = Firma.objects.get_or_create(name = line["Firma"])
+        firma, created = Firma.objects.get_or_create(name1 = line["Firma"])
         firma.save()
     else:
         firma = None
