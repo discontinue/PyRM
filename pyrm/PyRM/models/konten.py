@@ -4,7 +4,7 @@
     ~~~~~~~~~~~~
 
     http://de.wikipedia.org/wiki/Kontenrahmen
-    DATEV-Standardkontenrahmen 2008: http://www.datev.de/info-db/090779
+    DATEV-Standardkontenrahmen 2008: http://www.datev.de/info-db/0907799
 
     Last commit info:
     ~~~~~~~~~~~~~~~~~
