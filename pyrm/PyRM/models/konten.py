@@ -6,6 +6,17 @@
     http://de.wikipedia.org/wiki/Kontenrahmen
     DATEV-Standardkontenrahmen 2008: http://www.datev.de/info-db/0907799
 
+http://svn.gnucash.org/trac/browser/gnucash/trunk/accounts/de_DE/acctchrt_skr03.gnucash-xea
+
+    http://www.koders.com/?s=SKR03&la=*&li=*
+
+"unternehmer" berlios.de - SKR03 Daten sind 2 Jahre alt!
+http://svn.berlios.de/viewcvs/unternehmer/trunk/unstable/sql/
+http://svn.berlios.de/wsvn/unternehmer/trunk/unstable/sql/Germany-DATEV-SKR03EU-chart.sql
+http://svn.berlios.de/wsvn/unternehmer/trunk/unstable/sql/Germany-DATEV-SKR03EU-gifi.sql
+
+
+
     Last commit info:
     ~~~~~~~~~~~~~~~~~
     $LastChangedDate: $
@@ -20,22 +31,36 @@ from django.db import models
 from django.conf import settings
 from django.contrib import admin
 
-from PyRM.models import MWST
-
 KONTOARTEN = (
-    ("A", "Aktivkonto"),
-    ("P", "Passivkonto"),
-    ("E", "Erlöskonto"),
-    ("K", "Kostenkonto"),
-    ("S", "Statistikkonto"),
+    (6, u"INCOME",      u"Einnahmen"),
+    (7, u"EXPENSE",     u"Aufwändungen"),
+    (1, u"ASSET",       u"Aktivposten"),
+    (2, u"RECEIVABLE",  u"offen"),
+    (3, u"EQUITY",      u"Eigenkapital"),
+    (4, u"LIABILITY",   u"Verbindlichkeit"),
+    (5, u"PAYABLE",     u"fällig"),
+)
+KONTO_CHOICES = [(i[0], i[2]) for i in KONTOARTEN]
+GNUCASH_SKR03_MAP = dict([(i[1], i[0]) for i in KONTOARTEN])
+
+MWST = (
+    (7, 7),
+    (16, 16),
+    (19, 19),
 )
 
 class Konto(models.Model):
 
     datev_nummer = models.PositiveIntegerField(primary_key=True)
     name = models.CharField(max_length=150)
-    kontoart = models.CharField(max_length=1, choices=KONTOARTEN)
+
+    kontoart = models.CharField(max_length=1, choices=KONTO_CHOICES)
     mwst = models.CharField(max_length=1, choices=MWST, null=True, blank=True)
+
+    anzahl = models.PositiveIntegerField(
+        default=0,
+        help_text="Wie oft wurde dieses Konto verwendet (Nur für Sortierung)"
+    )
 
     class Meta:
         app_label = "PyRM"
@@ -43,14 +68,13 @@ class Konto(models.Model):
         verbose_name_plural = "Konten"
 
     def __unicode__(self):
-        return self.name
+        return u"%(datev_nummer)s - %(name)s - %(anzahl)s" % self.__dict__
 
 #______________________________________________________________________________
 
 class KontoAdmin(admin.ModelAdmin):
-    list_display = (
-        "datev_nummer", "kontoart", "mwst", "name"
-    )
-#        list_display_links = ("shortcut",)
+    list_display = ("datev_nummer", "kontoart", "mwst", "name")
+    list_display_links = ("kontoart",)
+    list_filter = ("kontoart", "mwst")
 
 admin.site.register(Konto, KontoAdmin)

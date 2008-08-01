@@ -15,12 +15,7 @@
     :license: GNU GPL v3, see LICENSE.txt for more details.
 """
 
-MWST = (
-    (7, 7),
-    (19, 19),
-)
-
-from konten import Konto
+from konten import Konto, KONTO_CHOICES, GNUCASH_SKR03_MAP, MWST
 from stammdaten import Ort, Person, Firma, Kunde, Lieferant
 from AusgangsRechnung import AusgangsRechnung, AusgangsPosten
 from EingangsRechnung import EingangsRechnung, EingangsPosten

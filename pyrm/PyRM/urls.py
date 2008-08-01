@@ -8,8 +8,14 @@ urlpatterns = patterns('',
     # Example:
     # (r'^{{ project_name }}/', include('{{ project_name }}.foo.urls')),
 
-    (r'^import/$', 'PyRM.CAO_import_view.menu'),
-    (r'^import/(?P<unit>[a-z]*?)/$', 'PyRM.CAO_import_view.import_csv'),
+    (r'^skr_import/$', 'PyRM.SKR03_import_view.menu'),
+    (r'^skr_import/(?P<unit>\w*?)/$', 'PyRM.SKR03_import_view.import_csv'),
+
+    (r'^import/$', 'PyRM.MMS_csv_import_view.menu'),
+    (r'^import/(?P<unit>\w*?)/$', 'PyRM.MMS_csv_import_view.import_csv'),
+
+#    (r'^import/$', 'PyRM.CAO_import_view.menu'),
+#    (r'^import/(?P<unit>[a-z]*?)/$', 'PyRM.CAO_import_view.import_csv'),
 
 #    (r'^import/$', 'PyRM.KRB_csv_import_view.menu'),
 #    (r'^import/(?P<unit>[a-z]*?)/$', 'PyRM.KRB_csv_import_view.import_csv'),
