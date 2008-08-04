@@ -54,8 +54,12 @@ class Konto(models.Model):
     datev_nummer = models.PositiveIntegerField(primary_key=True)
     name = models.CharField(max_length=150)
 
-    kontoart = models.CharField(max_length=1, choices=KONTO_CHOICES)
-    mwst = models.CharField(max_length=1, choices=MWST, null=True, blank=True)
+    kontoart = models.PositiveIntegerField(
+        max_length=1, choices=KONTO_CHOICES
+    )
+    mwst = models.PositiveIntegerField(
+        max_length=1, choices=MWST, null=True, blank=True
+    )
 
     anzahl = models.PositiveIntegerField(
         default=0,
@@ -66,6 +70,7 @@ class Konto(models.Model):
         app_label = "PyRM"
         verbose_name = "Konto"
         verbose_name_plural = "Konten"
+        ordering = ["anzahl", "datev_nummer"]
 
     def __unicode__(self):
         return u"%(datev_nummer)s - %(name)s - %(anzahl)s" % self.__dict__
@@ -73,8 +78,8 @@ class Konto(models.Model):
 #______________________________________________________________________________
 
 class KontoAdmin(admin.ModelAdmin):
-    list_display = ("datev_nummer", "kontoart", "mwst", "name")
-    list_display_links = ("kontoart",)
+    list_display = ("datev_nummer", "kontoart", "mwst", "name", "anzahl")
+    list_display_links = ("name",)
     list_filter = ("kontoart", "mwst")
 
 admin.site.register(Konto, KontoAdmin)

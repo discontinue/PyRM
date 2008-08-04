@@ -14,6 +14,7 @@
 """
 
 import sys
+from StringIO import StringIO
 
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
@@ -51,12 +52,16 @@ def _sub_menu(request, views):
 def _start_view(request, views, unit):
     response = HttpResponse(mimetype='text/plain')
 
-    if unit not in views:
-        response.write("Wrong URL!")
-    else:
-        old_stdout = sys.stdout
-        sys.stdout = response
-        views[unit]()
-        sys.stdout = old_stdout
+    old_stdout = sys.stdout
+    sys.stdout = StringIO()
+    views[unit]()
 
-    return response
+    context = {
+        "output": sys.stdout.getvalue(),
+        "admin_url_prefix": settings.ADMIN_URL_PREFIX,
+    }
+    sys.stdout = old_stdout
+
+    return render_to_response(
+        "import_output.html", context,context_instance=RequestContext(request)
+    )

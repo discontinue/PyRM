@@ -27,6 +27,11 @@ a {
 a:hover {
   text-decoration: underline;
 }
+pre {
+  background-color: #fefeff;
+  margin: 0.5em;
+  padding: 0.5em;
+}
 /* ----------------------------------------------------------------------------
    django admin panel
 ---------------------------------------------------------------------------- */

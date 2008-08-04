@@ -8,11 +8,9 @@ DEFAULT_MAHNFRIST = 30
 DEFAULT_LAND = "Deutschland"
 
 ADMIN_URL_PREFIX = "admin"
-LOGIN_URL = "/admin/"
 
 #______________________________________________________________________________
 # DJANGO STUFF
-
 
 DEBUG = True
 
@@ -32,6 +30,8 @@ ADMINS = (
 )
 
 MANAGERS = ADMINS
+
+LOGIN_URL = "/login/"
 
 #______________________________________________________________________________
 # DATABASE SETUP

@@ -20,6 +20,7 @@ urlpatterns = patterns('',
     url(r'^krb_import/$', 'PyRM.importer.KRB_view.menu', name="PyRM-KRB-import"),
     (r'^krb_import/(?P<unit>[a-z]*?)/$', 'PyRM.importer.KRB_view.start_view'),
 
+    (r'^login/', 'django.contrib.auth.views.login', {'template_name': 'login.html'}),
     (r'^%s/(.*)' % settings.ADMIN_URL_PREFIX, admin.site.root),
 
     (

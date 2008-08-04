@@ -15,7 +15,8 @@ from PyRM.importer.menu import _sub_menu, _start_view
 
 from utils.csv_utils import get_csv_tables, get_dictlist
 
-CSV_DATEI = "./_daten/TRANSFER.CSV"
+#CSV_DATEI = "./_daten/TRANSFER.CSV"
+CSV_DATEI = "./_daten/Beispielmandant TRANSFER.CSV"
 
 
 PROZ_RE = re.compile(r"(\d+?)\%")
@@ -79,13 +80,15 @@ def transfer_buchungen():
 
         konto_nr = int(line["Konto"])
         print "konto_nr:", konto_nr, type(konto_nr)
-#        try:
-        konto = Konto.objects.get(datev_nummer = konto_nr)
-#        except Konto.DoesNotExist, err:
-#            print "*"*79
-#            print "Konto unbekannt:", err
-#        else:
-        print "Konto:", konto
+        try:
+            konto = Konto.objects.get(datev_nummer = konto_nr)
+        except Konto.DoesNotExist, err:
+            print "*"*79
+            print "Konto unbekannt:", err
+            print "Erstelle neuen Eintrag!"
+            
+        else:
+            print "Konto:", konto
 
         Gkonto_nr = int(line["GGKto"])
         try:
