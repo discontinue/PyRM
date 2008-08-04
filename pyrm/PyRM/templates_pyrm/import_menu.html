@@ -1,0 +1,11 @@
+{% extends "pyrm_base.html" %}
+{% block content %}
+<h1>Import menu:</h1>
+<ul>
+  <li><a href="{% url PyRM-SKR03-import %}">SKR03 import</a></li>
+  <li><a href="{% url PyRM-CAO-import %}">CAO import</a></li>
+  <li><a href="{% url PyRM-MMS-import %}">MMS import</a></li>
+  <li><a href="{% url PyRM-KRB-import %}">KRB import</a></li>
+</ul>
+<a href="/{{ admin_url_prefix }}/">django admin panel</a>
+{% endblock %}

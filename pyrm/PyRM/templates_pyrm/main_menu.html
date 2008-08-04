@@ -1,0 +1,9 @@
+{% extends "pyrm_base.html" %}
+{% block content %}
+<h1>main menu:</h1>
+<ul>
+  <li><a href="{% url PyRM-import-menu %}">import menu</a></li>
+  <li><a href="/{{ admin_url_prefix }}/">django admin panel</a></li>
+</ul>
+
+{% endblock %}

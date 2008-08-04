@@ -3,20 +3,24 @@
 import sys, os, csv
 from pprint import pprint
 
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.conf import settings
 
 from PyRM.models import Firma, Person, Kunde, Ort
 
-import MySQLdb
-db = MySQLdb.Connect(
-    db='faktura',
-    #db=settings.DATABASE_NAME,
-    user=settings.DATABASE_USER,
-    passwd=settings.DATABASE_PASSWORD,
-)
-db.set_character_set('utf8')
-cursor = MySQLdb.cursors.DictCursor(db)
+try:
+    import MySQLdb
+    db = MySQLdb.Connect(
+        db='faktura',
+        #db=settings.DATABASE_NAME,
+        user=settings.DATABASE_USER,
+        passwd=settings.DATABASE_PASSWORD,
+    )
+    db.set_character_set('utf8')
+    cursor = MySQLdb.cursors.DictCursor(db)
+except Exception, err:
+    print "ERROR: Can't connect to CAO database:", err
 
 ORTE = {}
 
@@ -139,6 +143,7 @@ def kundenliste():
 views = {
     "kundenliste": kundenliste,
 }
+@login_required
 def menu(request):
     response = HttpResponse()
     for view in views.keys():
@@ -146,6 +151,7 @@ def menu(request):
 
     return response
 
+@login_required
 def import_csv(request, unit=""):
     response = HttpResponse(mimetype='text/plain')
 

@@ -21,6 +21,7 @@ import sys, re
 from xml.etree import ElementTree as ET
 from pprint import pprint
 
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.conf import settings
 
@@ -100,6 +101,7 @@ def import_skr03():
 views = {
     "import_skr03": import_skr03,
 }
+@login_required
 def menu(request):
     response = HttpResponse()
     for view in views.keys():
@@ -107,6 +109,7 @@ def menu(request):
 
     return response
 
+@login_required
 def import_csv(request, unit=""):
     response = HttpResponse(mimetype='text/plain')
 

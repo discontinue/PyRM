@@ -8,13 +8,24 @@ DEFAULT_MAHNFRIST = 30
 DEFAULT_LAND = "Deutschland"
 
 ADMIN_URL_PREFIX = "admin"
+LOGIN_URL = "/admin/"
 
 #______________________________________________________________________________
 # DJANGO STUFF
 
 
 DEBUG = True
+
+# A boolean that turns on/off template debug mode. If this is True, the fancy
+# error page will display a detailed report for any TemplateSyntaxError.
+# Note that Django only displays fancy error pages if DEBUG is True!
 TEMPLATE_DEBUG = DEBUG
+
+if TEMPLATE_DEBUG:
+    # Display invalid (e.g. misspelled, unused) template variables
+    # http://www.djangoproject.com/documentation/templates_python/#how-invalid-variables-are-handled
+    # http://www.djangoproject.com/documentation/settings/#template-string-if-invalid
+    TEMPLATE_STRING_IF_INVALID = "XXX INVALID TEMPLATE STRING '%s' XXX"
 
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
@@ -52,12 +63,12 @@ USE_I18N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = ''
+MEDIA_ROOT = './static/'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = ''
+MEDIA_URL = '/static/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
@@ -88,6 +99,8 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    "PyRM/templates_pyrm",
+    "PyRM/templates_django",
 )
 
 INSTALLED_APPS = (

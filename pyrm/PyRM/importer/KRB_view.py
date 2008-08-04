@@ -3,6 +3,7 @@
 import sys, os, csv
 from pprint import pprint
 
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.conf import settings
 
@@ -118,6 +119,7 @@ def kundenliste():
 views = {
     "kundenliste": kundenliste,
 }
+@login_required
 def menu(request):
     response = HttpResponse()
     for view in views.keys():
@@ -125,6 +127,7 @@ def menu(request):
 
     return response
 
+@login_required
 def import_csv(request, unit=""):
     response = HttpResponse(mimetype='text/plain')
 
