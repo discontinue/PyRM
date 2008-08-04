@@ -1,0 +1,52 @@
+/* ----------------------------------------------------------------------------
+   common
+---------------------------------------------------------------------------- */
+* {
+  font-family: tahoma, arial, sans-serif;
+  color: #000;
+
+  padding: 0px;
+  margin: 0px;
+  border: 0px;
+  background-repeat: no-repeat;
+  outline: none;
+}
+html, body {
+  padding: 1em 3em 1em 3em;
+  background-color: #fff;
+}
+body {
+  font-size: 0.9em;
+  background-color: #eef;
+  margin: 1em 3em 1em 3em;
+  border: 3px solid #05d;
+}
+a {
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+/* ----------------------------------------------------------------------------
+   django admin panel
+---------------------------------------------------------------------------- */
+#header {
+  background-color: #05d;
+  color:#FFFFCC;
+}
+/* ----------------------------------------------------------------------------
+   PyRM
+---------------------------------------------------------------------------- */
+.selection_menu {
+  padding: 1em;
+}
+/* ------------------------------------------------------------------------- */
+.pyrm_footer {
+  border-top: 1px solid #05d;
+  text-align:right;
+}
+.pyrm_footer li {
+  display: inline;
+  list-style: none;
+  padding-left:1em;
+}
