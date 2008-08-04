@@ -8,8 +8,10 @@ from django.http import HttpResponse
 from django.conf import settings
 
 from PyRM.models import Firma, Person, Kunde, Ort
+from PyRM.importer.menu import _sub_menu, _start_view
 
-try:
+
+def _get_faktura_db_cursor():
     import MySQLdb
     db = MySQLdb.Connect(
         db='faktura',
@@ -19,12 +21,18 @@ try:
     )
     db.set_character_set('utf8')
     cursor = MySQLdb.cursors.DictCursor(db)
-except Exception, err:
-    print "ERROR: Can't connect to CAO database:", err
+    return cursor
+
 
 ORTE = {}
 
 def kundenliste():
+    try:
+        cursor = _get_faktura_db_cursor()
+    except Exception, err:
+        print "ERROR: Can't connect to CAO database:", err
+        return
+
     Ort.objects.all().delete()
     Person.objects.all().delete()
     Firma.objects.all().delete()
@@ -145,22 +153,8 @@ views = {
 }
 @login_required
 def menu(request):
-    response = HttpResponse()
-    for view in views.keys():
-        response.write('<a href="%s/">%s</a><br />' % (view, view))
-
-    return response
+    return _sub_menu(request, views.keys())
 
 @login_required
-def import_csv(request, unit=""):
-    response = HttpResponse(mimetype='text/plain')
-
-    if unit not in views:
-        response.write("Wrong URL!")
-    else:
-        old_stdout = sys.stdout
-        sys.stdout = response
-        views[unit]()
-        sys.stdout = old_stdout
-
-    return response
+def start_view(request, unit=""):
+    return _start_view(request, views, unit)

@@ -1,0 +1,13 @@
+{% extends "pyrm_base.html" %}
+{% block content %}
+<h1>Import sub menu:</h1>
+<ul>
+  {% for item in views %}
+  <li><a href="{{ item }}">{{ item }}</a></li>
+  {% endfor %}
+</ul>
+<ul>
+  <li><a href="..">back</a></li>
+  <li><a href="/{{ admin_url_prefix }}/">django admin panel</a></li>
+</ul>
+{% endblock %}

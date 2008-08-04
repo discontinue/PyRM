@@ -4,10 +4,14 @@ import sys, os, csv, re
 from datetime import datetime
 from pprint import pprint
 
-from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
+from django.template import RequestContext
+from django.shortcuts import render_to_response
+
 from django.conf import settings
 
 from PyRM.models import Konto, MWST#Firma, Person, Kunde, Ort
+from PyRM.importer.menu import _sub_menu, _start_view
 
 from utils.csv_utils import get_csv_tables, get_dictlist
 
@@ -94,28 +98,17 @@ def transfer_buchungen():
 
         print "-"*80
 
-#______________________________________________________________________________
+#------------------------------------------------------------------------------
 
 views = {
     "MSS_transfer_konten": transfer_konten,
     "MSS_transfer_buchungen": transfer_buchungen,
 }
+
+@login_required
 def menu(request):
-    response = HttpResponse()
-    for view in views.keys():
-        response.write('<a href="%s/">%s</a><br />' % (view, view))
+    return _sub_menu(request, views.keys())
 
-    return response
-
-def import_csv(request, unit=""):
-    response = HttpResponse(mimetype='text/plain')
-
-    if unit not in views:
-        response.write("Wrong URL!")
-    else:
-        old_stdout = sys.stdout
-        sys.stdout = response
-        views[unit]()
-        sys.stdout = old_stdout
-
-    return response
+@login_required
+def start_view(request, unit=""):
+    return _start_view(request, views, unit)

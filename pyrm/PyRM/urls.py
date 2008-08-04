@@ -9,16 +9,16 @@ assert media_url != ""
 
 urlpatterns = patterns('',
     url(r'^skr_import/$', 'PyRM.importer.SKR03_view.menu', name="PyRM-SKR03-import"),
-    (r'^skr_import/(?P<unit>\w*?)/$', 'PyRM.importer.SKR03_view.import_csv'),
+    (r'^skr_import/(?P<unit>\w*?)/$', 'PyRM.importer.SKR03_view.start_view'),
 
     url(r'^mms_import/$', 'PyRM.importer.MMS_view.menu', name="PyRM-MMS-import"),
-    (r'^mms_import/(?P<unit>\w*?)/$', 'PyRM.importer.MMS_view.import_csv'),
+    (r'^mms_import/(?P<unit>\w*?)/$', 'PyRM.importer.MMS_view.start_view'),
 
     url(r'^cao_import/$', 'PyRM.importer.CAO_view.menu', name="PyRM-CAO-import"),
-    (r'^cao_import/(?P<unit>[a-z]*?)/$', 'PyRM.importer.CAO_view.import_csv'),
+    (r'^cao_import/(?P<unit>[a-z]*?)/$', 'PyRM.importer.CAO_view.start_view'),
 
-    url(r'^krb_import/$', 'PyRM.importer.KRB_view.menu', name="PyRM-MRB-import"),
-    (r'^krb_import/(?P<unit>[a-z]*?)/$', 'PyRM.importer.KRB_view.import_csv'),
+    url(r'^krb_import/$', 'PyRM.importer.KRB_view.menu', name="PyRM-KRB-import"),
+    (r'^krb_import/(?P<unit>[a-z]*?)/$', 'PyRM.importer.KRB_view.start_view'),
 
     (r'^%s/(.*)' % settings.ADMIN_URL_PREFIX, admin.site.root),
 

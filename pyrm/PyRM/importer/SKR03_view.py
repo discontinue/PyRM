@@ -26,7 +26,7 @@ from django.http import HttpResponse
 from django.conf import settings
 
 from PyRM.models import Konto, MWST, GNUCASH_SKR03_MAP#Firma, Person, Kunde, Ort
-
+from PyRM.importer.menu import _sub_menu, _start_view
 
 SKR_DATEI = "./_daten/acctchrt_skr03.gnucash-xea"
 EXIST_MWST = tuple([i[0] for i in MWST])
@@ -96,29 +96,16 @@ def import_skr03():
 
     print " - END - "
 
-#______________________________________________________________________________
+#------------------------------------------------------------------------------
 
 views = {
     "import_skr03": import_skr03,
 }
+
 @login_required
 def menu(request):
-    response = HttpResponse()
-    for view in views.keys():
-        response.write('<a href="%s/">%s</a><br />' % (view, view))
-
-    return response
+    return _sub_menu(request, views.keys())
 
 @login_required
-def import_csv(request, unit=""):
-    response = HttpResponse(mimetype='text/plain')
-
-    if unit not in views:
-        response.write("Wrong URL!")
-    else:
-        old_stdout = sys.stdout
-        sys.stdout = response
-        views[unit]()
-        sys.stdout = old_stdout
-
-    return response
+def start_view(request, unit=""):
+    return _start_view(request, views, unit)
