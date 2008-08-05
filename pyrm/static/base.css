@@ -4,7 +4,6 @@
 * {
   font-family: tahoma, arial, sans-serif;
   color: #000;
-
   padding: 0px;
   margin: 0px;
   border: 0px;
@@ -31,6 +30,57 @@ pre {
   background-color: #fefeff;
   margin: 0.5em;
   padding: 0.5em;
+}
+fieldset, legend {
+  display: inline;
+  background-color: #fefeff;
+}
+fieldset {
+  padding: 3px;
+  margin: 3px;
+}
+legend {
+  display: block;
+  padding: 2px;
+  border: 1px solid #000;
+}
+/* ----------------------------------------------------------------------------
+   forms
+---------------------------------------------------------------------------- */
+.forms ul {
+    list-style-type:none;
+}
+.forms li {
+  padding: 3px;
+  margin: 3px;
+}
+.forms label {
+    font-size: 0.8em;
+}
+.forms .field_help_text {
+    font-size:0.7em;
+    display: block;
+    padding-left: 11em;
+}
+.forms label {
+    float: left;
+    padding-right: 4px;
+    text-align: right;
+    width: 9em;
+}
+.forms input, .forms select {
+    border: 1px solid #eee;
+    width: 35%;
+}
+.forms li:hover input {
+  border: 1px solid #777;
+}
+.forms .bigger {
+    /* make some text input fields bigger e.g. keywords,description */
+    width: 75%;
+}
+.forms input[type=submit] {
+  border: 1px solid #000;
 }
 /* ----------------------------------------------------------------------------
    django admin panel
