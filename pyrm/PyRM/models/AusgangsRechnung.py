@@ -67,7 +67,7 @@ class AusgangsPosten(models.Model):
 
     anzahl = models.PositiveIntegerField()
     beschreibung = models.TextField()
-    einzelpreis = models.FloatField()
+    einzelpreis = models.DecimalField(max_digits = 6, decimal_places = 2,)
 
     rechnung = models.ForeignKey(
         "AusgangsRechnung", #related_name="positionen"
@@ -77,6 +77,7 @@ class AusgangsPosten(models.Model):
         app_label = "PyRM"
         verbose_name = "Ausgangsrechnung-Position"
         verbose_name_plural = "Ausgangsrechnung-Positionen"
+        ordering = ['rechnung']
 
     def __unicode__(self):
         return self.beschreibung
@@ -85,7 +86,11 @@ class AusgangsPostenAdmin(admin.ModelAdmin):
     list_display = (
         "anzahl", "beschreibung", "einzelpreis", "rechnung"
     )
-#        list_display_links = ("shortcut",)
+    list_display_links = ("beschreibung",)
+    list_filter = ("rechnung",)
+    list_per_page = 20
+    list_select_related = True
+    search_fields = ("beschreibung",)
 
 admin.site.register(AusgangsPosten, AusgangsPostenAdmin)
 
@@ -122,12 +127,15 @@ class AusgangsRechnung(models.Model):
     """
     objects = AusgangsRechnungManager()
 
-    id = models.AutoField(primary_key=True,
-        help_text="ID - Rechnungsnummer"
+    id = models.AutoField(primary_key=True)
+
+    nummer = models.PositiveIntegerField(
+        null=True, blank=True,
+        help_text="AusgangsRechnungNummer"
     )
 
     bestellnummer = models.CharField(max_length=128, null=True, blank=True)
-    datum = models.DateField()
+    datum = models.DateField(null=True, blank=True)
     konto = models.ForeignKey(
         "Konto", null=True, blank=True,
         related_name="konto_set",
@@ -140,7 +148,8 @@ class AusgangsRechnung(models.Model):
     kunde = models.ForeignKey("Kunde", null=True, blank=True)
 
     anschrift = models.TextField(
-        help_text="Komplette Anschrift",
+        help_text="Abweichende Anschrift",
+        null=True, blank=True
     )
 
     lieferdatum = models.DateField(null=True, blank=True,
@@ -157,7 +166,8 @@ class AusgangsRechnung(models.Model):
         help_text="Anzahl der verschickten Mahnungen."
     )
 
-    summe = models.FloatField(
+    summe = models.DecimalField(
+        max_digits = 6, decimal_places = 2,
         help_text="Wird automatisch aus den Rechnungspositionen erechnet.",
         null=True, blank=True
     )
@@ -166,12 +176,36 @@ class AusgangsRechnung(models.Model):
         app_label = "PyRM"
         verbose_name = "Ausgangsrechnung"
         verbose_name_plural = "Ausgangsrechnungen"
-        ordering = ['-id']
+        ordering = ['-nummer']
 
     def __unicode__(self):
-        return u"Rechnung Nr.%s" % self.id
+        return u"Re.Nr.%s" % self.id
+
+class PostenInline(admin.TabularInline):
+#class PostenInline(admin.StackedInline):
+    model = AusgangsPosten
 
 class AusgangsRechnungAdmin(admin.ModelAdmin):
-    pass
+    inlines = (PostenInline,)
+    list_display = ("nummer", "kunde", "datum", "valuta", "konto", "summe")
+    list_display_links = ("nummer", "kunde")
+    list_filter = ("mahnstufe", "kunde", "konto",)
+    list_per_page = 20
+    list_select_related = True
+#    search_fields = ['foreign_key__related_fieldname']
+#    fieldsets = (
+#        (None, {
+#            'fields': ("nummer", "bestellnummer", "kunde", "summe", "mahnstufe")
+#        }),
+#        ('Kontenrahmen', {
+##            'classes': ('collapse',),
+#            'fields': ("konto", "ggkto")
+#        }),
+#        ('Datum', {
+##            'classes': ('collapse',),
+#            'fields': ("datum", "lieferdatum", "versand", "valuta")
+#        }),
+#    )
+
 
 admin.site.register(AusgangsRechnung, AusgangsRechnungAdmin)

@@ -67,7 +67,7 @@ def get_dictlist(table_data, used_fieldnames=None):
         dictlist.append(fields)
 
     # First item is all keys
-    return dictlist[1:]
+    return dictlist
 
 
 def convert(data, mapping):

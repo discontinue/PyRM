@@ -1,18 +1,32 @@
 # -*- coding: utf-8 -*-
 
-import sys, os, csv
+import sys, os, csv, re
+import codecs
+from datetime import datetime
 from pprint import pprint
+from decimal import Decimal
 
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.conf import settings
 
-from PyRM.models import Firma, Person, Kunde, Ort
 from PyRM.importer.menu import _sub_menu, _start_view
+from PyRM.models import Firma, Person, Kunde, Ort, Konto, \
+            AusgangsRechnung, AusgangsPosten, EingangsRechnung, EingangsPosten
 
 from utils.csv_utils import get_dictlist
 
 KUNDENLISTE = "./_daten/20080729 KRB Kundenliste.csv"
+BUCHUNGEN = "./_daten/20080805 KRB Buchungen.csv"
+
+
+def _get_dictlist(filename):
+    f = file(filename, "r")
+    data = f.readlines()
+    f.close()
+
+    dictlist = get_dictlist(data, used_fieldnames=None)
+    return dictlist
 
 
 def get_kunden_obj(line):
@@ -87,16 +101,13 @@ def kundenliste():
     Firma.objects.all().delete()
     Kunde.objects.all().delete()
 
-
-    f = file(KUNDENLISTE, "r")
-    data = f.readlines()
-    f.close()
-
-    dictlist = get_dictlist(data, used_fieldnames=None)
-    for line in dictlist:
+    for line in _get_dictlist(KUNDENLISTE):
+        print "_"*80
         if line["ID.1"]=="" or line["Vorname"]=="sonstiges":
+            print line
             continue
         pprint(line)
+        print " -"*40
 
         kundennummer = int(line["ID.1"])
 
@@ -107,20 +118,160 @@ def kundenliste():
         else:
             anzeigen = False
 
-        kunde = Kunde(
-            nummer = kundennummer,
-            person = person,
-            firma = firma,
-            anzeigen = anzeigen,
-        )
-        kunde.save()
+        kwargs = {
+            "nummer": kundennummer,
+            "person": person,
+            "firma": firma,
+            "anzeigen": anzeigen,
+        }
+#        print repr(kwargs)
+        try:
+            kunde = Kunde(**kwargs)
+            kunde.save()
+        except Exception, err:
+            print "Fehler:", err
 
-        print "-"*80
+#------------------------------------------------------------------------------
+
+KONTO_MAP = {
+    135 : 27,   # EDV-Software
+    650 : 420,  # Büroeinrichtung
+    4200: 1200, # Erlöse Steuerfrei -> Bankkonto
+    4400: 8400, # Einnahmen 16%
+    4401: 8400, # Einnahmen 16%
+    5400: 3400, # Wareneingang
+    6430: 1800, # Handy
+    6470: 4805, # Reperatur
+    6600: 4610, # Werbekosten
+    6800: 4910, # Porto
+    6815: 4930, # Bürobedarf
+}
+
+def _get_decimal(raw_summe):
+    summe1 = raw_summe.replace(".", "") # tausender punkte?
+    summe2 = summe1.replace(",", ".")
+    summe = Decimal(summe2)
+    return summe
+
+RE_TEXT_REXP = re.compile(r"^(\d+)[x ]+(.*?)[a ]+([\d,]+)$")
+def _get_re_posten(raw_text, summe):
+    text_lines = raw_text.strip().splitlines()
+    result = []
+    test_summe = Decimal(0)
+    for text_line in text_lines:
+        posten = RE_TEXT_REXP.findall(text_line.strip())
+        if posten == []:
+            return [(1, raw_text, summe)]
+
+        assert len(posten) == 1
+        posten = posten[0]
+
+        raw_anzahl, txt, raw_preis = posten
+        anzahl = int(raw_anzahl)
+        preis = _get_decimal(raw_preis)
+
+        result.append((anzahl, txt, preis))
+        test_summe += (anzahl * preis)
+
+    assert test_summe == summe
+    return result
+
+def buchungen():
+    for line in _get_dictlist(BUCHUNGEN):
+        raw_summe = line["Wert"]
+
+        print "_"*80
+        pprint(line)
+        if raw_summe == "" or line["Rechnungstext"].startswith("^^^"):
+            print " *** SKIP *** "
+            continue
+        print " -"*40
+
+        #----------------------------------------------------------------------
+
+        raw_summe = raw_summe.split(" ")[0]
+        summe = _get_decimal(raw_summe)
+        print "Betrag:", summe
+
+        #----------------------------------------------------------------------
+
+        kunden_nummer1 = line["K.Nr."]
+        if kunden_nummer1 == "" or kunden_nummer1 == "999":
+            # Kein kunde eingetragen
+            kunde = None
+        else:
+            kunden_nummer2 = int(kunden_nummer1)
+            kunde = Kunde.objects.get(nummer = kunden_nummer2)
+        print "Kunde:", kunde
+
+        #----------------------------------------------------------------------
+
+        date_string = line["R.Datum"]
+        if date_string == "":
+            datum = None
+        else:
+            print "date_string:", date_string
+            datum = datetime.strptime(date_string, "%d.%m.%y")
+        print "datum:", datum
+
+        #----------------------------------------------------------------------
+
+        re_posten = _get_re_posten(line["Rechnungstext"], summe)
+        print "RE.Posten:"
+        if len(re_posten)>1:
+            print " *"*40
+        pprint(re_posten)
+
+        #----------------------------------------------------------------------
+
+        raw_datev_nr = line["Art"]
+        if raw_datev_nr == "":
+            konto = None
+        else:
+            datev_nr = int(raw_datev_nr)
+            if datev_nr in KONTO_MAP:
+                datev_nr = KONTO_MAP[datev_nr]
+            konto = Konto.objects.get(datev_nummer = datev_nr)
+        print "Konto:", konto
+
+        #----------------------------------------------------------------------
+
+        raw_nr = line["R.Nr."]
+        if raw_nr == "":
+            re_nr = None
+        else:
+            re_nr = int(raw_nr)
+
+        #----------------------------------------------------------------------
+
+        if summe<0:
+            print "Ausgabe - Eingangsrechnung"
+#            EingangsPosten
+#            EingangsRechnung
+        else:
+            print "Einnahme - Ausgangsrechnung"
+            rechnung = AusgangsRechnung(
+                nummer = re_nr,
+                kunde = kunde,
+                datum = datum,
+                konto = konto,
+                summe = summe,
+            )
+            rechnung.save()
+            for anzahl, txt, preis in re_posten:
+                AusgangsPosten(
+                    anzahl = anzahl,
+                    beschreibung = txt,
+                    einzelpreis = preis,
+                    rechnung = rechnung
+                ).save()
+
 
 #------------------------------------------------------------------------------
 
 views = {
     "kundenliste": kundenliste,
+    "buchungen": buchungen,
 }
 @login_required
 def menu(request):

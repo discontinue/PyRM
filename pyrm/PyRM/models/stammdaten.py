@@ -345,7 +345,7 @@ class Kunde(BaseModel):
 
 
 class KundeAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("nummer", "person", "firma",)
 
 admin.site.register(Kunde, KundeAdmin)
 

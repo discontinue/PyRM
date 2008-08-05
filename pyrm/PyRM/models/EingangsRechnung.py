@@ -28,7 +28,7 @@ class EingangsPosten(models.Model):
     id = models.AutoField(primary_key=True)
 
     beschreibung = models.TextField()
-    einkaufspreis = models.FloatField()
+    einkaufspreis = models.DecimalField(max_digits = 6, decimal_places = 2,)
 
     eingangsrechnung = models.ForeignKey(
         "EingangsRechnung",
@@ -53,11 +53,11 @@ class EingangsRechnung(models.Model):
     Fremde Rechnungen die man selber beazhlen muß.
     i.d.R. für Waren-/Diensleistungseinkauf.
     """
-    id = models.AutoField(primary_key=True,)
+    id = models.AutoField(primary_key=True)
 
-    rechnungsnummer = models.CharField(
-         max_length=128, null=True, blank=True,
-         help_text="Rechnungsnummer",
+    nummer = models.CharField(
+        max_length=128, null=True, blank=True,
+        help_text="EingangsRechnungNummer"
     )
 
     class Meta:
@@ -66,7 +66,13 @@ class EingangsRechnung(models.Model):
         verbose_name_plural = "Eingangsrechnungen"
         ordering = ['-id']
 
+class PostenInline(admin.TabularInline):
+#class PostenInline(admin.StackedInline):
+    model = EingangsPosten
+
 class EingangsRechnungAdmin(admin.ModelAdmin):
-    pass
+    inlines = [
+        PostenInline,
+    ]
 
 admin.site.register(EingangsRechnung, EingangsRechnungAdmin)
