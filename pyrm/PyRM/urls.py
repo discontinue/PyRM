@@ -30,5 +30,6 @@ urlpatterns = patterns('',
     ),
 
     url(r'^import_menu/$', 'PyRM.importer.menu.menu', name="PyRM-import-menu"),
+    url(r'^setup/$', 'PyRM.index.setup', name="PyRM-setup"),
     url(r'^$', 'PyRM.index.menu', name="PyRM-main-menu"),
 )

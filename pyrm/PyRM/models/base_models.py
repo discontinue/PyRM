@@ -31,8 +31,6 @@ class BaseModel(models.Model):
     """
     Grundmodell für fast alle Klassen.
     """
-    id = models.AutoField(primary_key=True)
-
     erstellt_am = models.DateTimeField(
 #        auto_now_add=True, # Bug?
         help_text="Zeitpunkt der Erstellung",

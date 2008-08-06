@@ -16,6 +16,27 @@ http://svn.berlios.de/wsvn/unternehmer/trunk/unstable/sql/Germany-DATEV-SKR03EU-
 http://svn.berlios.de/wsvn/unternehmer/trunk/unstable/sql/Germany-DATEV-SKR03EU-gifi.sql
 
 
+    Im DATEV-Erfassungssystem werden Buchungs- und Steuerschlüssel an die
+    sechste Stelle vor das Gegenkonto gesetzt
+    (Vgl. Nr. 7: vor Konto (0)4530 steht der Steuerschlüssel 9 (16% VSt).
+
+    Zu den Erlöskonten 8400  8409 ist der Steuerschlüssel 3 (USt 16 %)
+    hinterlegt (<Mandant> <Kontenplan> <Eigenschaften> Steuerschlüssel), zu
+    den Erlöskonten 8300  8314 entsprechend der Steuerschlüssel 2 (USt 7 %).
+
+    Zu den WE-Konten 3400  3420 ist der Steuerschlüssel 9 (VSt 16 %)
+    hinterlegt (<Mandant> <Kontenplan> <Eigenschaften> Steuerschlüssel), zu den
+    WE-Konten 3300  3320 entsprechend der Steuerschlüssel 8 (VSt 7 %).
+
+    Zu den Konten der 4-er Klasse ist kein Steuerschlüssel hinterlegt.
+    Der Steuerschlüssel 9 (VSt 16%) bzw. der Steuerschlüssel 8 (VSt 7%) wird
+    vor das Gegenkonto gesetzt.
+
+    Es ist möglich die Konten der 4-er Klasse mit Steuerschlüsseln zu versehen.
+    Ratsam ist das nicht. In der Regel sind z.B. nicht alle Bürokosten mit
+    16% Vorsteuer belastet. Bei unberech-tigten Vorsteuerabzügen kann mit
+    keinem Wohlwollen eines Betriebsprüfers gerechnet werden.
+
 
     Last commit info:
     ~~~~~~~~~~~~~~~~~
@@ -53,6 +74,67 @@ MWST = (
     (16, 16),
     (19, 19),
 )
+
+# Der Steuerschlüssel steht der datev kontonummer vorran und gibt den
+# Prozentwert der MwSt. an.
+STEUER_SCHLUESSEL = (
+    (3, 19, u"Umsatzsteuer 19%"),
+    (5, 16, u"Umsatzsteuer 16%"),
+    (7, 16, u"Vorsteuer 16%"),
+    (8,  7, u"Vorsteuer 7%"),
+    (9, 19, u"Vorsteuer 19%"),
+)
+
+#______________________________________________________________________________
+class StSlManager(models.Manager):
+    def setup(self):
+        """
+        Alle vorhanden Werte aus STEUER_SCHLUESSEL eintragen
+        """
+        for data in STEUER_SCHLUESSEL:
+            entry = self.model(
+                id = data[0],
+                steuersatz = data[1],
+                beschreibung = data[2],
+            )
+            print "neuer Eintrag:", entry
+            entry.save()
+
+class StSl(BaseModel):
+    """
+    Datev-SteuerSchlüssel
+    """
+    objects = StSlManager()
+
+    id = models.PositiveIntegerField("schluessel", primary_key=True)
+    steuersatz = models.PositiveIntegerField()
+    beschreibung = models.CharField(max_length=150)
+
+    class Meta:
+        app_label = "PyRM"
+        verbose_name = verbose_name_plural = u"Steuerschlüssel"
+        ordering = ("id",)
+
+    def __unicode__(self):
+#        return repr(self.__dict__)
+        return u"%s - %s%% (%s)" % (
+            self.id, self.steuersatz, self.beschreibung
+        )
+#______________________________________________________________________________
+
+class StSlAdmin(admin.ModelAdmin):
+    list_display = ("id", "steuersatz", "beschreibung")
+    list_display_links = ("beschreibung",)
+    list_filter = ("steuersatz",)
+    fieldsets = (
+        (None, {
+            'fields': ("id", "steuersatz", "beschreibung")
+        }),
+        BASE_FIELDSET
+    )
+    fieldsets = add_missing_fields(StSl, fieldsets)
+
+admin.site.register(StSl, StSlAdmin)
 
 #______________________________________________________________________________
 
