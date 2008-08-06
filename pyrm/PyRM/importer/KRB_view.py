@@ -246,9 +246,11 @@ def buchungen():
 
         if summe<0:
             print "Ausgabe - Eingangsrechnung"
+            rechung = EingangsRechnung(
+            )
 #            EingangsPosten
-#            EingangsRechnung
         else:
+            continue
             print "Einnahme - Ausgangsrechnung"
             rechnung = AusgangsRechnung(
                 nummer = re_nr,

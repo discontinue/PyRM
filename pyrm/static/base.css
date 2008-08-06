@@ -32,7 +32,6 @@ pre {
   padding: 0.5em;
 }
 fieldset, legend {
-  display: inline;
   background-color: #fefeff;
 }
 fieldset {
@@ -47,6 +46,9 @@ legend {
 /* ----------------------------------------------------------------------------
    forms
 ---------------------------------------------------------------------------- */
+input, textarea, select {
+  font-family: tahoma, arial, sans-serif;
+}
 .forms ul {
     list-style-type:none;
 }
@@ -68,12 +70,19 @@ legend {
     text-align: right;
     width: 9em;
 }
-.forms input, .forms select {
-    border: 1px solid #eee;
-    width: 35%;
+textarea {
+    width: 80%;
 }
-.forms li:hover input {
-  border: 1px solid #777;
+.forms input, .forms select, input[type="text"], input[type="password"], select {
+    border: 1px solid #aaa;
+    width: 40%;
+}
+.vDateField {
+    width: 6em !important;
+}
+.forms li:hover input, .forms li:hover textarea, .forms li:hover select,
+.form-row:hover input, .form-row:hover textarea, .form-row:hover select {
+  border: 1px solid #333;
 }
 .forms .bigger {
     /* make some text input fields bigger e.g. keywords,description */
@@ -96,11 +105,16 @@ legend {
   padding: 1em;
 }
 /* ------------------------------------------------------------------------- */
-.pyrm_footer {
-  border-top: 1px solid #05d;
+.pyrm_footer, .pyrm_header_nav {
   text-align:right;
 }
-.pyrm_footer li {
+.pyrm_header_nav {
+  border-bottom: 1px solid #05d;
+}
+.pyrm_footer {
+  border-top: 1px solid #05d;
+}
+.pyrm_selection_menu li {
   display: inline;
   list-style: none;
   padding-left:1em;

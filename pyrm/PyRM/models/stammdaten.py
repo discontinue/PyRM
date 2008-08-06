@@ -32,6 +32,7 @@ from django.contrib.auth.models import User
 
 # PyRM
 from PyRM.middleware import threadlocals
+from utils.django_modeladmin import add_missing_fields
 
 #______________________________________________________________________________
 
@@ -114,7 +115,6 @@ class BaseModel(models.Model):
         erstellt_von = self.erstellt_von
 
         super(BaseModel,self).save()
-
 
     class Meta:
         app_label = "PyRM"
@@ -218,6 +218,21 @@ class FirmaAdmin(admin.ModelAdmin):
     )
     list_display_links = ("name1",)
     list_filter = ("ort",)
+    fieldsets = (
+        (None, {
+            'fields': ("name1","name2", "notizen")
+        }),
+        ("kontakt", {
+            'fields': ("telefon", "mobile", "fax", "email", "internet")
+        }),
+        ("Adresse", {
+            'fields': ("strasse", "strassen_zusatz", "plz", "ort")
+        }),
+        ("bank", {
+            'fields': ("UStIdNr", "kontonr", "blz", "iban", "bic")
+        }),
+    )
+    fieldsets = add_missing_fields(Firma, fieldsets)
 
 admin.site.register(Firma, FirmaAdmin)
 

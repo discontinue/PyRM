@@ -19,6 +19,9 @@ from django.conf import settings
 from django.db import models
 from django.contrib import admin
 
+from PyRM.models.Rechnung import BasisRechnung
+from utils.django_modeladmin import add_missing_fields
+
 #______________________________________________________________________________
 
 class AusgangsPostenManager(models.Manager):
@@ -121,46 +124,20 @@ class AusgangsRechnungManager(models.Manager):
             raise AttributeError(obj)
         return obj
 
-class AusgangsRechnung(models.Model):
+class AusgangsRechnung(BasisRechnung):
     """
     Rechnungen die man selber erstellt.
     """
     objects = AusgangsRechnungManager()
 
-    id = models.AutoField(primary_key=True)
-
-    nummer = models.PositiveIntegerField(
-        null=True, blank=True,
-        help_text="AusgangsRechnungNummer"
-    )
-
-    bestellnummer = models.CharField(max_length=128, null=True, blank=True)
-    datum = models.DateField(null=True, blank=True)
-    konto = models.ForeignKey(
-        "Konto", null=True, blank=True,
-        related_name="konto_set",
-    )
-    ggkto = models.ForeignKey(
-        "Konto", help_text="Gegenkonto",
-        related_name="gegenkonto_set",
-        null=True, blank=True
-    )
     kunde = models.ForeignKey("Kunde", null=True, blank=True)
 
     anschrift = models.TextField(
         help_text="Abweichende Anschrift",
         null=True, blank=True
     )
-
-    lieferdatum = models.DateField(null=True, blank=True,
-        help_text="Zeitpunkt der Leistungserbringung"
-    )
     versand = models.DateField(null=True, blank=True,
         help_text="Versanddatum der Rechnung."
-    )
-
-    valuta = models.DateField(null=True, blank=True,
-        help_text="Datum der Buchung laut Kontoauszug."
     )
     mahnstufe = models.PositiveIntegerField(default=0,
         help_text="Anzahl der verschickten Mahnungen."
@@ -185,6 +162,8 @@ class PostenInline(admin.TabularInline):
 #class PostenInline(admin.StackedInline):
     model = AusgangsPosten
 
+
+
 class AusgangsRechnungAdmin(admin.ModelAdmin):
     inlines = (PostenInline,)
     list_display = ("nummer", "kunde", "datum", "valuta", "konto", "summe")
@@ -193,19 +172,22 @@ class AusgangsRechnungAdmin(admin.ModelAdmin):
     list_per_page = 20
     list_select_related = True
 #    search_fields = ['foreign_key__related_fieldname']
-#    fieldsets = (
-#        (None, {
-#            'fields': ("nummer", "bestellnummer", "kunde", "summe", "mahnstufe")
-#        }),
-#        ('Kontenrahmen', {
-##            'classes': ('collapse',),
-#            'fields': ("konto", "ggkto")
-#        }),
-#        ('Datum', {
-##            'classes': ('collapse',),
-#            'fields': ("datum", "lieferdatum", "versand", "valuta")
-#        }),
-#    )
-
+    fieldsets = (
+        (None, {
+            'fields': (
+                "nummer", "bestellnummer", "kunde", "anschrift", "summe",
+                "mahnstufe"
+            )
+        }),
+        ('Kontenrahmen', {
+#            'classes': ('collapse',),
+            'fields': ("konto", "ggkto")
+        }),
+        ('Datum', {
+#            'classes': ('collapse',),
+            'fields': ("datum", "lieferdatum", "versand", "valuta")
+        }),
+    )
+    fieldsets = add_missing_fields(AusgangsRechnung, fieldsets)
 
 admin.site.register(AusgangsRechnung, AusgangsRechnungAdmin)

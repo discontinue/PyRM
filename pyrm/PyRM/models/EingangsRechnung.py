@@ -19,6 +19,8 @@ from django.conf import settings
 from django.db import models
 from django.contrib import admin
 
+from PyRM.models.Rechnung import BasisRechnung
+from utils.django_modeladmin import add_missing_fields
 
 
 class EingangsPosten(models.Model):
@@ -48,17 +50,13 @@ admin.site.register(EingangsPosten, EingangsPostenAdmin)
 #______________________________________________________________________________
 
 
-class EingangsRechnung(models.Model):
+class EingangsRechnung(BasisRechnung):
     """
     Fremde Rechnungen die man selber beazhlen muß.
     i.d.R. für Waren-/Diensleistungseinkauf.
     """
-    id = models.AutoField(primary_key=True)
 
-    nummer = models.CharField(
-        max_length=128, null=True, blank=True,
-        help_text="EingangsRechnungNummer"
-    )
+    lieferant = models.ForeignKey("Lieferant", null=True, blank=True)
 
     class Meta:
         app_label = "PyRM"
@@ -74,5 +72,19 @@ class EingangsRechnungAdmin(admin.ModelAdmin):
     inlines = [
         PostenInline,
     ]
+    fieldsets = (
+        (None, {
+            'fields': ("nummer", "lieferant","bestellnummer",)
+        }),
+        ('Kontenrahmen', {
+#            'classes': ('collapse',),
+            'fields': ("konto", "ggkto")
+        }),
+        ('Datum', {
+#            'classes': ('collapse',),
+            'fields': ("datum", "lieferdatum", "valuta")
+        }),
+    )
+    fieldsets = add_missing_fields(EingangsRechnung, fieldsets)
 
 admin.site.register(EingangsRechnung, EingangsRechnungAdmin)

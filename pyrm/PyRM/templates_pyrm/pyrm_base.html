@@ -11,12 +11,24 @@
 </head>
 <body {% block body_tag %}{% endblock %}>
 <a name="top"></a>
-{% block content %}{% endblock %}
-{% block base_footer %}
-<div id="footer" class="pyrm_footer">
-<ul class="selection_menu">
+
+{% block base_header_nav %}
+<div id="header_nav" class="pyrm_header_nav">
+<ul class="pyrm_selection_menu">
   <li><a href="/">index</a></li>
   <li><a href="/{{ admin_url_prefix }}/">django admin panel</a></li>
 </ul>
 </div>{% endblock %}
+
+
+{% block content %}{% endblock %}
+
+{% block base_footer %}
+<div id="footer" class="pyrm_footer">
+<ul class="pyrm_selection_menu">
+  <li><a href="/">index</a></li>
+  <li><a href="/{{ admin_url_prefix }}/">django admin panel</a></li>
+</ul>
+</div>{% endblock %}
+
 </body></html>
