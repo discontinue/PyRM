@@ -168,7 +168,7 @@ class Firma(FirmaPersonBaseModel):
 class FirmaAdmin(admin.ModelAdmin):
     list_display = (
         "name1", "plz", "ort",
-        "erstellt_von", "erstellt_am", "geaendert_von", "geaendert_am",
+        #"erstellt_von", "erstellt_am", "geaendert_von", "geaendert_am",
     )
     list_display_links = ("name1",)
     list_filter = ("ort",)
