@@ -28,10 +28,9 @@
 from django.db import models
 from django.conf import settings
 from django.contrib import admin
-from django.contrib.auth.models import User
 
 # PyRM
-from PyRM.middleware import threadlocals
+from PyRM.models.base_models import BaseModel
 from utils.django_modeladmin import add_missing_fields
 
 #______________________________________________________________________________
@@ -75,51 +74,6 @@ class OrtAdmin(admin.ModelAdmin):
     list_filter = ("land",)
 
 admin.site.register(Ort, OrtAdmin)
-
-#______________________________________________________________________________
-
-class BaseModel(models.Model):
-    """
-    Basis Klasse für Person, Firma, Kunde und Lieferrant.
-    """
-    id = models.AutoField(primary_key=True)
-
-    erstellt_am = models.DateTimeField(
-        auto_now_add=True, help_text="Zeitpunkt der Erstellung",
-    )
-    erstellt_von = models.ForeignKey(
-        User, editable=False, blank=True, null=True,
-        help_text="Benutzer der diesen Eintrag erstellt hat.",
-        related_name="%(class)s_erstellt_von"
-    )
-    geaendert_am = models.DateTimeField(
-        auto_now=True, help_text="Zeitpunkt der letzten Änderung",
-    )
-    geaendert_von = models.ForeignKey(
-        User, editable=False, blank=True, null=True,
-        help_text="Benutzer der diesen Eintrag zuletzt geändert hat.",
-        related_name="%(class)s_geaendert_von"
-    )
-
-    notizen = models.TextField(blank=True, null=True)
-
-    def save(self):
-        current_user = threadlocals.get_current_user()
-        self.geaendert_von = current_user
-
-        if self.erstellt_von == None:
-            # This is a new object
-            self.erstellt_von = current_user
-
-        id = self.id
-        erstellt_von = self.erstellt_von
-
-        super(BaseModel,self).save()
-
-    class Meta:
-        app_label = "PyRM"
-        # http://www.djangoproject.com/documentation/model-api/#abstract-base-classes
-        abstract = True # Abstract base classes
 
 #______________________________________________________________________________
 
@@ -331,14 +285,6 @@ class KundeLieferantBase(BaseModel):
         # http://www.djangoproject.com/documentation/model-api/#abstract-base-classes
         abstract = True # Abstract base classes
 
-    def __unicode__(self):
-        if self.firma:
-            if self.anzeigen:
-                return u"%s - %s" % (self.firma, self.person)
-            else:
-                return u"%s" % self.firma
-        else:
-            return u"%s" % self.person
 #______________________________________________________________________________
 
 
@@ -364,6 +310,15 @@ class Kunde(KundeLieferantBase):
         default = settings.DEFAULT_MAHNFRIST,
         help_text="Frist in Tagen."
     )
+
+    def __unicode__(self):
+        if self.firma:
+            if self.anzeigen:
+                return u"%s - %s" % (self.firma, self.person)
+            else:
+                return u"%s" % self.firma
+        else:
+            return u"%s" % self.person
 
     class Meta:
         app_label = "PyRM"
@@ -408,6 +363,12 @@ class Lieferant(KundeLieferantBase):
         max_length=128, null=True, blank=True,
         help_text="Kundennummer bei diesem Lieferrant.",
     )
+
+    def __unicode__(self):
+        if self.firma:
+            return u"%s - %s" % (self.firma, self.person)
+        else:
+            return u"%s" % self.person
 
     class Meta:
         app_label = "PyRM"

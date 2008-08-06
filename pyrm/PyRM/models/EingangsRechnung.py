@@ -19,7 +19,8 @@ from django.conf import settings
 from django.db import models
 from django.contrib import admin
 
-from PyRM.models.Rechnung import BasisRechnung, BasisPosten, BasisPostenAdmin
+from PyRM.models.base_models import BASE_FIELDSET, BasisRechnung, BasisPosten, \
+                                                                BasisPostenAdmin
 from utils.django_modeladmin import add_missing_fields
 
 
@@ -27,6 +28,9 @@ class EingangsPosten(BasisPosten):
     """
     Einzelne Positionen auf einer Eingangsrechnung
     """
+    rechnung = models.ForeignKey(
+        "EingangsRechnung", #related_name="positionen"
+    )
     class Meta:
         app_label = "PyRM"
         verbose_name = "Eingangsrechnung-Position"
@@ -49,16 +53,23 @@ class EingangsRechnung(BasisRechnung):
         app_label = "PyRM"
         verbose_name = "Eingangsrechnung"
         verbose_name_plural = "Eingangsrechnungen"
-        ordering = ['-id']
+
 
 class PostenInline(admin.TabularInline):
 #class PostenInline(admin.StackedInline):
     model = EingangsPosten
 
+
 class EingangsRechnungAdmin(admin.ModelAdmin):
     inlines = [
         PostenInline,
     ]
+    list_display = ("nummer", "lieferant", "datum", "valuta", "konto", "summe")
+    list_display_links = ("nummer", "lieferant")
+    list_filter = ("lieferant", "konto",)
+    list_per_page = 20
+    list_select_related = True
+#    search_fields = ['foreign_key__related_fieldname']
     fieldsets = (
         (None, {
             'fields': ("nummer", "lieferant","bestellnummer",)
@@ -71,6 +82,7 @@ class EingangsRechnungAdmin(admin.ModelAdmin):
 #            'classes': ('collapse',),
             'fields': ("datum", "lieferdatum", "valuta")
         }),
+        BASE_FIELDSET,
     )
     fieldsets = add_missing_fields(EingangsRechnung, fieldsets)
 

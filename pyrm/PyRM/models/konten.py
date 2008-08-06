@@ -31,6 +31,11 @@ from django.db import models
 from django.conf import settings
 from django.contrib import admin
 
+from PyRM.models.base_models import BaseModel, BASE_FIELDSET
+from utils.django_modeladmin import add_missing_fields
+
+#______________________________________________________________________________
+
 KONTOARTEN = (
     (6, u"INCOME",      u"Einnahmen"),
     (7, u"EXPENSE",     u"Aufwändungen"),
@@ -49,9 +54,10 @@ MWST = (
     (19, 19),
 )
 
-class Konto(models.Model):
+#______________________________________________________________________________
 
-    datev_nummer = models.PositiveIntegerField(primary_key=True)
+class Konto(BaseModel):
+    datev_nummer = models.PositiveIntegerField()
     name = models.CharField(max_length=150)
 
     kontoart = models.PositiveIntegerField(
@@ -81,5 +87,12 @@ class KontoAdmin(admin.ModelAdmin):
     list_display = ("datev_nummer", "kontoart", "mwst", "name", "anzahl")
     list_display_links = ("name",)
     list_filter = ("kontoart", "mwst")
+    fieldsets = (
+        (None, {
+            'fields': ("datev_nummer", "name", "kontoart", "mwst", "anzahl")
+        }),
+        BASE_FIELDSET
+    )
+    fieldsets = add_missing_fields(Konto, fieldsets)
 
 admin.site.register(Konto, KontoAdmin)

@@ -19,7 +19,8 @@ from django.conf import settings
 from django.db import models
 from django.contrib import admin
 
-from PyRM.models.Rechnung import BasisRechnung, BasisPosten, BasisPostenAdmin
+from PyRM.models.base_models import BASE_FIELDSET, BasisRechnung, BasisPosten, \
+                                                                BasisPostenAdmin
 from utils.django_modeladmin import add_missing_fields
 
 #______________________________________________________________________________
@@ -65,6 +66,10 @@ class AusgangsPosten(BasisPosten):
     Jede einzelne Position auf einer Ausgangsrechnung.
     """
     objects = AusgangsPostenManager()
+
+    rechnung = models.ForeignKey(
+        "AusgangsRechnung", #related_name="positionen"
+    )
 
     class Meta:
         app_label = "PyRM"
@@ -123,10 +128,8 @@ class AusgangsRechnung(BasisRechnung):
         app_label = "PyRM"
         verbose_name = "Ausgangsrechnung"
         verbose_name_plural = "Ausgangsrechnungen"
-        ordering = ['-nummer']
 
-    def __unicode__(self):
-        return u"Re.Nr.%s" % self.id
+
 
 class PostenInline(admin.TabularInline):
 #class PostenInline(admin.StackedInline):
@@ -157,6 +160,7 @@ class AusgangsRechnungAdmin(admin.ModelAdmin):
 #            'classes': ('collapse',),
             'fields': ("datum", "lieferdatum", "versand", "valuta")
         }),
+        BASE_FIELDSET,
     )
     fieldsets = add_missing_fields(AusgangsRechnung, fieldsets)
 

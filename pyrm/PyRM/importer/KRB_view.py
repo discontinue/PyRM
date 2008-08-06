@@ -153,6 +153,12 @@ def _get_decimal(raw_summe):
     summe = Decimal(summe2)
     return summe
 
+
+def _get_datum(raw_datum):
+    if raw_datum != "":
+        return datetime.strptime(raw_datum, "%d.%m.%y")
+
+
 RE_TEXT_REXP = re.compile(r"^(\d+)[x ]+(.*?)[a ]+([\d,]+)$")
 def _get_re_posten(raw_text, summe):
     text_lines = raw_text.strip().splitlines()
@@ -176,6 +182,7 @@ def _get_re_posten(raw_text, summe):
     assert test_summe == summe
     return result
 
+
 def buchungen():
     AusgangsRechnung.objects.all().delete()
     AusgangsPosten.objects.all().delete()
@@ -187,6 +194,7 @@ def buchungen():
 
 
     for line in _get_dictlist(BUCHUNGEN):
+        notiz = ""
         raw_summe = line["Wert"]
 
         print "_"*80
@@ -215,13 +223,13 @@ def buchungen():
 
         #----------------------------------------------------------------------
 
-        date_string = line["R.Datum"]
-        if date_string == "":
-            datum = None
-        else:
-            print "date_string:", date_string
-            datum = datetime.strptime(date_string, "%d.%m.%y")
-        print "datum:", datum
+        datum = _get_datum(raw_datum = line["R.Datum"])
+        raw_valute_datum = line["gezahlt\nEingang"]
+        try:
+            valuta = _get_datum(raw_datum = raw_valute_datum)
+        except ValueError, err:
+            print "ValueError:", err
+            notiz += raw_valute_datum
 
         #----------------------------------------------------------------------
 
@@ -263,40 +271,40 @@ def buchungen():
                     firma = kunde.firma,
                 )
                 lieferant.save()
+            else:
+                lieferant = None
 
-                rechung = EingangsRechnung(
-                    nummer = re_nr,
-                    lieferant = lieferant,
-                    datum = datum,
-                    konto = konto,
-                    summe = summe,
-                )
-                rechung.save()
-                for anzahl, txt, preis in re_posten:
-                    EingangsPosten(
-                        anzahl = anzahl,
-                        beschreibung = txt,
-                        einzelpreis = preis,
-                        rechnung = rechnung
-                    ).save()
+            rechnung = EingangsRechnung(
+                nummer = re_nr,
+                lieferant = lieferant,
+                datum = datum,
+                valuta = valuta,
+                konto = konto,
+                summe = summe,
+            )
+            rechnung.save()
+            PostenModel = EingangsPosten
         else:
             print "Einnahme - Ausgangsrechnung"
             rechnung = AusgangsRechnung(
                 nummer = re_nr,
                 kunde = kunde,
                 datum = datum,
+                valuta = valuta,
                 konto = konto,
                 summe = summe,
             )
             rechnung.save()
-            for anzahl, txt, preis in re_posten:
-                AusgangsPosten(
-                    anzahl = anzahl,
-                    beschreibung = txt,
-                    einzelpreis = preis,
-                    rechnung = rechnung
-                ).save()
+            PostenModel = AusgangsPosten
 
+
+        for anzahl, txt, preis in re_posten:
+            PostenModel(
+                anzahl = anzahl,
+                beschreibung = txt,
+                einzelpreis = preis,
+                rechnung = rechnung
+            ).save()
 
 #------------------------------------------------------------------------------
 
