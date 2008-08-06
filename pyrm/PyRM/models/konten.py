@@ -61,7 +61,7 @@ class Konto(BaseModel):
     name = models.CharField(max_length=150)
 
     kontoart = models.PositiveIntegerField(
-        max_length=1, choices=KONTO_CHOICES
+        max_length=1, choices=KONTO_CHOICES, null=True, blank=True
     )
     mwst = models.PositiveIntegerField(
         max_length=1, choices=MWST, null=True, blank=True
@@ -79,7 +79,11 @@ class Konto(BaseModel):
         ordering = ["anzahl", "datev_nummer"]
 
     def __unicode__(self):
-        return u"%(datev_nummer)s - %(name)s - %(anzahl)s" % self.__dict__
+#        return repr(self.__dict__)
+        return u" - ".join(
+            (str(self.datev_nummer), repr(self.name),
+            str(self.kontoart), str(self.anzahl))
+        )
 
 #______________________________________________________________________________
 

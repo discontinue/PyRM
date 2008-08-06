@@ -15,14 +15,14 @@ from PyRM.importer.menu import _sub_menu, _start_view
 
 from utils.csv_utils import get_csv_tables, get_dictlist
 
-#CSV_DATEI = "./_daten/TRANSFER.CSV"
-CSV_DATEI = "./_daten/Beispielmandant TRANSFER.CSV"
+CSV_DATEI = "./_daten/TRANSFER.CSV"
+#CSV_DATEI = "./_daten/Beispielmandant TRANSFER.CSV"
 
 
 PROZ_RE = re.compile(r"(\d+?)\%")
 
 def transfer_konten():
-    Konto.objects.all().delete()
+#    Konto.objects.all().delete()
 
     buchungen, konten = get_csv_tables(CSV_DATEI)
 
@@ -30,14 +30,10 @@ def transfer_konten():
 
     dictlist = get_dictlist(konten, used_fieldnames=None)
     for line in dictlist:
-        print "_"*79
 #        if line["ID.1"]=="" or line["Vorname"]=="sonstiges":
 #            continue
-        for k,v in line.iteritems():
-            if v:
-                print k, v
-
-        konto_name = line['Listenname']
+        datev_nummer = int(line['Konto'])
+        konto_name = unicode(line['Listenname'], "utf8")
 
         mwst = None
         try:
@@ -49,13 +45,24 @@ def transfer_konten():
             if mwst in exist_mwst:
                 print "MwSt: %s%%" % mwst
 
-        konto = Konto(
-            datev_nummer = line['Konto'],
-            name = konto_name,
-            #kontoart =
-            mwst = mwst,
-        )
-        konto.save()
+        try:
+            konto = Konto.objects.get(datev_nummer = datev_nummer)
+        except Konto.DoesNotExist:
+            konto = Konto(
+                datev_nummer = datev_nummer,
+                name = konto_name,
+                mwst = mwst,
+            )
+            konto.save()
+            print "Neues Konto erstellt:", konto
+        else:
+            print "Konto besteht schon:", konto
+            if konto_name != konto.name:
+                print " *** andere Bezeichnung:"
+                print konto_name, "!=", konto.name
+            if mwst != konto.mwst:
+                print " *** andere MwSt.:"
+                print mwst, "!=", konto.mwst
 
         print "-"*80
 
@@ -86,7 +93,7 @@ def transfer_buchungen():
             print "*"*79
             print "Konto unbekannt:", err
             print "Erstelle neuen Eintrag!"
-            
+
         else:
             print "Konto:", konto
 
