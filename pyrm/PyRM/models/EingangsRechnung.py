@@ -19,32 +19,20 @@ from django.conf import settings
 from django.db import models
 from django.contrib import admin
 
-from PyRM.models.Rechnung import BasisRechnung
+from PyRM.models.Rechnung import BasisRechnung, BasisPosten, BasisPostenAdmin
 from utils.django_modeladmin import add_missing_fields
 
 
-class EingangsPosten(models.Model):
+class EingangsPosten(BasisPosten):
     """
     Einzelne Positionen auf einer Eingangsrechnung
     """
-    id = models.AutoField(primary_key=True)
-
-    beschreibung = models.TextField()
-    einkaufspreis = models.DecimalField(max_digits = 6, decimal_places = 2,)
-
-    eingangsrechnung = models.ForeignKey(
-        "EingangsRechnung",
-        #related_name="eingangs_posten",
-    )
     class Meta:
         app_label = "PyRM"
         verbose_name = "Eingangsrechnung-Position"
         verbose_name_plural = "Eingangsrechnung-Positionen"
 
-class EingangsPostenAdmin(admin.ModelAdmin):
-    pass
-
-admin.site.register(EingangsPosten, EingangsPostenAdmin)
+admin.site.register(EingangsPosten, BasisPostenAdmin)
 
 
 #______________________________________________________________________________
@@ -55,7 +43,6 @@ class EingangsRechnung(BasisRechnung):
     Fremde Rechnungen die man selber beazhlen muß.
     i.d.R. für Waren-/Diensleistungseinkauf.
     """
-
     lieferant = models.ForeignKey("Lieferant", null=True, blank=True)
 
     class Meta:

@@ -308,28 +308,14 @@ admin.site.register(Skonto, SkontoAdmin)
 
 #______________________________________________________________________________
 
-
-class Kunde(BaseModel):
+class KundeLieferantBase(BaseModel):
     """
-    Firmen- und Privat-Kunden für Ausgangsrechnungen.
+    Basis Klasse für Kunde und Lieferant
     """
-    nummer = models.IntegerField(
-        unique=True, help_text="Kundennummer Nummer"
-    )
     person = models.ForeignKey(Person, null=True, blank=True)
-    anzeigen = models.BooleanField(
-        help_text="Name der Person mit anzeigen, wenn es eine Firma ist?"
-    )
     firma = models.ForeignKey(Firma, null=True, blank=True)
 
     seid = models.DateField(auto_now_add=True, null=True, blank=True)
-
-    lieferrantennr = models.CharField(max_length=128,
-        help_text=(
-            "Lieferrantennummer bei dieser Firma, falls vorhanden."
-            " Wird auf jeder Rechnung aufgeführt"
-        )
-    )
 
     lieferstop_datum = models.DateField(blank=True, null=True)
     lieferstop_grund = models.TextField(blank=True, null=True)
@@ -338,16 +324,12 @@ class Kunde(BaseModel):
         default = settings.DEFAULT_ZAHLUNGSZIEL,
         help_text="max. Zahlungseingangsdauer in Tagen"
     )
-    mahnfrist = models.PositiveIntegerField(
-        default = settings.DEFAULT_MAHNFRIST,
-        help_text="Frist in Tagen."
-    )
     skonto = models.ManyToManyField(Skonto, verbose_name="Skonto liste")
 
     class Meta:
         app_label = "PyRM"
-        verbose_name = "Kunde"
-        verbose_name_plural = "Kunden"
+        # http://www.djangoproject.com/documentation/model-api/#abstract-base-classes
+        abstract = True # Abstract base classes
 
     def __unicode__(self):
         if self.firma:
@@ -357,33 +339,75 @@ class Kunde(BaseModel):
                 return u"%s" % self.firma
         else:
             return u"%s" % self.person
+#______________________________________________________________________________
+
+
+class Kunde(KundeLieferantBase):
+    """
+    Firmen- und Privat-Kunden für Ausgangsrechnungen.
+    """
+    nummer = models.IntegerField(
+        unique=True, help_text="Kundennummer Nummer"
+    )
+    anzeigen = models.BooleanField(
+        help_text="Name der Person mit anzeigen, wenn es eine Firma ist?"
+    )
+
+    lieferrantennr = models.CharField(max_length=128,
+        help_text=(
+            "Lieferrantennummer bei dieser Firma, falls vorhanden."
+            " Wird auf jeder Rechnung aufgeführt"
+        )
+    )
+
+    mahnfrist = models.PositiveIntegerField(
+        default = settings.DEFAULT_MAHNFRIST,
+        help_text="Frist in Tagen."
+    )
+
+    class Meta:
+        app_label = "PyRM"
+        verbose_name = "Kunde"
+        verbose_name_plural = "Kunden"
+
 
 
 class KundeAdmin(admin.ModelAdmin):
     list_display = ("nummer", "person", "firma",)
+    fieldsets = (
+        ("Basis Daten", {
+            'fields': (
+                "nummer", "lieferrantennr","person", "anzeigen", "firma",
+                "notizen"
+            )
+        }),
+        ("Lieferstop", {
+#            'classes': ('collapse',),
+            'fields': ("lieferstop_datum", "lieferstop_grund")
+        }),
+        ("Zeiten", {
+#            'classes': ('collapse',),
+            'fields': ("mahnfrist", "zahlungsziel",)
+        }),
+    )
+    fieldsets = add_missing_fields(Kunde, fieldsets)
 
 admin.site.register(Kunde, KundeAdmin)
 
 #______________________________________________________________________________
 
-class Lieferant(BaseModel):
+class Lieferant(KundeLieferantBase):
     """
     Lieferanten für die Eingansrechnungen
     """
     nummer = models.IntegerField(
-        unique=True, help_text="Lieferranten Nummer"
+        null=True, blank=True, unique=True,
+        help_text="Lieferranten Nummer"
     )
-    kundenummer =  models.CharField(
+    kundennummer =  models.CharField(
         max_length=128, null=True, blank=True,
         help_text="Kundennummer bei diesem Lieferrant.",
     )
-    person = models.ForeignKey(Person, null=True, blank=True)
-    firma = models.ForeignKey(Firma, null=True, blank=True)
-
-    zahlungsziel = models.PositiveIntegerField(null=True, blank=True,
-        help_text="Zahlungseingangsdauer in Tagen"
-    )
-    skonto = models.ManyToManyField(Skonto, verbose_name="Skonto liste")
 
     class Meta:
         app_label = "PyRM"
@@ -392,6 +416,20 @@ class Lieferant(BaseModel):
         ordering = ("firma", "person")
 
 class LieferantAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("nummer", "person", "firma",)
+    fieldsets = (
+        ("Basis Daten", {
+            'fields': ("nummer", "kundennummer","person", "firma", "notizen")
+        }),
+        ("Lieferstop", {
+#            'classes': ('collapse',),
+            'fields': ("lieferstop_datum", "lieferstop_grund")
+        }),
+        (None, {
+#            'classes': ('collapse',),
+            'fields': ("zahlungsziel",)
+        }),
+    )
+    fieldsets = add_missing_fields(Lieferant, fieldsets)
 
 admin.site.register(Lieferant, LieferantAdmin)

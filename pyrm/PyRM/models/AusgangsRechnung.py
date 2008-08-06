@@ -19,7 +19,7 @@ from django.conf import settings
 from django.db import models
 from django.contrib import admin
 
-from PyRM.models.Rechnung import BasisRechnung
+from PyRM.models.Rechnung import BasisRechnung, BasisPosten, BasisPostenAdmin
 from utils.django_modeladmin import add_missing_fields
 
 #______________________________________________________________________________
@@ -60,42 +60,18 @@ class AusgangsPostenManager(models.Manager):
         rechnung.summe = preis_summe
         rechnung.save()
 
-class AusgangsPosten(models.Model):
+class AusgangsPosten(BasisPosten):
     """
     Jede einzelne Position auf einer Ausgangsrechnung.
     """
     objects = AusgangsPostenManager()
 
-    id = models.AutoField(primary_key=True)
-
-    anzahl = models.PositiveIntegerField()
-    beschreibung = models.TextField()
-    einzelpreis = models.DecimalField(max_digits = 6, decimal_places = 2,)
-
-    rechnung = models.ForeignKey(
-        "AusgangsRechnung", #related_name="positionen"
-    )
-
     class Meta:
         app_label = "PyRM"
         verbose_name = "Ausgangsrechnung-Position"
         verbose_name_plural = "Ausgangsrechnung-Positionen"
-        ordering = ['rechnung']
 
-    def __unicode__(self):
-        return self.beschreibung
-
-class AusgangsPostenAdmin(admin.ModelAdmin):
-    list_display = (
-        "anzahl", "beschreibung", "einzelpreis", "rechnung"
-    )
-    list_display_links = ("beschreibung",)
-    list_filter = ("rechnung",)
-    list_per_page = 20
-    list_select_related = True
-    search_fields = ("beschreibung",)
-
-admin.site.register(AusgangsPosten, AusgangsPostenAdmin)
+admin.site.register(AusgangsPosten, BasisPostenAdmin)
 
 #______________________________________________________________________________
 
@@ -141,12 +117,6 @@ class AusgangsRechnung(BasisRechnung):
     )
     mahnstufe = models.PositiveIntegerField(default=0,
         help_text="Anzahl der verschickten Mahnungen."
-    )
-
-    summe = models.DecimalField(
-        max_digits = 6, decimal_places = 2,
-        help_text="Wird automatisch aus den Rechnungspositionen erechnet.",
-        null=True, blank=True
     )
 
     class Meta:

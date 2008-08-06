@@ -11,7 +11,7 @@ from django.http import HttpResponse
 from django.conf import settings
 
 from PyRM.importer.menu import _sub_menu, _start_view
-from PyRM.models import Firma, Person, Kunde, Ort, Konto, \
+from PyRM.models import Firma, Person, Kunde, Lieferant, Ort, Konto, \
             AusgangsRechnung, AusgangsPosten, EingangsRechnung, EingangsPosten
 
 from utils.csv_utils import get_dictlist
@@ -177,6 +177,15 @@ def _get_re_posten(raw_text, summe):
     return result
 
 def buchungen():
+    AusgangsRechnung.objects.all().delete()
+    AusgangsPosten.objects.all().delete()
+
+    EingangsRechnung.objects.all().delete()
+    EingangsPosten.objects.all().delete()
+
+    Lieferant.objects.all().delete()
+
+
     for line in _get_dictlist(BUCHUNGEN):
         raw_summe = line["Wert"]
 
@@ -246,11 +255,31 @@ def buchungen():
 
         if summe<0:
             print "Ausgabe - Eingangsrechnung"
-            rechung = EingangsRechnung(
-            )
-#            EingangsPosten
+            print "*"*79
+            if kunde:
+                # Kunde als Lieferant eintragen
+                lieferant, created = Lieferant.objects.get_or_create(
+                    person = kunde.person,
+                    firma = kunde.firma,
+                )
+                lieferant.save()
+
+                rechung = EingangsRechnung(
+                    nummer = re_nr,
+                    lieferant = lieferant,
+                    datum = datum,
+                    konto = konto,
+                    summe = summe,
+                )
+                rechung.save()
+                for anzahl, txt, preis in re_posten:
+                    EingangsPosten(
+                        anzahl = anzahl,
+                        beschreibung = txt,
+                        einzelpreis = preis,
+                        rechnung = rechnung
+                    ).save()
         else:
-            continue
             print "Einnahme - Ausgangsrechnung"
             rechnung = AusgangsRechnung(
                 nummer = re_nr,
