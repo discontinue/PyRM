@@ -20,13 +20,14 @@ print
 #except KeyboardInterrupt:
 #    sys.exit(0)
 
-print "Lösche Datei '%s'..." % settings.DATABASE_NAME,
-try:
-    os.remove(settings.DATABASE_NAME) # SQLite Datei löschen
-except OSError, err:
-    print "Fehler:", err
-else:
-    print "OK"
+if settings.DATABASE_ENGINE == 'sqlite3':
+    print "Lösche Datei '%s'..." % settings.DATABASE_NAME,
+    try:
+        os.remove(settings.DATABASE_NAME) # SQLite Datei löschen
+    except OSError, err:
+        print "Fehler:", err
+    else:
+        print "OK"
 
 
 from django.core.management import setup_environ
@@ -36,9 +37,10 @@ from django.core import management
 
 assert("PyRM" in settings.INSTALLED_APPS)
 
-print "Delete all tables..."
-management.call_command('reset', "PyRM", verbosity=2, interactive=False)
-print "-"*80
+if settings.DATABASE_ENGINE != 'sqlite3':
+    print "Delete all tables..."
+    management.call_command('reset', "PyRM", verbosity=2, interactive=False)
+    print "-"*80
 
 print "syncdb..."
 management.call_command('syncdb', verbosity=1, interactive=False)
