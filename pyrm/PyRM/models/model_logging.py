@@ -24,6 +24,7 @@ from django.contrib import admin
 from django.db.models import signals
 from django.contrib.auth.models import User
 from django.contrib.contenttypes import generic
+from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.contenttypes.models import ContentType
 
 from PyRM.middleware import threadlocals
@@ -77,7 +78,6 @@ admin.site.register(ModelLog, ModelLogAdmin)
 
 #______________________________________________________________________________
 
-
 class BaseLogModel(models.Model):
     def __init__(self, *args, **kwargs):
         self._old_data = None
@@ -107,14 +107,17 @@ class BaseLogModel(models.Model):
 
 #______________________________________________________________________________
 
-
 def _get_model_data(instance):
     """
     Returns a dict with all model fields (key, value)
     """
     data = {}
     for field in instance._meta.fields:
-        data[field.name] = getattr(instance, field.name)
+        try:
+            data[field.name] = getattr(instance, field.name)
+        except ObjectDoesNotExist:
+            # Related field?
+            continue
     return data
 
 
