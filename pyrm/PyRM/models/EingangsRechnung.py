@@ -61,9 +61,7 @@ class PostenInline(admin.TabularInline):
 
 
 class EingangsRechnungAdmin(admin.ModelAdmin):
-    inlines = [
-        PostenInline,
-    ]
+#    inlines = (PostenInline,)
     list_display = ("nummer", "lieferant", "datum", "valuta", "konto", "summe")
     list_display_links = ("nummer", "lieferant")
     list_filter = ("lieferant", "konto",)

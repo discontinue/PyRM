@@ -138,7 +138,7 @@ class PostenInline(admin.TabularInline):
 
 
 class AusgangsRechnungAdmin(admin.ModelAdmin):
-    inlines = (PostenInline,)
+#    inlines = (PostenInline,)
     list_display = ("nummer", "kunde", "datum", "valuta", "konto", "summe")
     list_display_links = ("nummer", "kunde")
     list_filter = ("mahnstufe", "kunde", "konto",)
