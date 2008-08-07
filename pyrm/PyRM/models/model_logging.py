@@ -128,6 +128,18 @@ class BaseLogModel(models.Model):
 
 #______________________________________________________________________________
 
+class RelationField(object):
+    """
+    Only a simple helper class for generation a nice __repr__ witched used in
+    pprint.pformat to display Relationship fields.
+    """
+    def __init__(self, field):
+        self.class_name = field.__class__
+        self.id = field.pk
+    def __repr__(self):
+        class_path = repr(self.class_name).split("'")[1] # FIXME
+        return u"<RelationField:%r,pk:%i>" % (class_path, self.id)
+
 def _get_model_data(instance):
     """
     Returns a dict with all model fields (key, value)
@@ -135,10 +147,16 @@ def _get_model_data(instance):
     data = {}
     for field in instance._meta.fields:
         try:
-            data[field.name] = getattr(instance, field.name)
+            value = getattr(instance, field.name)
         except ObjectDoesNotExist:
-            # Related field?
+            # Relationship field witch can't resolve (e.g. creation?)
             continue
+
+        if isinstance(value, models.Model):
+            # The field is a relationship value -> make a nice __repr__
+            value = RelationField(value)
+
+        data[field.name] = value
     return data
 
 #______________________________________________________________________________
