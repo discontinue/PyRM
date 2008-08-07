@@ -97,7 +97,8 @@ class StSlManager(models.Manager):
                 steuersatz = data[1],
                 beschreibung = data[2],
             )
-            print "neuer Eintrag:", entry
+            entry.add_log_message("Neuer Eintrag durch StSlManager.setup()")
+            print "neuer Eintrag:", entry#.__dict__
             entry.save()
 
 class StSl(BaseModel):
@@ -112,7 +113,7 @@ class StSl(BaseModel):
 
     class Meta:
         app_label = "PyRM"
-        verbose_name = verbose_name_plural = u"Steuerschlüssel"
+        verbose_name = verbose_name_plural = u"Steuerschlüssel (StSl)"
         ordering = ("id",)
 
     def __unicode__(self):

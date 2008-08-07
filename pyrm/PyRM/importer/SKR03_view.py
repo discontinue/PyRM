@@ -117,6 +117,7 @@ def import_skr03():
             kontoart = kontoart,
             mwst = mwst,
         )
+        konto.add_log_message("SKR03 import")
         konto.save()
 
     print " - END - "

@@ -31,6 +31,7 @@ from django.contrib import admin
 
 # PyRM
 from PyRM.models.base_models import BaseModel
+from PyRM.models import BaseLogModel
 from utils.django_modeladmin import add_missing_fields
 
 #______________________________________________________________________________
@@ -43,7 +44,7 @@ GESCHLECHTER = (
 #______________________________________________________________________________
 
 
-class Ort(models.Model):
+class Ort(BaseLogModel):
     """
     Ort + Land für Personen- und Firmen-Adressen.
     Länder angabe ist als einfacher String hinterlegt.
@@ -164,6 +165,8 @@ class Firma(FirmaPersonBaseModel):
     def __unicode__(self):
         return self.name1
 
+class FirmaInline(admin.TabularInline):
+    model = Firma
 
 class FirmaAdmin(admin.ModelAdmin):
     list_display = (
@@ -216,6 +219,8 @@ class Person(FirmaPersonBaseModel):
         else:
             return self.nachname
 
+class PersonInline(admin.TabularInline):
+    model = Person
 
 class PersonAdmin(admin.ModelAdmin):
     list_display = ("vorname", "nachname", "strasse", "plz", "ort")
@@ -266,8 +271,14 @@ class KundeLieferantBase(BaseModel):
     """
     Basis Klasse für Kunde und Lieferant
     """
-    person = models.ForeignKey(Person, null=True, blank=True)
-    firma = models.ForeignKey(Firma, null=True, blank=True)
+    person = models.ForeignKey(
+        Person, null=True, blank=True,
+        related_name="%(class)s_person"
+    )
+    firma = models.ForeignKey(
+        Firma, null=True, blank=True,
+        related_name="%(class)s_firma"
+    )
 
     seid = models.DateField(auto_now_add=True, null=True, blank=True)
 
@@ -299,7 +310,8 @@ class Kunde(KundeLieferantBase):
         help_text="Name der Person mit anzeigen, wenn es eine Firma ist?"
     )
 
-    lieferrantennr = models.CharField(max_length=128,
+    lieferrantennr = models.CharField(
+        max_length=128, blank=True, null=True,
         help_text=(
             "Lieferrantennummer bei dieser Firma, falls vorhanden."
             " Wird auf jeder Rechnung aufgeführt"
@@ -327,7 +339,10 @@ class Kunde(KundeLieferantBase):
 
 
 
+
+
 class KundeAdmin(admin.ModelAdmin):
+#    inlines = (PersonInline,FirmaInline)
     list_display = ("nummer", "person", "firma",)
     fieldsets = (
         ("Basis Daten", {
@@ -376,7 +391,9 @@ class Lieferant(KundeLieferantBase):
         verbose_name_plural = "Lieferanten"
         ordering = ("firma", "person")
 
+
 class LieferantAdmin(admin.ModelAdmin):
+#    inlines = (PersonInline,FirmaInline)
     list_display = ("nummer", "person", "firma",)
     fieldsets = (
         ("Basis Daten", {

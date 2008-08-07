@@ -33,7 +33,7 @@ def transfer_konten():
 #        if line["ID.1"]=="" or line["Vorname"]=="sonstiges":
 #            continue
         datev_nummer = int(line['Konto'])
-        konto_name = unicode(line['Listenname'], "utf8")
+        konto_name = line['Listenname']
 
         mwst = None
         try:
@@ -53,16 +53,34 @@ def transfer_konten():
                 name = konto_name,
                 mwst = mwst,
             )
+            konto.add_log_message("Neues Konto aus MMS import")
             konto.save()
             print "Neues Konto erstellt:", konto
         else:
             print "Konto besteht schon:", konto
+            must_save=False
+
             if konto_name != konto.name:
                 print " *** andere Bezeichnung:"
                 print konto_name, "!=", konto.name
+                print "Setzte neuen Namen"
+                konto.name = konto_name
+                konto.add_log_message("Neuer Konto Namen aus MMS import")
+                konto.notizen += "\n neuer Konto namen aus MMS import"
+                must_save=True
+
             if mwst != konto.mwst:
                 print " *** andere MwSt.:"
                 print mwst, "!=", konto.mwst
+                print "setzte neue MwSt:"
+                konto.mwst = mwst
+                konto.add_log_message("Neue MwSt.Satz aus MMS import")
+                konto.notizen += "\n neue MwSt.Satz aus MMS import"
+                must_save=True
+
+            if must_save:
+                print "SAVE"
+                konto.save()
 
         print "-"*80
 

@@ -22,17 +22,18 @@ from django.db import models
 from django.contrib import admin
 from django.contrib.auth.models import User
 
+from PyRM.models import BaseLogModel
 from PyRM.middleware import threadlocals
 from utils.django_modeladmin import add_missing_fields
 
 #______________________________________________________________________________
 
-class BaseModel(models.Model):
+
+class BaseModel(BaseLogModel):
     """
     Grundmodell für fast alle Klassen.
     """
-    erstellt_am = models.DateTimeField(
-#        auto_now_add=True, # Bug?
+    erstellt_am = models.DateTimeField(default = datetime.now,
         help_text="Zeitpunkt der Erstellung",
     )
     erstellt_von = models.ForeignKey(
@@ -51,7 +52,7 @@ class BaseModel(models.Model):
         related_name="%(class)s_geaendert_von"
     )
 
-    notizen = models.TextField(blank=True, null=True)
+    notizen = models.TextField(blank=True, null=False)
 
     def save(self):
         current_user = threadlocals.get_current_user()
@@ -59,7 +60,6 @@ class BaseModel(models.Model):
         if self.erstellt_von == None:
             # This is a new object
             self.erstellt_von = current_user
-            self.erstellt_am = datetime.now()
         else:
             self.geaendert_von = current_user
             self.geaendert_am = datetime.now()
