@@ -79,7 +79,6 @@ def transfer_konten():
                 must_save=True
 
             if must_save:
-                print "SAVE"
                 konto.save()
 
         print "-"*80

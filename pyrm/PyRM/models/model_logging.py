@@ -25,9 +25,20 @@ from django.db.models import signals
 from django.contrib.auth.models import User
 from django.contrib.contenttypes import generic
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils.translation import ugettext_lazy as _
 from django.contrib.contenttypes.models import ContentType
 
 from PyRM.middleware import threadlocals
+
+ADD = 1
+EDIT = 2
+DELETE = 3
+
+ACTION_CHOICES = (
+    (ADD,    _("add")),
+    (EDIT,   _("edit")),
+    (DELETE, _("delete")),
+)
 
 
 class ModelLogManager(models.Manager):
@@ -55,6 +66,9 @@ class ModelLog(models.Model):
         help_text="Benutzer der diesen Eintrag zuletzt geändert hat.",
         related_name="%(class)s_geaendert_von"
     )
+    action_type = models.PositiveSmallIntegerField(
+        choices=ACTION_CHOICES, null=True, blank=True
+    )
     log_messages = models.TextField(blank=True)
     diff_data = models.TextField(blank=True)
 
@@ -68,11 +82,11 @@ class ModelLog(models.Model):
 
 class ModelLogAdmin(admin.ModelAdmin):
     list_display = (
-        "object_pk", "content_type", #"content_object",
+        "object_pk", "content_type", "action_type", #"content_object",
         "created_at", "user", "log_messages"
     )
     list_display_links = ("object_pk", "content_type")
-    list_filter = ("content_type", "user")
+    list_filter = ("action_type", "content_type", "user")
 
 admin.site.register(ModelLog, ModelLogAdmin)
 
@@ -80,9 +94,15 @@ admin.site.register(ModelLog, ModelLogAdmin)
 
 class BaseLogModel(models.Model):
     def __init__(self, *args, **kwargs):
+        self._action_type = None
         self._old_data = None
         self._log_message = []
         super(BaseLogModel, self).__init__(*args, **kwargs)
+
+    def set_action_type(self, action_type):
+        self._action_type = action_type
+    def get_action_type(self):
+        return self._action_type
 
     def set_old_data(self, data):
         self._old_data = data
@@ -95,10 +115,11 @@ class BaseLogModel(models.Model):
 
     def get_and_delete_log_messages(self):
         if self._log_message == []:
-            return "---"
-        messages = "\n".join(self._log_message)
-        self._log_message = []
-        return messages
+            return u"---"
+        else:
+            messages = u"\n".join(self._log_message)
+            self._log_message = []
+            return messages
 
     class Meta:
         app_label = "PyRM"
@@ -120,16 +141,28 @@ def _get_model_data(instance):
             continue
     return data
 
+#______________________________________________________________________________
+# SIGNAL HANDLER
 
-def model_logging_init(instance, **kwargs):
+def log_post_init(instance, **kwargs):
     """
     Save the current model data into the model.
     """
     data = _get_model_data(instance)
     instance.set_old_data(data)
 
+def log_pre_save(instance, **kwargs):
+    """
+    Setup action type.
+    """
+    if instance.pk == None:
+        action = ADD
+    else:
+        action = EDIT
 
-def model_logging_save(instance, **kwargs):
+    instance.set_action_type(action)
+
+def log_post_save(instance, **kwargs):
     """
     Add a new ModelLog entry with the model-data-diff
     """
@@ -144,9 +177,23 @@ def model_logging_save(instance, **kwargs):
     ModelLog.objects.log(
         object_pk    = instance.pk,
         content_type = ContentType.objects.get_for_model(kwargs["sender"]),
+        action_type  = instance.get_action_type(),
         log_messages = instance.get_and_delete_log_messages(),
         diff_data    = pformat(diff_data),
     )
 
+def log_pre_delete(instance, **kwargs):
+    """
+    Log a deletion of a model entry.
+    """
+    data = _get_model_data(instance)
+
+    ModelLog.objects.log(
+        object_pk    = instance.pk,
+        content_type = ContentType.objects.get_for_model(kwargs["sender"]),
+        action_type  = DELETE,
+        log_messages = instance.get_and_delete_log_messages(),
+        diff_data    = pformat(data),
+    )
 
 
