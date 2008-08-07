@@ -65,7 +65,9 @@ def get_dictlist(table_data, used_fieldnames=None):
             fields = result
 
         for k in fields.keys():
-            fields[k] = unicode(fields[k], "utf8")
+            value = fields[k]
+            if value != None:
+                fields[k] = unicode(value, "utf8")
 
         dictlist.append(fields)
 
