@@ -163,10 +163,7 @@ class Konto(BaseModel):
 
     def __unicode__(self):
 #        return repr(self.__dict__)
-        return u" - ".join(
-            (str(self.datev_nummer), repr(self.name),
-            str(self.kontoart), str(self.anzahl))
-        )
+        return u"%s - %s" % (self.datev_nummer, self.name)
 
 #______________________________________________________________________________
 

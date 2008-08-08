@@ -36,10 +36,6 @@ class BasisPosten(BaseModel):
         max_digits = 6, decimal_places = 2,
         help_text = u"Preis pro Einheit"
     )
-    stsl = models.ForeignKey(StSl,
-        blank=True, null=True,
-        help_text = u"Der Datev-SteuerSchlüssel (StSl)"
-    )
 
     def __unicode__(self):
         return self.beschreibung
@@ -92,15 +88,6 @@ class BasisRechnung(BaseModel):
         help_text="Datum der Buchung laut Kontoauszug."
     )
 
-    konto = models.ForeignKey(
-        "Konto", null=True, blank=True,
-        related_name="%(class)s_konto_set",
-    )
-    ggkto = models.ForeignKey(
-        "Konto", null=True, blank=True,
-        help_text="Gegenkonto",
-        related_name="%(class)s_ggkto_set",
-    )
 
     summe = models.DecimalField(
         max_digits = 6, decimal_places = 2,

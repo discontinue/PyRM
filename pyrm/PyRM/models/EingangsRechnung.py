@@ -19,6 +19,7 @@
 from django.db import models
 from django.contrib import admin
 
+from PyRM.models import StSl
 from PyRM.models.base_models import BASE_FIELDSET
 from PyRM.models.base_rechnung import BasisRechnung, BasisPosten, \
                                                                 BasisPostenAdmin
@@ -32,10 +33,30 @@ class EingangsPosten(BasisPosten):
     rechnung = models.ForeignKey(
         "EingangsRechnung", #related_name="positionen"
     )
+
+    konto = models.ForeignKey(
+        "Konto", null=True, blank=True,
+        related_name = "%(class)s_konto",
+    )
+    stsl = models.ForeignKey(StSl,
+        blank=True, null=True,
+        help_text = u"Der Datev-SteuerSchlüssel (StSl)"
+    )
+    ggkto = models.ForeignKey(
+        "Konto", null=True, blank=True,
+        related_name = "%(class)s_gkonto",
+        help_text="Gegenkonto",
+    )
+
     class Meta:
         app_label = "PyRM"
         verbose_name = "Eingangsrechnung-Position"
         verbose_name_plural = "Eingangsrechnung-Positionen"
+
+#        ('Kontenrahmen', {
+##            'classes': ('collapse',),
+#            'fields': ("konto", "ggkto")
+#        }),
 
 admin.site.register(EingangsPosten, BasisPostenAdmin)
 
@@ -68,19 +89,15 @@ class PostenInline(admin.TabularInline):
 
 class EingangsRechnungAdmin(admin.ModelAdmin):
 #    inlines = (PostenInline,)
-    list_display = ("nummer", "lieferant", "datum", "valuta", "konto", "summe")
+    list_display = ("nummer", "lieferant", "datum", "valuta", "summe")
     list_display_links = ("nummer", "lieferant")
-    list_filter = ("lieferant", "konto",)
+    list_filter = ("lieferant", )
     list_per_page = 20
     list_select_related = True
 #    search_fields = ['foreign_key__related_fieldname']
     fieldsets = (
         (None, {
             'fields': ("nummer", "lieferant","bestellnummer",)
-        }),
-        ('Kontenrahmen', {
-#            'classes': ('collapse',),
-            'fields': ("konto", "ggkto")
         }),
         ('Datum', {
 #            'classes': ('collapse',),

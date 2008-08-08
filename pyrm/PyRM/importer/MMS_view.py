@@ -131,17 +131,19 @@ def transfer_buchungen():
         else:
             print "Konto:", konto
 
-        gkonto = line["GGKto"]
-        if len(gkonto) > 4:
+        ggkto = line["GGKto"]
+        if len(ggkto) > 4:
             # SteuerSchlüssel drin
-            stsl_nr = int(gkonto[0])
+            stsl_nr = int(ggkto[0])
             stsl = StSl.objects.get(id = stsl_nr)
             print u"Steuerschlüssel:", stsl
-            gkonto = gkonto[1:]
+            ggkto = ggkto[1:]
+        else:
+            stsl = None
 
-        Gkonto_nr = int(gkonto)
+        Gkonto_nr = int(ggkto)
         try:
-            gkonto = Konto.objects.get(datev_nummer = Gkonto_nr)
+            ggkto = Konto.objects.get(datev_nummer = Gkonto_nr)
         except Konto.DoesNotExist, err:
             print "*"*79
             print "GKonto unbekannt:", err
@@ -160,6 +162,11 @@ def transfer_buchungen():
         kunde = None
         rechnung = None
 
+        if kommentar == "EB":
+            print "Endbestand des Kontos vom Vorjahr -> auslassen"
+            # TODO: Braucht man das?
+            continue
+
         if "-" in kommentar:
             print "*********", kommentar
             try:
@@ -172,14 +179,42 @@ def transfer_buchungen():
             else:
                 # Kunden nummer + Rechnungsnimmer in Kommentar
 #                print kunden_nr, re_nr
-                kunde = Kunde.objects.get(nummer = kunden_nr)
+                try:
+                    kunde = Kunde.objects.get(nummer = kunden_nr)
+                except Kunde.DoesNotExist, err:
+                    print "FEHLER: Kunde %s nicht gefunden: %s" % (
+                        kunden_nr, err
+                    )
+
                 try:
                     rechnung = AusgangsRechnung.objects.get(nummer=re_nr)
                 except AusgangsRechnung.DoesNotExist, err:
                     print "FEHLER: Rechnung %s nicht gefunden: %s" % (
                         re_nr, err
                     )
-                    continue
+                    rechnung = AusgangsRechnung(
+                            nummer = re_nr,
+                            kunde = kunde,
+#                            datum = datum,
+                            valuta = datum,
+                            konto = konto,
+                            stsl = stsl,
+                            ggkto = ggkto,
+                            summe = summe,
+                            notizen = "erstellt beim MMS import",
+                    )
+                    add_message(rechnung, "MMS import")
+                    rechnung.save()
+
+                    p = AusgangsPosten(
+                        anzahl = 1,
+                        beschreibung = "(MMS import)",
+                        einzelpreis = summe,
+                        rechnung = rechnung,
+                        notizen = "erstellt beim MMS import",
+                    )
+                    add_message(p, "MMS import")
+                    p.save()
 
         else:
             try:

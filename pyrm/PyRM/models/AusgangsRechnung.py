@@ -19,6 +19,7 @@ from django.conf import settings
 from django.db import models
 from django.contrib import admin
 
+from PyRM.models import StSl
 from PyRM.models.base_models import BASE_FIELDSET
 from PyRM.models.base_rechnung import BasisRechnung, BasisPosten, \
                                                                 BasisPostenAdmin
@@ -126,6 +127,21 @@ class AusgangsRechnung(BasisRechnung):
     versand = models.DateField(null=True, blank=True,
         help_text="Versanddatum der Rechnung."
     )
+
+    konto = models.ForeignKey(
+        "Konto", null=True, blank=True,
+        related_name = "%(class)s_konto",
+    )
+    stsl = models.ForeignKey(StSl,
+        blank=True, null=True,
+        help_text = u"Der Datev-SteuerSchlüssel (StSl)"
+    )
+    ggkto = models.ForeignKey(
+        "Konto", null=True, blank=True,
+        related_name = "%(class)s_gkonto",
+        help_text="Gegenkonto",
+    )
+
     mahnstufe = models.PositiveIntegerField(default=0,
         help_text="Anzahl der verschickten Mahnungen."
     )
@@ -160,7 +176,7 @@ class AusgangsRechnungAdmin(admin.ModelAdmin):
         }),
         ('Kontenrahmen', {
 #            'classes': ('collapse',),
-            'fields': ("konto", "ggkto")
+            'fields': ("konto", "stsl", "ggkto")
         }),
         ('Datum', {
 #            'classes': ('collapse',),
