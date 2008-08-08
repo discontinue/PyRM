@@ -3,7 +3,7 @@
 import sys, os, csv, re
 from pprint import pprint
 from decimal import Decimal
-from datetime import datetime
+from datetime import datetime, date
 
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
@@ -107,36 +107,33 @@ def transfer_buchungen():
     for line in dictlist:
         kommentar = line["Kommentar"]
         print "_"*79
-        pprint(line)
-        print " -"*40
+#        pprint(line)
+#        print " -"*40
 
         date_string = line["Datum"]
-        print "date_string:", date_string
-        datum = datetime.strptime(date_string, "%d.%m.%Y")
-        print "datum:", datum
+#        print "date_string:", date_string
+        datum = datetime.strptime(date_string, "%d.%m.%Y").date()
+#        datum = date.strptime(date_string, "%d.%m.%Y")
 
         raw_summe = line["Betrag"]
         summe = _get_decimal(raw_summe)
-        print "summe:", summe
 
         konto_nr = int(line["Konto"])
-        print "konto_nr:", konto_nr, type(konto_nr)
+#        print "konto_nr:", konto_nr, type(konto_nr)
         try:
             konto = Konto.objects.get(datev_nummer = konto_nr)
         except Konto.DoesNotExist, err:
             print "*"*79
-            print "Konto unbekannt:", err
-            print "Erstelle neuen Eintrag!"
-
-        else:
-            print "Konto:", konto
+            print "Fehler: Konto unbekannt:", err
+#            print "Erstelle neuen Eintrag!"
+            return
 
         ggkto = line["GGKto"]
         if len(ggkto) > 4:
             # SteuerSchlüssel drin
             stsl_nr = int(ggkto[0])
             stsl = StSl.objects.get(id = stsl_nr)
-            print u"Steuerschlüssel:", stsl
+#            print u"Steuerschlüssel:", stsl
             ggkto = ggkto[1:]
         else:
             stsl = None
@@ -146,17 +143,26 @@ def transfer_buchungen():
             ggkto = Konto.objects.get(datev_nummer = Gkonto_nr)
         except Konto.DoesNotExist, err:
             print "*"*79
-            print "GKonto unbekannt:", err
-        else:
-            print "GKonto:", konto
+            print "Fehler: GKonto unbekannt:", err
+            return
 
+        print "datum:", datum#, type(datum)
+        print "Konto:", konto
+        print "StSl:", stsl
+        print "GKonto:", ggkto
+        print "summe:", summe
+        print "Kommentar:", kommentar
         print " -"*40
 
         if summe<0:
             print "Ausgabe - Eingangsrechnung"
+            if Gkonto_nr==8400:
+                print "XXX 111"
             RechnungModel = EingangsRechnung
         else:
             print "Einnahme - Ausgangsrechnung"
+            if Gkonto_nr not in (8400, 8340, 8150):
+                print "XXX 222"
             RechnungModel = AusgangsRechnung
 
         kunde = None
