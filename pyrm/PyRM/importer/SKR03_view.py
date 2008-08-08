@@ -29,6 +29,9 @@ from django.conf import settings
 from PyRM.models import Konto, MWST, GNUCASH_SKR03_MAP#Firma, Person, Kunde, Ort
 from PyRM.importer.menu import _sub_menu, _start_view
 
+from modelvcs.messages import add_message
+
+
 SKR_URL = (
     "http://svn.gnucash.org/"
     "trac/browser/gnucash/trunk/accounts/de_DE/"
@@ -117,7 +120,7 @@ def import_skr03():
             kontoart = kontoart,
             mwst = mwst,
         )
-        konto.add_log_message("SKR03 import")
+        add_message(konto, "SKR03 import")
         konto.save()
 
     print " - END - "

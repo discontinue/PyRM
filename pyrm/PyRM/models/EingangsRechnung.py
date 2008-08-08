@@ -15,13 +15,13 @@
     :copyleft: 2008 by Jens Diemer
     :license: GNU GPL v3, see LICENSE.txt for more details.
 """
-from django.conf import settings
+
 from django.db import models
 from django.contrib import admin
 
 from PyRM.models.base_models import BASE_FIELDSET, BasisRechnung, BasisPosten, \
                                                                 BasisPostenAdmin
-from utils.django_modeladmin import add_missing_fields
+from PyRM.utils.django_modeladmin import add_missing_fields
 
 
 class EingangsPosten(BasisPosten):

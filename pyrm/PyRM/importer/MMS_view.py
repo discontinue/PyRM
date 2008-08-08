@@ -12,8 +12,10 @@ from django.conf import settings
 
 from PyRM.models import Konto, MWST#Firma, Person, Kunde, Ort
 from PyRM.importer.menu import _sub_menu, _start_view
-
 from utils.csv_utils import get_csv_tables, get_dictlist
+
+from modelvcs.messages import add_message
+
 
 CSV_DATEI = "./_daten/TRANSFER.CSV"
 #CSV_DATEI = "./_daten/Beispielmandant TRANSFER.CSV"
@@ -53,7 +55,7 @@ def transfer_konten():
                 name = konto_name,
                 mwst = mwst,
             )
-            konto.add_log_message("Neues Konto aus MMS import")
+            add_message(konto, "Neues Konto aus MMS import")
             konto.save()
             print "Neues Konto erstellt:", konto
         else:
@@ -65,7 +67,7 @@ def transfer_konten():
                 print konto_name, "!=", konto.name
                 print "Setzte neuen Namen"
                 konto.name = konto_name
-                konto.add_log_message("Neuer Konto Namen aus MMS import")
+                add_message(konto, "Neuer Konto Namen aus MMS import")
                 konto.notizen += "\n neuer Konto namen aus MMS import"
                 must_save=True
 
@@ -74,7 +76,7 @@ def transfer_konten():
                 print mwst, "!=", konto.mwst
                 print "setzte neue MwSt:"
                 konto.mwst = mwst
-                konto.add_log_message("Neue MwSt.Satz aus MMS import")
+                add_message(konto, "Neue MwSt.Satz aus MMS import")
                 konto.notizen += "\n neue MwSt.Satz aus MMS import"
                 must_save=True
 

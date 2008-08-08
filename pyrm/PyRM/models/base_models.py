@@ -17,19 +17,17 @@
 
 from datetime import datetime
 
-from django.conf import settings
 from django.db import models
 from django.contrib import admin
 from django.contrib.auth.models import User
 
-from PyRM.models import BaseLogModel
-from PyRM.middleware import threadlocals
-from utils.django_modeladmin import add_missing_fields
+from PyRM.utils.django_modeladmin import add_missing_fields
+
+from modelvcs.middleware import threadlocals
 
 #______________________________________________________________________________
 
-
-class BaseModel(BaseLogModel):
+class BaseModel(models.Model):
     """
     Grundmodell für fast alle Klassen.
     """

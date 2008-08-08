@@ -24,15 +24,12 @@
     :license: GNU GPL v3, see LICENSE.txt for more details.
 """
 
-# django
 from django.db import models
 from django.conf import settings
 from django.contrib import admin
 
-# PyRM
 from PyRM.models.base_models import BaseModel
-from PyRM.models import BaseLogModel
-from utils.django_modeladmin import add_missing_fields
+from PyRM.utils.django_modeladmin import add_missing_fields
 
 #______________________________________________________________________________
 
@@ -44,7 +41,7 @@ GESCHLECHTER = (
 #______________________________________________________________________________
 
 
-class Ort(BaseLogModel):
+class Ort(models.Model):
     """
     Ort + Land für Personen- und Firmen-Adressen.
     Länder angabe ist als einfacher String hinterlegt.

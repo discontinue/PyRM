@@ -96,7 +96,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.doc.XViewMiddleware',
-    "PyRM.middleware.threadlocals.ThreadLocals",
+    "modelvcs.middleware.threadlocals.ThreadLocals",
 )
 
 ROOT_URLCONF = 'PyRM.urls'
@@ -115,5 +115,6 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
 #    'django.contrib.sites',
     'django.contrib.admin',
+    "modelvcs",
     "PyRM",
 )

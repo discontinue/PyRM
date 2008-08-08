@@ -49,11 +49,12 @@ http://svn.berlios.de/wsvn/unternehmer/trunk/unstable/sql/Germany-DATEV-SKR03EU-
 """
 
 from django.db import models
-from django.conf import settings
 from django.contrib import admin
 
 from PyRM.models.base_models import BaseModel, BASE_FIELDSET
-from utils.django_modeladmin import add_missing_fields
+from PyRM.utils.django_modeladmin import add_missing_fields
+
+from modelvcs.messages import add_message
 
 #______________________________________________________________________________
 
@@ -84,7 +85,6 @@ STEUER_SCHLUESSEL = (
     (8,  7, u"Vorsteuer 7%"),
     (9, 19, u"Vorsteuer 19%"),
 )
-
 #______________________________________________________________________________
 class StSlManager(models.Manager):
     def setup(self):
@@ -97,7 +97,7 @@ class StSlManager(models.Manager):
                 steuersatz = data[1],
                 beschreibung = data[2],
             )
-            entry.add_log_message("Neuer Eintrag durch StSlManager.setup()")
+            add_message(entry, "Neuer Eintrag durch StSlManager.setup()")
             print "neuer Eintrag:", entry#.__dict__
             entry.save()
 
