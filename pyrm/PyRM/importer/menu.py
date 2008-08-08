@@ -14,7 +14,7 @@
 """
 
 import sys
-from StringIO import StringIO
+from PyRM.utils.unicode_stringio import UnicodeStringIO
 
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
@@ -53,14 +53,15 @@ def _start_view(request, views, unit):
     response = HttpResponse(mimetype='text/plain')
 
     old_stdout = sys.stdout
-    sys.stdout = StringIO()
+    sys.stdout = UnicodeStringIO()
     views[unit]()
+    output = sys.stdout.getvalue()
+    sys.stdout = old_stdout
 
     context = {
-        "output": sys.stdout.getvalue(),
+        "output": output,
         "admin_url_prefix": settings.ADMIN_URL_PREFIX,
     }
-    sys.stdout = old_stdout
 
     return render_to_response(
         "import_output.html", context,context_instance=RequestContext(request)

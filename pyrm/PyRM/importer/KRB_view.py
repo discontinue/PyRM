@@ -16,6 +16,9 @@ from PyRM.models import Firma, Person, Kunde, Lieferant, Ort, Konto, \
 
 from PyRM.utils.csv_utils import get_dictlist
 
+from modelvcs.messages import add_message
+
+
 KUNDENLISTE = "./_daten/20080729 KRB Kundenliste.csv"
 BUCHUNGEN = "./_daten/20080805 KRB Buchungen.csv"
 
@@ -38,6 +41,7 @@ def get_kunden_obj(line):
         plz, ort_name = daten[4].split(" ", 1)
         print "*"*79
         ort = Ort(name=ort_name, land="Frankreich")
+        add_message(ort, "KRB import")
         ort.save()
         firma = Firma(
             name1 = daten[0],
@@ -46,12 +50,14 @@ def get_kunden_obj(line):
             plz = int(plz),
             ort = ort,
         )
+        add_message(firma, "KRB import")
         firma.save()
         person = Person(
             vorname="Thorsten",
             nachname="Beitzel",
             geschlecht="M",
         )
+        add_message(person, "KRB import")
         person.save()
         return person, firma
 
@@ -84,10 +90,12 @@ def get_kunden_obj(line):
             telefon = line["Telefon"],
             #mobile =
         )
+        add_message(person, "KRB import")
         person.save()
 
     if line["Firma"] != "":
         firma, created = Firma.objects.get_or_create(name1 = line["Firma"])
+        add_message(firma, "KRB import")
         firma.save()
     else:
         firma = None
@@ -127,6 +135,7 @@ def kundenliste():
 #        print repr(kwargs)
         try:
             kunde = Kunde(**kwargs)
+            add_message(kunde, "KRB import")
             kunde.save()
         except Exception, err:
             print "Fehler:", err
@@ -266,11 +275,21 @@ def buchungen():
             print "*"*79
             if kunde:
                 # Kunde als Lieferant eintragen
-                lieferant, created = Lieferant.objects.get_or_create(
-                    person = kunde.person,
-                    firma = kunde.firma,
-                )
-                lieferant.save()
+                try:
+                    lieferant = Lieferant.objects.get(
+                        person = kunde.person,
+                        firma = kunde.firma,
+                    )
+                except Lieferant.DoesNotExist:
+                   lieferant = Lieferant(
+                        person = kunde.person,
+                        firma = kunde.firma,
+                    )
+                   add_message(lieferant, "KRB import")
+                   lieferant.save()
+                except Lieferant.MultipleObjectsReturned:
+                    # Bei mehreren Treffern, nimm den ersten
+                    lieferant = lieferant[0]
             else:
                 lieferant = None
 
@@ -282,10 +301,15 @@ def buchungen():
                 konto = konto,
                 summe = summe,
             )
+            add_message(rechnung, "KRB import")
             rechnung.save()
             PostenModel = EingangsPosten
         else:
             print "Einnahme - Ausgangsrechnung"
+            if re_nr == None:
+                print "Fehler: Ausgangsrechnung ohne Re.Nummer???"
+                continue
+
             rechnung = AusgangsRechnung(
                 nummer = re_nr,
                 kunde = kunde,
@@ -294,17 +318,20 @@ def buchungen():
                 konto = konto,
                 summe = summe,
             )
+            add_message(rechnung, "KRB import")
             rechnung.save()
             PostenModel = AusgangsPosten
 
 
         for anzahl, txt, preis in re_posten:
-            PostenModel(
+            p = PostenModel(
                 anzahl = anzahl,
                 beschreibung = txt,
                 einzelpreis = preis,
                 rechnung = rechnung
-            ).save()
+            )
+            add_message(p, "KRB import")
+            p.save()
 
 #------------------------------------------------------------------------------
 

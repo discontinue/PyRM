@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from StringIO import StringIO
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -9,6 +8,8 @@ from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.db.models import get_app, get_models
 from django.contrib.auth.decorators import login_required
+
+from PyRM.utils.unicode_stringio import UnicodeStringIO
 
 #@login_required
 def menu(request):
@@ -30,7 +31,7 @@ def setup(request):
     response = HttpResponse(mimetype='text/plain')
 
     old_stdout = sys.stdout
-    sys.stdout = StringIO()
+    sys.stdout = UnicodeStringIO()
 
     print "Setup!"
 

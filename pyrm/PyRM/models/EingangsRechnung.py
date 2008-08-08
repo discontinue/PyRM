@@ -19,7 +19,8 @@
 from django.db import models
 from django.contrib import admin
 
-from PyRM.models.base_models import BASE_FIELDSET, BasisRechnung, BasisPosten, \
+from PyRM.models.base_models import BASE_FIELDSET
+from PyRM.models.base_rechnung import BasisRechnung, BasisPosten, \
                                                                 BasisPostenAdmin
 from PyRM.utils.django_modeladmin import add_missing_fields
 
@@ -47,6 +48,11 @@ class EingangsRechnung(BasisRechnung):
     Fremde Rechnungen die man selber beazhlen muß.
     i.d.R. für Waren-/Diensleistungseinkauf.
     """
+    nummer = models.CharField(max_length= 50,
+        null=True, blank=True,
+        help_text="Rechnungs Nummer (optional)"
+    )
+
     lieferant = models.ForeignKey("Lieferant", null=True, blank=True)
 
     class Meta:

@@ -19,7 +19,8 @@ from django.conf import settings
 from django.db import models
 from django.contrib import admin
 
-from PyRM.models.base_models import BASE_FIELDSET, BasisRechnung, BasisPosten, \
+from PyRM.models.base_models import BASE_FIELDSET
+from PyRM.models.base_rechnung import BasisRechnung, BasisPosten, \
                                                                 BasisPostenAdmin
 from PyRM.utils.django_modeladmin import add_missing_fields
 
@@ -110,6 +111,11 @@ class AusgangsRechnung(BasisRechnung):
     Rechnungen die man selber erstellt.
     """
     objects = AusgangsRechnungManager()
+
+    nummer = models.PositiveIntegerField(
+        primary_key=True,
+        help_text="Rechnungs Nummer"
+    )
 
     kunde = models.ForeignKey("Kunde", null=True, blank=True)
 

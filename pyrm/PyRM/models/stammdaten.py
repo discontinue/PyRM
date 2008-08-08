@@ -301,7 +301,8 @@ class Kunde(KundeLieferantBase):
     Firmen- und Privat-Kunden für Ausgangsrechnungen.
     """
     nummer = models.IntegerField(
-        unique=True, help_text="Kundennummer Nummer"
+        primary_key=True,
+        help_text="Kundennummer Nummer"
     )
     anzeigen = models.BooleanField(
         help_text="Name der Person mit anzeigen, wenn es eine Firma ist?"
@@ -340,7 +341,7 @@ class Kunde(KundeLieferantBase):
 
 class KundeAdmin(admin.ModelAdmin):
 #    inlines = (PersonInline,FirmaInline)
-    list_display = ("nummer", "person", "firma",)
+    list_display = list_display_links = ("nummer", "person", "firma",)
     fieldsets = (
         ("Basis Daten", {
             'fields': (
@@ -368,7 +369,7 @@ class Lieferant(KundeLieferantBase):
     Lieferanten für die Eingansrechnungen
     """
     nummer = models.IntegerField(
-        null=True, blank=True, unique=True,
+        primary_key=True,
         help_text="Lieferranten Nummer"
     )
     kundennummer =  models.CharField(

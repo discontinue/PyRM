@@ -32,20 +32,21 @@ class BaseModel(models.Model):
     Grundmodell für fast alle Klassen.
     """
     erstellt_am = models.DateTimeField(default = datetime.now,
+        editable=False,
         help_text="Zeitpunkt der Erstellung",
     )
     erstellt_von = models.ForeignKey(
-        User, blank=True, null=True, #editable=False,
+        User, blank=True, null=True, editable=False,
         help_text="Benutzer der diesen Eintrag erstellt hat.",
         related_name="%(class)s_erstellt_von"
     )
     geaendert_am = models.DateTimeField(
+        editable=False,
         blank=True, null=True,
-#        auto_now=True, # Bug?
         help_text="Zeitpunkt der letzten Änderung",
     )
     geaendert_von = models.ForeignKey(
-        User, blank=True, null=True, #editable=False,
+        User, blank=True, null=True, editable=False,
         help_text="Benutzer der diesen Eintrag zuletzt geändert hat.",
         related_name="%(class)s_geaendert_von"
     )
@@ -62,9 +63,6 @@ class BaseModel(models.Model):
             self.geaendert_von = current_user
             self.geaendert_am = datetime.now()
 
-        id = self.id
-        erstellt_von = self.erstellt_von
-
         super(BaseModel,self).save()
 
     class Meta:
@@ -75,101 +73,12 @@ class BaseModel(models.Model):
 BASE_FIELDSET = ('Metadaten', {
 #    'classes': ('collapse',),
     'fields': (
-        "erstellt_am", "erstellt_von",
-        "geaendert_am", "geaendert_von",
-        "notizen"
+#        "erstellt_am", "erstellt_von",
+#        "geaendert_am", "geaendert_von",
+        "notizen",
     )
 })
 
 #______________________________________________________________________________
-
-class BasisPosten(BaseModel):
-    """
-    Basis für Aus-/Eingansposten
-    """
-    anzahl = models.PositiveIntegerField()
-    beschreibung = models.TextField()
-    einzelpreis = models.DecimalField(max_digits = 6, decimal_places = 2,)
-
-    def __unicode__(self):
-        return self.beschreibung
-
-    class Meta:
-        app_label = "PyRM"
-        # http://www.djangoproject.com/documentation/model-api/#abstract-base-classes
-        abstract = True # Abstract base classes
-        ordering = ['rechnung']
-
-#______________________________________________________________________________
-
-class BasisPostenAdmin(admin.ModelAdmin):
-    list_display = (
-        "anzahl", "beschreibung", "einzelpreis", "rechnung"
-    )
-    list_display_links = ("beschreibung",)
-    list_filter = ("rechnung",)
-    list_per_page = 20
-    list_select_related = True
-    search_fields = ("beschreibung",)
-
-#    fieldsets = (
-#        (None, {
-#            'fields': ("anzahl", "beschreibung", "einzelpreis", "rechnung")
-#        }),
-#        BASE_FIELDSET
-#    )
-#    fieldsets = add_missing_fields(BasisPosten, fieldsets)
-
-
-#______________________________________________________________________________
-
-class BasisRechnung(BaseModel):
-    """
-    Basis für Aus-/Eingangsrechungen
-    """
-    nummer = models.PositiveIntegerField(
-        null=True, blank=True,
-        help_text="Rechnungs Nummer"
-    )
-
-    bestellnummer = models.CharField(
-        max_length=128, null=True, blank=True,
-        help_text="Bestell- bzw. Auftragsnummer"
-    )
-
-    datum = models.DateField(null=True, blank=True,
-        help_text="Datum der Rechung."
-    )
-    lieferdatum = models.DateField(null=True, blank=True,
-        help_text="Zeitpunkt der Leistungserbringung"
-    )
-    valuta = models.DateField(null=True, blank=True,
-        help_text="Datum der Buchung laut Kontoauszug."
-    )
-
-    konto = models.ForeignKey(
-        "Konto", null=True, blank=True,
-        related_name="%(class)s_konto_set",
-    )
-    ggkto = models.ForeignKey(
-        "Konto", null=True, blank=True,
-        help_text="Gegenkonto",
-        related_name="%(class)s_ggkto_set",
-    )
-
-    summe = models.DecimalField(
-        max_digits = 6, decimal_places = 2,
-        help_text="Summe aller einzelnen Posten.",
-        null=True, blank=True
-    )
-
-    def __unicode__(self):
-        return u"Re.Nr.%s" % self.id
-
-    class Meta:
-        app_label = "PyRM"
-        # http://www.djangoproject.com/documentation/model-api/#abstract-base-classes
-        abstract = True # Abstract base classes
-        ordering = ['-nummer']
 
 

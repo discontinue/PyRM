@@ -118,7 +118,7 @@ class StSl(BaseModel):
 
     def __unicode__(self):
 #        return repr(self.__dict__)
-        return u"%s - %s%% (%s)" % (
+        return u"StSl.%s - %s%% (%s)" % (
             self.id, self.steuersatz, self.beschreibung
         )
 #______________________________________________________________________________
@@ -140,7 +140,7 @@ admin.site.register(StSl, StSlAdmin)
 #______________________________________________________________________________
 
 class Konto(BaseModel):
-    datev_nummer = models.PositiveIntegerField()
+    datev_nummer = models.PositiveIntegerField(primary_key=True)
     name = models.CharField(max_length=150)
 
     kontoart = models.PositiveIntegerField(
