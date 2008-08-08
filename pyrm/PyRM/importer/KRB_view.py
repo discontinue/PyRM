@@ -14,7 +14,7 @@ from PyRM.importer.menu import _sub_menu, _start_view
 from PyRM.models import Firma, Person, Kunde, Lieferant, Ort, Konto, \
             AusgangsRechnung, AusgangsPosten, EingangsRechnung, EingangsPosten
 
-from utils.csv_utils import get_dictlist
+from PyRM.utils.csv_utils import get_dictlist
 
 KUNDENLISTE = "./_daten/20080729 KRB Kundenliste.csv"
 BUCHUNGEN = "./_daten/20080805 KRB Buchungen.csv"

@@ -12,7 +12,7 @@ from django.conf import settings
 
 from PyRM.models import Konto, MWST#Firma, Person, Kunde, Ort
 from PyRM.importer.menu import _sub_menu, _start_view
-from utils.csv_utils import get_csv_tables, get_dictlist
+from PyRM.utils.csv_utils import get_csv_tables, get_dictlist
 
 from modelvcs.messages import add_message
 
