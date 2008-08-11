@@ -1,14 +1,14 @@
 {% extends "admin/base.html" %}
 {% load i18n %}
 
-{% block title %}{{ title|escape }} | {% trans 'PyRM site admin' %}{% endblock %}
+{% block title %}{{ title|escape }} | {% trans 'pyrm_app site admin' %}{% endblock %}
 
 {% block extrastyle %}
 <link rel="stylesheet" type="text/css" href="/static/base.css" />
 {% endblock %}
 
 {% block branding %}
-<h1 id="site-name">{% trans 'PyRM Administration' %}</h1>
+<h1 id="site-name">{% trans 'pyrm_app Administration' %}</h1>
 &nbsp;<a href="/">&nbsp;&#xAB; {% trans 'back to' %} {{ request.META.HTTP_HOST }}/</a>
 {% endblock %}
 
@@ -45,6 +45,6 @@ textarea_resize()
 <ul>
   <li><a href="/">index</a></li>
   <li><a href="/{{ admin_url_prefix }}/">django admin panel</a></li>
-  <li><a href="{% url PyRM-import-menu %}">import menu</a></li>
+  <li><a href="{% url pyrm_app-import-menu %}">import menu</a></li>
 </ul>
 </div>{% endblock %}
