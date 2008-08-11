@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    PyRM - EingansRechnung
+    pyrm_app - EingansRechnung
     ~~~~~~~~~~~~~~~~~~~~~~~
 
     + EingansPosten
@@ -19,11 +19,11 @@
 from django.db import models
 from django.contrib import admin
 
-from PyRM.models import StSl
-from PyRM.models.base_models import BASE_FIELDSET
-from PyRM.models.base_rechnung import BasisRechnung, BasisPosten, \
+from pyrm_app.models import StSl
+from pyrm_app.models.base_models import BASE_FIELDSET
+from pyrm_app.models.base_rechnung import BasisRechnung, BasisPosten, \
                                                                 BasisPostenAdmin
-from PyRM.utils.django_modeladmin import add_missing_fields
+from pyrm_app.utils.django_modeladmin import add_missing_fields
 
 
 class EingangsPosten(BasisPosten):
@@ -49,7 +49,7 @@ class EingangsPosten(BasisPosten):
     )
 
     class Meta:
-        app_label = "PyRM"
+        app_label = "pyrm_app"
         verbose_name = "Eingangsrechnung-Position"
         verbose_name_plural = "Eingangsrechnung-Positionen"
 
@@ -77,7 +77,7 @@ class EingangsRechnung(BasisRechnung):
     lieferant = models.ForeignKey("Lieferant", null=True, blank=True)
 
     class Meta:
-        app_label = "PyRM"
+        app_label = "pyrm_app"
         verbose_name = "Eingangsrechnung"
         verbose_name_plural = "Eingangsrechnungen"
 

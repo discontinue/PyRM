@@ -11,11 +11,11 @@ from django.shortcuts import render_to_response
 
 from django.conf import settings
 
-from PyRM.models import Konto, MWST, StSl, \
+from pyrm_app.models import Konto, MWST, StSl, \
             AusgangsRechnung, AusgangsPosten, EingangsRechnung, EingangsPosten,\
             Firma, Person, Kunde, Ort
-from PyRM.importer.menu import _sub_menu, _start_view
-from PyRM.utils.csv_utils import get_csv_tables, get_dictlist
+from pyrm_app.importer.menu import _sub_menu, _start_view
+from pyrm_app.utils.csv_utils import get_csv_tables, get_dictlist
 
 from modelvcs.messages import add_message
 

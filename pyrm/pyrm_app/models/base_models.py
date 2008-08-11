@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    PyRM - Basis Models
+    pyrm_app - Basis Models
     ~~~~~~~~~~~~~~~~~~~
 
     Basis Model Klassen.
@@ -21,7 +21,7 @@ from django.db import models
 from django.contrib import admin
 from django.contrib.auth.models import User
 
-from PyRM.utils.django_modeladmin import add_missing_fields
+from pyrm_app.utils.django_modeladmin import add_missing_fields
 
 from modelvcs.middleware import threadlocals
 
@@ -66,7 +66,7 @@ class BaseModel(models.Model):
         super(BaseModel,self).save()
 
     class Meta:
-        app_label = "PyRM"
+        app_label = "pyrm_app"
         # http://www.djangoproject.com/documentation/model-api/#abstract-base-classes
         abstract = True # Abstract base classes
 

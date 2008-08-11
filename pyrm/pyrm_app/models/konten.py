@@ -51,8 +51,8 @@ http://svn.berlios.de/wsvn/unternehmer/trunk/unstable/sql/Germany-DATEV-SKR03EU-
 from django.db import models
 from django.contrib import admin
 
-from PyRM.models.base_models import BaseModel, BASE_FIELDSET
-from PyRM.utils.django_modeladmin import add_missing_fields
+from pyrm_app.models.base_models import BaseModel, BASE_FIELDSET
+from pyrm_app.utils.django_modeladmin import add_missing_fields
 
 from modelvcs.messages import add_message
 
@@ -112,7 +112,7 @@ class StSl(BaseModel):
     beschreibung = models.CharField(max_length=150)
 
     class Meta:
-        app_label = "PyRM"
+        app_label = "pyrm_app"
         verbose_name = verbose_name_plural = u"Steuerschlüssel (StSl)"
         ordering = ("id",)
 
@@ -156,7 +156,7 @@ class Konto(BaseModel):
     )
 
     class Meta:
-        app_label = "PyRM"
+        app_label = "pyrm_app"
         verbose_name = "Konto"
         verbose_name_plural = "Konten"
         ordering = ["anzahl", "datev_nummer"]

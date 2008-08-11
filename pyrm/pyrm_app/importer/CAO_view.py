@@ -7,8 +7,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.conf import settings
 
-from PyRM.models import Firma, Person, Kunde, Ort
-from PyRM.importer.menu import _sub_menu, _start_view
+from pyrm_app.models import Firma, Person, Kunde, Ort
+from pyrm_app.importer.menu import _sub_menu, _start_view
 
 
 def _get_faktura_db_cursor():

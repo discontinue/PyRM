@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    PyRM - Basis Models
+    pyrm_app - Basis Models
     ~~~~~~~~~~~~~~~~~~~
 
     Basis Model Klassen für Ein-/AusgangsRechnung
@@ -18,9 +18,9 @@
 from django.db import models
 from django.contrib import admin
 
-from PyRM.models.base_models import BaseModel, BASE_FIELDSET
-from PyRM.utils.django_modeladmin import add_missing_fields
-from PyRM.models import StSl
+from pyrm_app.models.base_models import BaseModel, BASE_FIELDSET
+from pyrm_app.utils.django_modeladmin import add_missing_fields
+from pyrm_app.models import StSl
 
 class BasisPosten(BaseModel):
     """
@@ -41,7 +41,7 @@ class BasisPosten(BaseModel):
         return self.beschreibung
 
     class Meta:
-        app_label = "PyRM"
+        app_label = "pyrm_app"
         # http://www.djangoproject.com/documentation/model-api/#abstract-base-classes
         abstract = True # Abstract base classes
         ordering = ['rechnung']
@@ -99,7 +99,7 @@ class BasisRechnung(BaseModel):
         return u"Re.Nr.%s %s %i€" % (self.nummer, self.datum, self.summe)
 
     class Meta:
-        app_label = "PyRM"
+        app_label = "pyrm_app"
         # http://www.djangoproject.com/documentation/model-api/#abstract-base-classes
         abstract = True # Abstract base classes
         ordering = ['-nummer']

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    PyRM - SKR03 import
+    pyrm_app - SKR03 import
     ~~~~~~~~~~~~~~~~~~~
 
     Importiert die SKR03 Konten.
@@ -26,8 +26,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.conf import settings
 
-from PyRM.models import Konto, MWST, GNUCASH_SKR03_MAP#Firma, Person, Kunde, Ort
-from PyRM.importer.menu import _sub_menu, _start_view
+from pyrm_app.models import Konto, MWST, GNUCASH_SKR03_MAP#Firma, Person, Kunde, Ort
+from pyrm_app.importer.menu import _sub_menu, _start_view
 
 from modelvcs.messages import add_message
 

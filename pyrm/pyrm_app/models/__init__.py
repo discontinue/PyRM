@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-    PyRM.models
+    pyrm_app.models
     ~~~~~~~~~~~~~~
 
-    The database models for PyRM
+    The database models for pyrm_app
 
     Last commit info:
     ~~~~~~~~~~~~~~~~~

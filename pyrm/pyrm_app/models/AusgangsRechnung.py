@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    PyRM - AusgangsRechnung
+    pyrm_app - AusgangsRechnung
     ~~~~~~~~~~~~~~~~~~~~~~~
 
     + AusgangsPosten
@@ -19,11 +19,11 @@ from django.conf import settings
 from django.db import models
 from django.contrib import admin
 
-from PyRM.models import StSl
-from PyRM.models.base_models import BASE_FIELDSET
-from PyRM.models.base_rechnung import BasisRechnung, BasisPosten, \
+from pyrm_app.models import StSl
+from pyrm_app.models.base_models import BASE_FIELDSET
+from pyrm_app.models.base_rechnung import BasisRechnung, BasisPosten, \
                                                                 BasisPostenAdmin
-from PyRM.utils.django_modeladmin import add_missing_fields
+from pyrm_app.utils.django_modeladmin import add_missing_fields
 
 #______________________________________________________________________________
 
@@ -74,7 +74,7 @@ class AusgangsPosten(BasisPosten):
     )
 
     class Meta:
-        app_label = "PyRM"
+        app_label = "pyrm_app"
         verbose_name = "Ausgangsrechnung-Position"
         verbose_name_plural = "Ausgangsrechnung-Positionen"
 
@@ -147,7 +147,7 @@ class AusgangsRechnung(BasisRechnung):
     )
 
     class Meta:
-        app_label = "PyRM"
+        app_label = "pyrm_app"
         verbose_name = "Ausgangsrechnung"
         verbose_name_plural = "Ausgangsrechnungen"
 

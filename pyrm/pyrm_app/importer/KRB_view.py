@@ -10,11 +10,11 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.conf import settings
 
-from PyRM.importer.menu import _sub_menu, _start_view
-from PyRM.models import Firma, Person, Kunde, Lieferant, Ort, Konto, \
+from pyrm_app.importer.menu import _sub_menu, _start_view
+from pyrm_app.models import Firma, Person, Kunde, Lieferant, Ort, Konto, \
             AusgangsRechnung, AusgangsPosten, EingangsRechnung, EingangsPosten
 
-from PyRM.utils.csv_utils import get_dictlist
+from pyrm_app.utils.csv_utils import get_dictlist
 
 from modelvcs.messages import add_message
 

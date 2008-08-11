@@ -9,7 +9,7 @@ from django.shortcuts import render_to_response
 from django.db.models import get_app, get_models
 from django.contrib.auth.decorators import login_required
 
-from PyRM.utils.unicode_stringio import UnicodeStringIO
+from pyrm_app.utils.unicode_stringio import UnicodeStringIO
 
 #@login_required
 def menu(request):
@@ -35,7 +35,7 @@ def setup(request):
 
     print "Setup!"
 
-    app = get_app("PyRM")
+    app = get_app("pyrm_app")
     for model in get_models(app):
         model_name = model._meta.object_name
         print model_name

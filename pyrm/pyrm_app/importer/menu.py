@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    PyRM - importer
+    pyrm_app - importer
     ~~~~~~~~~~~~~~~
 
     Last commit info:
@@ -14,7 +14,7 @@
 """
 
 import sys
-from PyRM.utils.unicode_stringio import UnicodeStringIO
+from pyrm_app.utils.unicode_stringio import UnicodeStringIO
 
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    PyRM - Stammdaten
+    pyrm_app - Stammdaten
     ~~~~~~~~~~~~~~~~~
 
     http://de.wikipedia.org/wiki/Stammdaten
@@ -28,8 +28,8 @@ from django.db import models
 from django.conf import settings
 from django.contrib import admin
 
-from PyRM.models.base_models import BaseModel
-from PyRM.utils.django_modeladmin import add_missing_fields
+from pyrm_app.models.base_models import BaseModel
+from pyrm_app.utils.django_modeladmin import add_missing_fields
 
 #______________________________________________________________________________
 
@@ -51,7 +51,7 @@ class Ort(models.Model):
     land = models.CharField(max_length=128, default=settings.DEFAULT_LAND)
 
     class Meta:
-        app_label = "PyRM"
+        app_label = "pyrm_app"
         verbose_name = "Ort"
         verbose_name_plural = "Orte"
         ordering = ("name", "land")
@@ -133,7 +133,7 @@ class FirmaPersonBaseModel(BaseModel):
         ),
     )
     class Meta:
-        app_label = "PyRM"
+        app_label = "pyrm_app"
         # http://www.djangoproject.com/documentation/model-api/#abstract-base-classes
         abstract = True # Abstract base classes
 
@@ -155,7 +155,7 @@ class Firma(FirmaPersonBaseModel):
     #__________________________________________________________________________
 
     class Meta:
-        app_label = "PyRM"
+        app_label = "pyrm_app"
         verbose_name = "Firma"
         verbose_name_plural = "Firmen"
 
@@ -205,7 +205,7 @@ class Person(FirmaPersonBaseModel):
     #__________________________________________________________________________
 
     class Meta:
-        app_label = "PyRM"
+        app_label = "pyrm_app"
         verbose_name = "Person"
         verbose_name_plural = "Personen"
         unique_together = (("vorname", "nachname"),)
@@ -251,7 +251,7 @@ class Skonto(BaseModel):
         return u"%s Tag(e) - %s Prozent" % (self.zahlungsziel, self.skonto)
 
     class Meta:
-        app_label = "PyRM"
+        app_label = "pyrm_app"
         verbose_name = "Skonto"
         verbose_name_plural = "Skonto Einträge"
         ordering = ("zahlungsziel", "skonto")
@@ -289,7 +289,7 @@ class KundeLieferantBase(BaseModel):
     skonto = models.ManyToManyField(Skonto, verbose_name="Skonto liste")
 
     class Meta:
-        app_label = "PyRM"
+        app_label = "pyrm_app"
         # http://www.djangoproject.com/documentation/model-api/#abstract-base-classes
         abstract = True # Abstract base classes
 
@@ -331,7 +331,7 @@ class Kunde(KundeLieferantBase):
             return u"%s" % self.person
 
     class Meta:
-        app_label = "PyRM"
+        app_label = "pyrm_app"
         verbose_name = "Kunde"
         verbose_name_plural = "Kunden"
 
@@ -384,7 +384,7 @@ class Lieferant(KundeLieferantBase):
             return u"%s" % self.person
 
     class Meta:
-        app_label = "PyRM"
+        app_label = "pyrm_app"
         verbose_name = "Lieferant"
         verbose_name_plural = "Lieferanten"
         ordering = ("firma", "person")

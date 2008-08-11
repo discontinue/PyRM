@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 #______________________________________________________________________________
-# PyRM
+# pyrm_app
 
 DEFAULT_ZAHLUNGSZIEL = 7
 DEFAULT_MAHNFRIST = 30
@@ -99,14 +99,14 @@ MIDDLEWARE_CLASSES = (
     "modelvcs.middleware.threadlocals.ThreadLocals",
 )
 
-ROOT_URLCONF = 'PyRM.urls'
+ROOT_URLCONF = 'pyrm_app.urls'
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    "PyRM/templates_pyrm",
-    "PyRM/templates_django",
+    "pyrm_app/templates_pyrm",
+    "pyrm_app/templates_django",
 )
 
 INSTALLED_APPS = (
@@ -116,5 +116,5 @@ INSTALLED_APPS = (
 #    'django.contrib.sites',
     'django.contrib.admin',
     "modelvcs",
-    "PyRM",
+    "pyrm_app",
 )

@@ -3,9 +3,9 @@
 
 import os
 
-os.environ["DJANGO_SETTINGS_MODULE"] = "PyRM.settings"
+os.environ["DJANGO_SETTINGS_MODULE"] = "pyrm_app.settings"
 #from django.conf import settings
-from PyRM import settings
+from pyrm_app import settings
 
 print
 print "WICHTIG:"
@@ -35,7 +35,7 @@ project_directory = setup_environ(settings)
 
 from django.core import management
 
-assert("PyRM" in settings.INSTALLED_APPS)
+assert("pyrm_app" in settings.INSTALLED_APPS)
 
 if settings.DATABASE_ENGINE != 'sqlite3':
     print "Delete all tables..."
