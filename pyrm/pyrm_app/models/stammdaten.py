@@ -298,7 +298,7 @@ class KundeLieferantBase(BaseModel):
 
 class Kunde(KundeLieferantBase):
     """
-    Firmen- und Privat-Kunden für Ausgangsrechnungen.
+    Firmen- und Privat-Kunden für Rechnungen.
     """
     nummer = models.IntegerField(
         primary_key=True,

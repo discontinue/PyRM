@@ -11,8 +11,8 @@ from django.http import HttpResponse
 from django.conf import settings
 
 from pyrm_app.importer.menu import _sub_menu, _start_view
-from pyrm_app.models import Firma, Person, Kunde, Lieferant, Ort, Konto, \
-            AusgangsRechnung, AusgangsPosten, EingangsRechnung, EingangsPosten
+from pyrm_app.models import Firma, Person, Kunde, Lieferant, Ort, \
+                                                    Rechnung, RechnungsPosten
 
 from pyrm_app.utils.csv_utils import get_dictlist
 
@@ -142,20 +142,6 @@ def kundenliste():
 
 #------------------------------------------------------------------------------
 
-KONTO_MAP = {
-    135 : 27,   # EDV-Software
-    650 : 420,  # Büroeinrichtung
-    4200: 1200, # Erlöse Steuerfrei -> Bankkonto
-    4400: 8400, # Einnahmen 16%
-    4401: 8400, # Einnahmen 16%
-    5400: 3400, # Wareneingang
-    6430: 1800, # Handy
-    6470: 4805, # Reperatur
-    6600: 4610, # Werbekosten
-    6800: 4910, # Porto
-    6815: 4930, # Bürobedarf
-}
-
 def _get_decimal(raw_summe):
     summe1 = raw_summe.replace(".", "") # tausender punkte?
     summe2 = summe1.replace(",", ".")
@@ -193,11 +179,8 @@ def _get_re_posten(raw_text, summe):
 
 
 def buchungen():
-    AusgangsRechnung.objects.all().delete()
-    AusgangsPosten.objects.all().delete()
-
-    EingangsRechnung.objects.all().delete()
-    EingangsPosten.objects.all().delete()
+    Rechnung.objects.all().delete()
+    RechnungsPosten.objects.all().delete()
 
     Lieferant.objects.all().delete()
 
@@ -250,18 +233,6 @@ def buchungen():
 
         #----------------------------------------------------------------------
 
-        raw_datev_nr = line["Art"]
-        if raw_datev_nr == "":
-            konto = None
-        else:
-            datev_nr = int(raw_datev_nr)
-            if datev_nr in KONTO_MAP:
-                datev_nr = KONTO_MAP[datev_nr]
-            konto = Konto.objects.get(datev_nummer = datev_nr)
-        print "Konto:", konto
-
-        #----------------------------------------------------------------------
-
         raw_nr = line["R.Nr."]
         if raw_nr == "":
             re_nr = None
@@ -273,58 +244,26 @@ def buchungen():
         if summe<0:
             print "Ausgabe - Eingangsrechnung"
             print "*"*79
-            if kunde:
-                # Kunde als Lieferant eintragen
-                try:
-                    lieferant = Lieferant.objects.get(
-                        person = kunde.person,
-                        firma = kunde.firma,
-                    )
-                except Lieferant.DoesNotExist:
-                   lieferant = Lieferant(
-                        person = kunde.person,
-                        firma = kunde.firma,
-                    )
-                   add_message(lieferant, "KRB import")
-                   lieferant.save()
-                except Lieferant.MultipleObjectsReturned:
-                    # Bei mehreren Treffern, nimm den ersten
-                    lieferant = lieferant[0]
-            else:
-                lieferant = None
+            continue
 
-            rechnung = EingangsRechnung(
-                nummer = re_nr,
-                lieferant = lieferant,
-                datum = datum,
-                valuta = valuta,
-                konto = konto,
-                summe = summe,
-            )
-            add_message(rechnung, "KRB import")
-            rechnung.save()
-            PostenModel = EingangsPosten
-        else:
-            print "Einnahme - Ausgangsrechnung"
-            if re_nr == None:
-                print "Fehler: Ausgangsrechnung ohne Re.Nummer???"
-                continue
 
-            rechnung = AusgangsRechnung(
-                nummer = re_nr,
-                kunde = kunde,
-                datum = datum,
-                valuta = valuta,
-                konto = konto,
-                summe = summe,
-            )
-            add_message(rechnung, "KRB import")
-            rechnung.save()
-            PostenModel = AusgangsPosten
+        print "Einnahme - Rechnung"
+        if re_nr == None:
+            print "Fehler: Rechnung ohne Re.Nummer???"
+            continue
 
+        rechnung = Rechnung(
+            nummer = re_nr,
+            kunde = kunde,
+            datum = datum,
+            valuta = valuta,
+            summe = summe,
+        )
+        add_message(rechnung, "KRB import")
+        rechnung.save()
 
         for anzahl, txt, preis in re_posten:
-            p = PostenModel(
+            p = RechnungsPosten(
                 anzahl = anzahl,
                 beschreibung = txt,
                 einzelpreis = preis,

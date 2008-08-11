@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-    pyrm_app - AusgangsRechnung
+    pyrm_app - Rechnung
     ~~~~~~~~~~~~~~~~~~~~~~~
 
-    + AusgangsPosten
-    + AusgangsRechnung
+    + RechnungsPosten
+    + Rechnung
 
     Last commit info:
     ~~~~~~~~~~~~~~~~~
@@ -19,15 +19,13 @@ from django.conf import settings
 from django.db import models
 from django.contrib import admin
 
-from pyrm_app.models import StSl
+from pyrm_app.models.base_models import BaseModel
 from pyrm_app.models.base_models import BASE_FIELDSET
-from pyrm_app.models.base_rechnung import BasisRechnung, BasisPosten, \
-                                                                BasisPostenAdmin
 from pyrm_app.utils.django_modeladmin import add_missing_fields
 
 #______________________________________________________________________________
 
-class AusgangsPostenManager(models.Manager):
+class RechnungsPostenManager(models.Manager):
     def all_with_summ(self):
         """
         Liefert alle Positionen zurück, fügt das Attribute 'summe' hinzu.
@@ -63,26 +61,58 @@ class AusgangsPostenManager(models.Manager):
         rechnung.summe = preis_summe
         rechnung.save()
 
-class AusgangsPosten(BasisPosten):
+class RechnungsPosten(BaseModel):
     """
-    Jede einzelne Position auf einer Ausgangsrechnung.
+    Jede einzelne Position auf einer Rechnung.
     """
-    objects = AusgangsPostenManager()
+    objects = RechnungsPostenManager()
+
+    anzahl = models.PositiveIntegerField(
+#        help_text = u"Rechnungstext für diese Position."
+    )
+    beschreibung = models.TextField(
+        help_text = u"Rechnungstext für diese Position."
+    )
+    einzelpreis = models.DecimalField(
+        max_digits = 6, decimal_places = 2,
+        help_text = u"Preis pro Einheit"
+    )
+
+    def __unicode__(self):
+        return self.beschreibung
 
     rechnung = models.ForeignKey(
-        "AusgangsRechnung", #related_name="positionen"
+        "Rechnung", #related_name="positionen"
     )
 
     class Meta:
         app_label = "pyrm_app"
-        verbose_name = "Ausgangsrechnung-Position"
-        verbose_name_plural = "Ausgangsrechnung-Positionen"
+        verbose_name = verbose_name_plural = "Rechnungsposten"
 
-admin.site.register(AusgangsPosten, BasisPostenAdmin)
+
+class RechnungsPostenAdmin(admin.ModelAdmin):
+    list_display = (
+        "anzahl", "beschreibung", "einzelpreis", "rechnung"
+    )
+    list_display_links = ("beschreibung",)
+    list_filter = ("rechnung",)
+    list_per_page = 20
+    list_select_related = True
+    search_fields = ("beschreibung",)
+
+#    fieldsets = (
+#        (None, {
+#            'fields': ("anzahl", "beschreibung", "einzelpreis", "rechnung")
+#        }),
+#        BASE_FIELDSET
+#    )
+#    fieldsets = add_missing_fields(BasisPosten, fieldsets)
+
+admin.site.register(RechnungsPosten, RechnungsPostenAdmin)
 
 #______________________________________________________________________________
 
-class AusgangsRechnungManager(models.Manager):
+class RechnungManager(models.Manager):
     def create(self, data_dict):
         """
         Create a new entry, use only key-values from the data_dict if a field
@@ -107,11 +137,42 @@ class AusgangsRechnungManager(models.Manager):
             raise AttributeError(obj)
         return obj
 
-class AusgangsRechnung(BasisRechnung):
+class Rechnung(BaseModel):
     """
     Rechnungen die man selber erstellt.
     """
-    objects = AusgangsRechnungManager()
+    objects = RechnungManager()
+
+    bestellnummer = models.CharField(
+        max_length=128, null=True, blank=True,
+        help_text="Bestell- bzw. Auftragsnummer"
+    )
+
+    datum = models.DateField(null=True, blank=True,
+        help_text="Datum der Rechung."
+    )
+    lieferdatum = models.DateField(null=True, blank=True,
+        help_text="Zeitpunkt der Leistungserbringung"
+    )
+    valuta = models.DateField(null=True, blank=True,
+        help_text="Datum der Buchung laut Kontoauszug."
+    )
+
+
+    summe = models.DecimalField(
+        max_digits = 6, decimal_places = 2,
+        help_text="Summe aller einzelnen Posten.",
+        null=True, blank=True
+    )
+
+    def __unicode__(self):
+        return u"Re.Nr.%s %s %i€" % (self.nummer, self.datum, self.summe)
+
+    class Meta:
+        app_label = "pyrm_app"
+        # http://www.djangoproject.com/documentation/model-api/#abstract-base-classes
+        abstract = True # Abstract base classes
+        ordering = ['-nummer']
 
     nummer = models.PositiveIntegerField(
         primary_key=True,
@@ -128,42 +189,28 @@ class AusgangsRechnung(BasisRechnung):
         help_text="Versanddatum der Rechnung."
     )
 
-    konto = models.ForeignKey(
-        "Konto", null=True, blank=True,
-        related_name = "%(class)s_konto",
-    )
-    stsl = models.ForeignKey(StSl,
-        blank=True, null=True,
-        help_text = u"Der Datev-SteuerSchlüssel (StSl)"
-    )
-    ggkto = models.ForeignKey(
-        "Konto", null=True, blank=True,
-        related_name = "%(class)s_gkonto",
-        help_text="Gegenkonto",
-    )
-
     mahnstufe = models.PositiveIntegerField(default=0,
         help_text="Anzahl der verschickten Mahnungen."
     )
 
     class Meta:
         app_label = "pyrm_app"
-        verbose_name = "Ausgangsrechnung"
-        verbose_name_plural = "Ausgangsrechnungen"
+        verbose_name = "Rechnung"
+        verbose_name_plural = "Rechnungen"
 
 
 
 class PostenInline(admin.TabularInline):
 #class PostenInline(admin.StackedInline):
-    model = AusgangsPosten
+    model = RechnungsPosten
 
 
 
-class AusgangsRechnungAdmin(admin.ModelAdmin):
+class RechnungAdmin(admin.ModelAdmin):
 #    inlines = (PostenInline,)
-    list_display = ("nummer", "kunde", "datum", "valuta", "konto", "summe")
+    list_display = ("nummer", "kunde", "datum", "valuta", "summe")
     list_display_links = ("nummer", "kunde")
-    list_filter = ("mahnstufe", "kunde", "konto",)
+    list_filter = ("mahnstufe", "kunde",)
     list_per_page = 20
     list_select_related = True
 #    search_fields = ['foreign_key__related_fieldname']
@@ -174,16 +221,12 @@ class AusgangsRechnungAdmin(admin.ModelAdmin):
                 "mahnstufe"
             )
         }),
-        ('Kontenrahmen', {
-#            'classes': ('collapse',),
-            'fields': ("konto", "stsl", "ggkto")
-        }),
         ('Datum', {
 #            'classes': ('collapse',),
             'fields': ("datum", "lieferdatum", "versand", "valuta")
         }),
         BASE_FIELDSET,
     )
-    fieldsets = add_missing_fields(AusgangsRechnung, fieldsets)
+    fieldsets = add_missing_fields(Rechnung, fieldsets)
 
-admin.site.register(AusgangsRechnung, AusgangsRechnungAdmin)
+admin.site.register(Rechnung, RechnungAdmin)

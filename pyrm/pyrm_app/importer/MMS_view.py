@@ -11,9 +11,7 @@ from django.shortcuts import render_to_response
 
 from django.conf import settings
 
-from pyrm_app.models import Konto, MWST, StSl, \
-            AusgangsRechnung, AusgangsPosten, EingangsRechnung, EingangsPosten,\
-            Firma, Person, Kunde, Ort
+from pyrm_app.models import Rechnung, RechnungsPosten, Firma, Person, Kunde, Ort
 from pyrm_app.importer.menu import _sub_menu, _start_view
 from pyrm_app.utils.csv_utils import get_csv_tables, get_dictlist
 
@@ -160,10 +158,10 @@ def transfer_buchungen():
                 print "XXX 111"
             RechnungModel = EingangsRechnung
         else:
-            print "Einnahme - Ausgangsrechnung"
+            print "Einnahme - Rechnung"
             if Gkonto_nr not in (8400, 8340, 8150):
                 print "XXX 222"
-            RechnungModel = AusgangsRechnung
+            RechnungModel = Rechnung
 
         kunde = None
         rechnung = None
@@ -193,12 +191,12 @@ def transfer_buchungen():
                     )
 
                 try:
-                    rechnung = AusgangsRechnung.objects.get(nummer=re_nr)
-                except AusgangsRechnung.DoesNotExist, err:
+                    rechnung = Rechnung.objects.get(nummer=re_nr)
+                except Rechnung.DoesNotExist, err:
                     print "FEHLER: Rechnung %s nicht gefunden: %s" % (
                         re_nr, err
                     )
-                    rechnung = AusgangsRechnung(
+                    rechnung = Rechnung(
                             nummer = re_nr,
                             kunde = kunde,
 #                            datum = datum,
@@ -212,7 +210,7 @@ def transfer_buchungen():
                     add_message(rechnung, "MMS import")
                     rechnung.save()
 
-                    p = AusgangsPosten(
+                    p = RechnungsPosten(
                         anzahl = 1,
                         beschreibung = "(MMS import)",
                         einzelpreis = summe,
