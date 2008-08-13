@@ -8,6 +8,9 @@ media_url = settings.MEDIA_URL.strip("/")
 assert media_url != ""
 
 urlpatterns = patterns('',
+    #__________________________________________________________________________
+    # IMPORT VIEWS
+
     url(
         r'^mms_import/$', 'pyrm_app.importer.MMS_view.menu',
         name="pyrm_app-MMS-import"
@@ -35,6 +38,9 @@ urlpatterns = patterns('',
         'pyrm_app.importer.KRB_view.start_view'
     ),
 
+
+    #__________________________________________________________________________
+    # DJANGO ADMIN PANEL
     (
         r'^login/',
         'django.contrib.auth.views.login',
@@ -42,19 +48,35 @@ urlpatterns = patterns('',
     ),
     (r'^%s/(.*)' % settings.ADMIN_URL_PREFIX, admin.site.root),
 
+    #__________________________________________________________________________
+    # STATIC FILES
     (
         r'^%s/(?P<path>.*)$' % media_url,
         'django.views.static.serve',
         {'document_root': settings.MEDIA_ROOT},
     ),
 
+    #__________________________________________________________________________
+    # OTHER VIEWS
+
+    url(
+        r'^import_menu/$', 'pyrm_app.e-rechnung.index',
+        name="pyrm_app-e-rechnung"
+    ),
+    url(
+        r'^import_menu/$', 'pyrm_app.kontieren.index',
+        name="pyrm_app-kontieren"
+    ),
     url(
         r'^import_menu/$', 'pyrm_app.importer.menu.menu',
-        name="pyrm_app-import-menu"),
+        name="pyrm_app-import-menu"
+    ),
     url(
         r'^setup/$', 'pyrm_app.index.setup',
-        name="pyrm_app-setup"),
+        name="pyrm_app-setup"
+    ),
     url(
         r'^$', 'pyrm_app.index.menu',
-        name="pyrm_app-main-menu"),
+        name="pyrm_app-main-menu"
+    ),
 )

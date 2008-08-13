@@ -137,6 +137,23 @@ class RechnungManager(models.Manager):
             raise AttributeError(obj)
         return obj
 
+    def exist_date_range(self, field_name="datum"):
+        """
+        Liefert das Datum der ersten und letzten Rechnung zurück.
+        """
+        def get_date(queryset):
+            for item in queryset.iterator():
+                if item[0]:
+                    return item[0]
+
+        oldest = get_date(
+            self.model.objects.values_list(field_name).order_by(field_name)
+        )
+        newest = get_date(
+            self.model.objects.values_list(field_name).order_by("-"+field_name)
+        )
+        return oldest, newest
+
 class Rechnung(BaseModel):
     """
     Rechnungen die man selber erstellt.

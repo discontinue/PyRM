@@ -1,0 +1,12 @@
+{% extends "pyrm_base.html" %}
+{% block content %}
+<h1>Kontieren - Zeitraum auswählen</h1>
+<ul>
+  <li>{{ count }} Rechnungen sind erfasst.</li>
+  <li>Zeitraum: {{ oldest|date:"d.m.Y" }} - {{ newest|date:"d.m.Y" }}</li>
+</ul>
+{{ form }}
+<pre>
+{{ output }}
+</pre>
+{% endblock %}

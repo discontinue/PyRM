@@ -1,0 +1,30 @@
+{% extends "pyrm_base.html" %}
+{% block base_head %}
+<script type="text/javascript">
+  $(document).ready(function(){
+    $('#id_date').datepicker();
+  });
+</script>
+
+<link rel="stylesheet" href="/static/jquery-ui-themes/default/ui.datepicker.css" type="text/css">
+<script type="text/javascript" src="/static/jquery-ui/ui.datepicker.js"></script>
+{% endblock %}
+
+{% block content %}
+<h1>Eingangs Rechnung Verwalten</h1>
+<fieldset><legend>upload</legend>
+<form method="post" action=".">
+<ul id="input_fields">
+    {% for field in form %}
+        <li title="{{ field.help_text }}" class="{{ field.html_name }}">
+        <label for="{{ field.auto_id }}">{{ field.label }}:</label>
+        {{ field }}
+        <span class="field_help_text">{{ field.help_text }}</span>
+        {% if field.errors %}<li class="field_errors">{{ field.errors }}</li>{% endif %}
+    </li>
+    {% endfor %}
+</ul>
+<input type="submit" name="save" value="speichern" />
+</form>
+</fieldset>
+{% endblock %}
