@@ -72,7 +72,7 @@ urlpatterns = patterns('',
     # OTHER VIEWS
 
     url(
-        r'^import_menu/$', 'pyrm_app.kontieren.index',
+        r'^kontieren/$', 'pyrm_app.kontieren.index',
         name="pyrm_app-kontieren"
     ),
     url(
