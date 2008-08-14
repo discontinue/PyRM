@@ -6,6 +6,27 @@
 
     Verwaltung für Eingangsrechnungen
 
+    Nach einem Upload landen alle PDF Dateien im Verzeichnis ./neu/
+
+    Direkt nach dem Upload kann man den Lieferanten und das Rechnungsdatum
+    angeben. Zur hilfe wird der Text aus dem PDF mit pdftotext angezeigt.
+
+    Gibt man einen Lieferanten und das Datum an, wird die Rechnung von ./neu/
+    in ein Unterverzeichnis (benannt nach dem Lieferanten) verschoben und dem
+    Dateinamen wird das Datum der Rechnung vorrangestellt.
+
+    All PDF Dateien im Verzeichnis ./neu/ kann man im nachhinein noch
+    automatisch verschieben. Das ist nützlich. So kann man viele PDF Dateien
+    im Dateisystem in das ./neu/ Verzeichnis kopieren und dann anschließend
+    ein nach dem anderen spezifizieren. Einfach auf dem Dateinamen klicken.
+
+    Das downloaden der PDF Dateien ist auch möglich.
+
+    TODO:
+        - Man sollte Meta Daten anlegen können, z.B. "ist gedruckt/eingeheftet"
+        - verschieben/umbenennen der Dateien
+        - SHA-1 checksum Datei könnte man beim Upload anlegen
+
     Last commit info:
     ~~~~~~~~~~~~~~~~~
     $LastChangedDate: $
