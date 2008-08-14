@@ -2,18 +2,28 @@
 {% block base_head %}
 <script type="text/javascript">
   $(document).ready(function(){
+
     $('#id_date').datepicker();
+
+    $("#browser").treeview({
+        persist: "location",
+        collapsed: true,
+        unique: true
+    });
+
   });
 </script>
 
 <link rel="stylesheet" href="/static/jquery-ui-themes/default/ui.datepicker.css" type="text/css">
-<script type="text/javascript" src="/static/jquery-ui/ui.datepicker.js"></script>
+<script src="/static/jquery-ui/ui.datepicker.js" type="text/javascript"></script>
+<link rel="stylesheet" href="/static/jquery-plugins/treeview/jquery.treeview.css" />
+<script src="/static/jquery-plugins/treeview/jquery.treeview.js" type="text/javascript"></script>
 {% endblock %}
 
 {% block content %}
 <h1>Eingangs Rechnung Verwalten</h1>
 <fieldset><legend>upload</legend>
-<form method="post" action=".">
+<form enctype="multipart/form-data" method="post" action=".">
 <ul id="input_fields">
     {% for field in form %}
         <li title="{{ field.help_text }}" class="{{ field.html_name }}">
@@ -27,4 +37,19 @@
 <input type="submit" name="save" value="speichern" />
 </form>
 </fieldset>
+
+<pre>{{ filelist }}</pre>
+
+<ul id="browser" class="filetree">
+{% for dir, files in filelist.items %}
+    <li><span class="folder">{{ dir }}</span>
+        <ul>
+        {% for file in files %}
+           <li><span class="file"><a href="{{ file.url }}">{{ file.name }}</a></span></li>
+        {% endfor %}
+        </ul>
+    </li>
+{% endfor %}
+</ul>
+
 {% endblock %}

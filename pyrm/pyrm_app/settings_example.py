@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import os
+
 #______________________________________________________________________________
 # pyrm_app
 
@@ -8,6 +10,10 @@ DEFAULT_MAHNFRIST = 30
 DEFAULT_LAND = "Deutschland"
 
 ADMIN_URL_PREFIX = "admin"
+
+E_RECHNUNGEN_DIR = "EingangsRechnungen"
+
+PDFTOTEXT = "/usr/bin/pdftotext"
 
 #______________________________________________________________________________
 # DJANGO STUFF

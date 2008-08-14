@@ -57,12 +57,20 @@ urlpatterns = patterns('',
     ),
 
     #__________________________________________________________________________
-    # OTHER VIEWS
+    # EingangsRechnung Verwaltung
 
     url(
-        r'^import_menu/$', 'pyrm_app.e-rechnung.index',
+        r'^e-rechnung/$', 'pyrm_app.e-rechnung.index',
         name="pyrm_app-e-rechnung"
     ),
+    url(
+        r'^e-rechnung/specify/(?P<file_path>.+?)$', 'pyrm_app.e-rechnung.specify_file',
+        name="pyrm_app-e-rechnung_specify"
+    ),
+
+    #__________________________________________________________________________
+    # OTHER VIEWS
+
     url(
         r'^import_menu/$', 'pyrm_app.kontieren.index',
         name="pyrm_app-kontieren"
