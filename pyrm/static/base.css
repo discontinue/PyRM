@@ -27,6 +27,10 @@ a:hover {
   text-decoration: underline;
 }
 pre {
+  font-family: "Courier New",Courier,monospace;
+  font-size: 0.8em;
+  word-spacing: 0em;
+  letter-spacing: -0.05em;
   background-color: #fefeff;
   margin: 0.5em;
   padding: 0.5em;

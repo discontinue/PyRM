@@ -128,13 +128,17 @@ def specify_file(request, file_path):
     file_path_abs = fp.abs_path
 
     process = subprocess.Popen(
-        [settings.PDFTOTEXT, file_path_abs, "-"],
+        [settings.PDFTOTEXT,
+        "-layout",
+        file_path_abs, "-"],
         stdout=subprocess.PIPE, stderr=subprocess.PIPE
     )
     process.wait()
     returncode = process.returncode
-    pdf_text = process.stdout.read()
     stderr = process.stderr.read()
+
+    pdf_text = process.stdout.read()
+#    pdf_text = pdf_text.replace("  ", " ")
 
     if request.method == 'POST':
         form = SpecifyForm(request.POST)
