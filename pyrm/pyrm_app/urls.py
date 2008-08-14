@@ -60,12 +60,19 @@ urlpatterns = patterns('',
     # EingangsRechnung Verwaltung
 
     url(
-        r'^e-rechnung/$', 'pyrm_app.e-rechnung.index',
+        r'^e-rechnung/$',
+        'pyrm_app.e-rechnung.index',
         name="pyrm_app-e-rechnung"
     ),
     url(
-        r'^e-rechnung/specify/(?P<file_path>.+?)$', 'pyrm_app.e-rechnung.specify_file',
+        r'^e-rechnung/specify/(?P<file_path>.+?)$',
+        'pyrm_app.e-rechnung.specify_file',
         name="pyrm_app-e-rechnung_specify"
+    ),
+    url(
+        r'^e-rechnung/download/(?P<file_path>.+?)$',
+        'pyrm_app.e-rechnung.download',
+        name="pyrm_app-e-rechnung_download"
     ),
 
     #__________________________________________________________________________

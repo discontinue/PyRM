@@ -368,7 +368,8 @@ class Lieferant(KundeLieferantBase):
     """
     Lieferanten für die Eingansrechnungen
     """
-    nummer = models.IntegerField(
+#    nummer = models.IntegerField(
+    nummer = models.AutoField(
         primary_key=True,
         help_text="Lieferranten Nummer"
     )
@@ -378,10 +379,8 @@ class Lieferant(KundeLieferantBase):
     )
 
     def __unicode__(self):
-        if self.firma:
-            return u"%s - %s" % (self.firma, self.person)
-        else:
-            return u"%s" % self.person
+        items = (str(self.nummer), unicode(self.firma), self.person)
+        return u" - ".join([i for i in items if i])
 
     class Meta:
         app_label = "pyrm_app"
@@ -392,10 +391,10 @@ class Lieferant(KundeLieferantBase):
 
 class LieferantAdmin(admin.ModelAdmin):
 #    inlines = (PersonInline,FirmaInline)
-    list_display = ("nummer", "person", "firma",)
+    list_display = list_display_links = ("nummer", "person", "firma",)
     fieldsets = (
         ("Basis Daten", {
-            'fields': ("nummer", "kundennummer","person", "firma", "notizen")
+            'fields': ("kundennummer","person", "firma", "notizen")
         }),
         ("Lieferstop", {
 #            'classes': ('collapse',),
@@ -406,6 +405,6 @@ class LieferantAdmin(admin.ModelAdmin):
             'fields': ("zahlungsziel",)
         }),
     )
-    fieldsets = add_missing_fields(Lieferant, fieldsets)
+#    fieldsets = add_missing_fields(Lieferant, fieldsets)
 
 admin.site.register(Lieferant, LieferantAdmin)

@@ -5,7 +5,7 @@
 
     $('#id_date').datepicker();
 
-    $("#browser").treeview({
+    $(".filetree").treeview({
         persist: "location",
         collapsed: true,
         unique: true
@@ -22,7 +22,7 @@
 
 {% block content %}
 <h1>Eingangs Rechnung Verwalten</h1>
-<fieldset><legend>upload</legend>
+<fieldset class="forms"><legend>upload</legend>
 <form enctype="multipart/form-data" method="post" action=".">
 <ul id="input_fields">
     {% for field in form %}
@@ -38,18 +38,20 @@
 </form>
 </fieldset>
 
-<pre>{{ filelist }}</pre>
-
-<ul id="browser" class="filetree">
+<fieldset><legend>EingangsRechnungen</legend>
+<ul class="filetree">
 {% for dir, files in filelist.items %}
     <li><span class="folder">{{ dir }}</span>
         <ul>
         {% for file in files %}
-           <li><span class="file"><a href="{{ file.url }}">{{ file.name }}</a></span></li>
+           <li><span class="file">
+            <a href="{{ file.specify_url }}">{{ file.name }}</a>
+            <a href="{{ file.download_url }}">download</a>
+           </span></li>
         {% endfor %}
         </ul>
     </li>
 {% endfor %}
 </ul>
-
+</fieldset>
 {% endblock %}

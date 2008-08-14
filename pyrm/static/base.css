@@ -90,6 +90,9 @@ textarea {
 }
 .forms input[type=submit] {
   border: 1px solid #000;
+  width: auto;
+  padding: 1px 1em 1px 1em;
+  margin-left: 9em;
 }
 /* ----------------------------------------------------------------------------
    django admin panel

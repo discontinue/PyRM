@@ -12,8 +12,8 @@
 
 {% block content %}
 <h1>Eingangs Rechnung / einsortieren</h1>
-<fieldset><legend>{{ file_path }}</legend>
-<form method="post" action=".">
+<fieldset class="forms"><legend>{{ file_path }}</legend>
+<form method="post" action="{{ url }}">
 <ul id="input_fields">
     {% for field in form %}
         <li title="{{ field.help_text }}" class="{{ field.html_name }}">
