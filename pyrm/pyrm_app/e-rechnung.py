@@ -52,6 +52,7 @@ from pyrm_app.models import Lieferant
 
 NEU_E_RECHNUNG = os.path.join(settings.E_RECHNUNGEN_DIR, "neu")
 
+#------------------------------------------------------------------------------
 
 class UploadForm(forms.Form):
     file  = ExtFileField(ext_whitelist = (".pdf",))
@@ -65,6 +66,30 @@ class SpecifyForm(forms.Form):
         input_formats=["%d.%m.%y", "%d.%m.%Y"]
     )
 
+#------------------------------------------------------------------------------
+
+class FilePath(object):
+    def __init__(self, file_path):
+        if not os.path.isfile(file_path):
+            raise Http404("File '%s' not found!" % file_path)
+        if not file_path.startswith(settings.E_RECHNUNGEN_DIR):
+            raise Http404("path '%s' not allowed!" % file_path)
+
+        self.file_path = file_path
+        self.abs_path = os.path.abspath(file_path)
+        self.path, self.filename = os.path.split(file_path)
+
+    def get_specify_url(self):
+        return reverse(
+            'pyrm_app-e-rechnung_specify', kwargs={"file_path": self.file_path}
+        )
+
+    def get_download_url(self):
+        return reverse(
+            'pyrm_app-e-rechnung_download', kwargs={"file_path": self.file_path}
+        )
+
+#------------------------------------------------------------------------------
 
 def handle_uploaded_file(f):
     """
@@ -79,14 +104,10 @@ def handle_uploaded_file(f):
         new_file.write(chunk)
 
     new_file.close()
-    url = get_specify_url(destination)
+    
+    fp = FilePath(destination)
+    url = fp.get_specify_url()
     return HttpResponseRedirect(url)
-
-
-def get_specify_url(file_path):
-    return reverse(
-        'pyrm_app-e-rechnung_specify', kwargs={"file_path": file_path}
-    )
 
 
 def move_rechnung(file_path, lieferant, datum):
@@ -110,16 +131,6 @@ def move_rechnung(file_path, lieferant, datum):
     shutil.move(file_path, destination)
 
 
-class FilePath(object):
-    def __init__(self, file_path):
-        if not os.path.isfile(file_path):
-            raise Http404("File '%s' not found!" % file_path)
-        if not file_path.startswith(settings.E_RECHNUNGEN_DIR):
-            raise Http404("path '%s' not allowed!" % file_path)
-
-        self.abs_path = os.path.abspath(file_path)
-        self.path, self.filename = os.path.split(file_path)
-
 
 
 @login_required
@@ -128,9 +139,7 @@ def specify_file(request, file_path):
     file_path_abs = fp.abs_path
 
     process = subprocess.Popen(
-        [settings.PDFTOTEXT,
-        "-layout",
-        file_path_abs, "-"],
+        [settings.PDFTOTEXT, "-layout", file_path_abs, "-"],
         stdout=subprocess.PIPE, stderr=subprocess.PIPE
     )
     process.wait()
@@ -153,8 +162,12 @@ def specify_file(request, file_path):
     else:
         form = SpecifyForm()
 
+    back_url = reverse('pyrm_app-e-rechnung')
+
     context = {
         "url": request.path_info,
+        "back_url": back_url,
+        "download_url": fp.get_download_url(),
         "form": form,
         "file_path": file_path,
         "pdf_text": pdf_text,
@@ -187,10 +200,9 @@ def filelist():
                 continue
             file_path = os.path.join(root, fn)
 
-            specify_url = get_specify_url(file_path)
-            download_url = reverse(
-                'pyrm_app-e-rechnung_download', kwargs={"file_path": file_path}
-            )
+            fp = FilePath(file_path)
+            specify_url = fp.get_specify_url()
+            download_url = fp.get_download_url()
 
             file_list.append({
                 "specify_url": specify_url,
