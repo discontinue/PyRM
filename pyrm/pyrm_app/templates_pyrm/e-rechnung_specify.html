@@ -12,6 +12,7 @@
 
 {% block content %}
 <h1>Eingangs Rechnung / einsortieren</h1>
+<a href="{{ back_url }}">&lt; zurück</a>
 <fieldset class="forms"><legend>{{ file_path }}</legend>
 <form method="post" action="{{ url }}">
 <ul id="input_fields">
@@ -27,6 +28,12 @@
 <input type="submit" name="save" value="speichern" />
 </form>
 </fieldset>
+
+<ul><li>
+download: <a href="{{ download_url }}" title="download">{{ file_path }}</a></p>
+</li></ul>
+
+<a href="{{ back_url }}">&lt; zurück</a>
 
 <fieldset><legend>PDF Text:</legend>
 <pre>{{ pdf_text }}</pre>

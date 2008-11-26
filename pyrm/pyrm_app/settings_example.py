@@ -44,7 +44,7 @@ LOGIN_URL = "/login/"
 
 # Database connection info.
 DATABASE_ENGINE = 'sqlite3'    # 'postgresql', 'mysql', 'sqlite3' or 'ado_mssql'.
-DATABASE_NAME = 'test.db3'  # Or path to database file if using sqlite3.
+DATABASE_NAME = 'test.db3'     # Or path to database file if using sqlite3.
 DATABASE_USER = ''             # Not used with sqlite3.
 DATABASE_PASSWORD = ''         # Not used with sqlite3.
 DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.

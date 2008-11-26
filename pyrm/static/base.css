@@ -39,8 +39,8 @@ fieldset, legend {
   background-color: #fefeff;
 }
 fieldset {
-  padding: 3px;
-  margin: 3px;
+  padding: 5px;
+  margin: 1.5em 5px 1.5em 5px;
 }
 legend {
   display: block;

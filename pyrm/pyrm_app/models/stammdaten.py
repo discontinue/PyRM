@@ -82,9 +82,9 @@ class FirmaPersonBaseModel(BaseModel):
     internet = models.URLField(verify_exists=False, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
 
-    telefon = models.PhoneNumberField(blank=True, null=True)
-    fax = models.PhoneNumberField(blank=True, null=True)
-    mobile = models.PhoneNumberField(blank=True, null=True)
+    telefon = models.CharField(max_length=32, blank=True, null=True)
+    fax = models.CharField(max_length=32, blank=True, null=True)
+    mobile = models.CharField(max_length=32, blank=True, null=True)
 
     strasse = models.CharField(max_length=128, blank=True, null=True)
     strassen_zusatz = models.CharField(max_length=128, blank=True, null=True)

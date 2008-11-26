@@ -76,12 +76,20 @@ urlpatterns = patterns('',
     ),
 
     #__________________________________________________________________________
-    # OTHER VIEWS
+    # Rechnungen Kontieren
 
     url(
         r'^kontieren/$', 'pyrm_app.kontieren.index',
         name="pyrm_app-kontieren"
     ),
+    url(
+        r'^kontieren/(?P<start>.+?)-(?P<end>.+?)/$',
+        'pyrm_app.kontieren.kontieren',
+        name="pyrm_app-kontieren-kontieren"
+    ),
+    
+    #__________________________________________________________________________
+    # OTHER VIEWS
     url(
         r'^import_menu/$', 'pyrm_app.importer.menu.menu',
         name="pyrm_app-import-menu"

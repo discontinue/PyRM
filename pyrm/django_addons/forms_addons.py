@@ -15,22 +15,41 @@
 """
 
 import os
+import copy
+import datetime
+import calendar
 
 from django import forms
+
+ROMAN_QUARTER_DATA = {
+    "I"  : (1,3),
+    "II" : (4,6),
+    "III": (7,9),
+    "IV" : (10, 12),
+}
+ROMAN_NUMERALS = ROMAN_QUARTER_DATA.keys() # ['I', 'II', 'III', 'IV']
+
 
 class QuarterChoiceField(forms.ChoiceField):
     """
     >>> start = datetime.date(2007, 1, 1)
     >>> end = datetime.date(2008, 12, 31)
-    >>> t = QuarterChoiceField(epoch = (start, end))
-    >>> t.choices
-    [(1, 'I.2007'), (2, 'II.2007'), (3, 'III.2007'), (4, 'IV.2007'), \
-(5, 'I.2008'), (6, 'II.2008'), (7, 'III.2008'), (8, 'IV.2008')]
-
+    
     >>> t = QuarterChoiceField(epoch = (start, end), reverse=True)
     >>> t.choices
-    [(1, 'IV.2008'), (2, 'III.2008'), (3, 'II.2008'), (4, 'I.2008'), \
-(5, 'IV.2007'), (6, 'III.2007'), (7, 'II.2007'), (8, 'I.2007')]
+    [(0, 'IV.2008'), (1, 'III.2008'), (2, 'II.2008'), (3, 'I.2008'), \
+(4, 'IV.2007'), (5, 'III.2007'), (6, 'II.2007'), (7, 'I.2007')]
+    >>> t.clean(0)
+    (datetime.date(2008, 10, 1), datetime.date(2008, 12, 31))
+    >>> t.clean(7)
+    (datetime.date(2007, 1, 1), datetime.date(2007, 3, 31))
+    
+    >>> t = QuarterChoiceField(epoch = (start, end))
+    >>> t.choices
+    [(0, 'I.2007'), (1, 'II.2007'), (2, 'III.2007'), (3, 'IV.2007'), \
+(4, 'I.2008'), (5, 'II.2008'), (6, 'III.2008'), (7, 'IV.2008')]
+    >>> t.clean(2)
+    (datetime.date(2007, 7, 1), datetime.date(2007, 9, 30))
 
     >>> t = QuarterChoiceField(epoch = (end, start))
     Traceback (most recent call last):
@@ -41,32 +60,54 @@ class QuarterChoiceField(forms.ChoiceField):
         """
         kwarg 'epoch' must be two datetime objects.
         """
-        oldest, newest = kwargs.pop("epoch")
-        reverse = kwargs.pop("reverse", False)
+        self.oldest, self.newest = kwargs.pop("epoch")
+        assert(self.oldest<self.newest)
+        
+        self.reverse = kwargs.pop("reverse", False)
         super(QuarterChoiceField, self).__init__(*args, **kwargs)
-        self.choices = self.build_choices(oldest, newest, reverse)
+        
+        self.time_range = range(self.oldest.year, self.newest.year+1)
+        
+        self.roman_range = copy.copy(ROMAN_NUMERALS)
+        if self.reverse:
+            self.time_range.reverse()
+            self.roman_range.reverse()
+        
+        self.choices = self._build_choices()
 
-    def build_choices(self, oldest, newest, reverse):
+    def clean(self, value):
+        """
+        FIXME: Find a better solution!
+        """
+        value = super(QuarterChoiceField, self).clean(value)
+        index = int(value)
+
+        string_repr = self.choices[index][1]
+        quarter, year = string_repr.split(".")
+        year = int(year)
+        
+        start_month, end_month = ROMAN_QUARTER_DATA[quarter]
+        
+        start = datetime.date(year, start_month, 1)
+        
+        day_count = calendar.monthrange(year, end_month)[1]
+        end = datetime.date(year, end_month, day_count)
+            
+        return start, end
+
+    def _build_choices(self):
         """
         FIXME: Nur die wirklichen Quartale sollten genommen werden und nicht
             alle des Jahres.        
         """
-        assert(oldest<newest)
-
-        time_range = range(oldest.year, newest.year+1)
-        roman_range = ["I", "II", "III", "IV"]
-        if reverse:
-            time_range.reverse()
-            roman_range.reverse()
-
         choices = []
         no = 0
-        for year in time_range:
-            for roman in roman_range:
-                no += 1
+        for year in self.time_range:
+            for roman in self.roman_range:
                 choices.append(
                     (no, "%s.%s" % (roman, year))
                 )
+                no += 1
         return choices
 
 

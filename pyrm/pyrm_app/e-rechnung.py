@@ -37,7 +37,7 @@
     :license: GNU GPL v3, see LICENSE.txt for more details.
 """
 
-import os, subprocess, shutil
+import os, subprocess, shutil, datetime
 
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
@@ -52,6 +52,9 @@ from pyrm_app.models import Lieferant
 
 NEU_E_RECHNUNG = os.path.join(settings.E_RECHNUNGEN_DIR, "neu")
 
+FILE_DATE_FORMAT = "%Y%m%d"
+FORM_DATE_FORMAT = "%d.%m.%Y"
+
 #------------------------------------------------------------------------------
 
 class UploadForm(forms.Form):
@@ -63,7 +66,7 @@ class SpecifyForm(forms.Form):
     )
     datum = forms.DateField(
         label="Datum",
-        input_formats=["%d.%m.%y", "%d.%m.%Y"]
+        input_formats=["%d.%m.%y", FORM_DATE_FORMAT]
     )
 
 #------------------------------------------------------------------------------
@@ -78,6 +81,24 @@ class FilePath(object):
         self.file_path = file_path
         self.abs_path = os.path.abspath(file_path)
         self.path, self.filename = os.path.split(file_path)
+    
+    def get_lieferant_from_path(self):
+        last_path = os.path.split(self.path)[-1]
+        try:
+            no, name = last_path.split("-",1)
+            no = int(no)
+            name = name.strip()
+        except ValueError:
+            return None
+        
+        return Lieferant.objects.get(nummer = no)
+    
+    def get_date_from_filename(self):
+        date_string = self.filename.split("_",1)[0]
+        try:
+            return datetime.datetime.strptime(date_string, FILE_DATE_FORMAT)
+        except ValueError:
+            return None        
 
     def get_specify_url(self):
         return reverse(
@@ -112,7 +133,7 @@ def handle_uploaded_file(f):
 
 def move_rechnung(file_path, lieferant, datum):
 
-    date_prefix = datum.strftime("%Y%m%d")
+    date_prefix = datum.strftime(FILE_DATE_FORMAT)
     path, filename = os.path.split(file_path)
 
     if filename.startswith(date_prefix):
@@ -135,6 +156,10 @@ def move_rechnung(file_path, lieferant, datum):
 
 @login_required
 def specify_file(request, file_path):
+    """
+    Eine Bestehende Rechnung einsortieren.
+    Es wird per pdftotext der Text der PDF Datei angezeigt.
+    """
     fp = FilePath(file_path)
     file_path_abs = fp.abs_path
 
@@ -160,7 +185,18 @@ def specify_file(request, file_path):
             url = reverse('pyrm_app-e-rechnung')
             return HttpResponseRedirect(url)
     else:
-        form = SpecifyForm()
+        lieferant = fp.get_lieferant_from_path()
+        init_data = {
+            "lieferant": lieferant,
+        }
+        
+        datum = fp.get_date_from_filename()
+        if datum:
+            init_data["datum"] = datum.strftime(FORM_DATE_FORMAT)
+        
+        print init_data
+        form = SpecifyForm(initial=init_data)
+#        .fields["lieferant"]
 
     back_url = reverse('pyrm_app-e-rechnung')
 
