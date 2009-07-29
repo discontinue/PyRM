@@ -37,7 +37,11 @@
     :license: GNU GPL v3, see LICENSE.txt for more details.
 """
 
-import os, subprocess, shutil, datetime
+import os
+import sys
+import shutil
+import datetime
+import subprocess
 
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
@@ -58,7 +62,7 @@ FORM_DATE_FORMAT = "%d.%m.%Y"
 #------------------------------------------------------------------------------
 
 class UploadForm(forms.Form):
-    file  = ExtFileField(ext_whitelist = (".pdf",))
+    file = ExtFileField(ext_whitelist=(".pdf",))
 
 class SpecifyForm(forms.Form):
     lieferant = forms.ModelChoiceField(
@@ -81,24 +85,30 @@ class FilePath(object):
         self.file_path = file_path
         self.abs_path = os.path.abspath(file_path)
         self.path, self.filename = os.path.split(file_path)
-    
+
     def get_lieferant_from_path(self):
         last_path = os.path.split(self.path)[-1]
         try:
-            no, name = last_path.split("-",1)
+            no, name = last_path.split("-", 1)
             no = int(no)
             name = name.strip()
         except ValueError:
             return None
-        
-        return Lieferant.objects.get(nummer = no)
-    
+
+        try:
+            return Lieferant.objects.get(nummer=no)
+        except:
+            etype, evalue, etb = sys.exc_info()
+            evalue = etype("Can't get lieferant with 'nummer==%r': %s" % (no, evalue))
+            raise etype, evalue, etb
+
+
     def get_date_from_filename(self):
-        date_string = self.filename.split("_",1)[0]
+        date_string = self.filename.split("_", 1)[0]
         try:
             return datetime.datetime.strptime(date_string, FILE_DATE_FORMAT)
         except ValueError:
-            return None        
+            return None
 
     def get_specify_url(self):
         return reverse(
@@ -125,7 +135,7 @@ def handle_uploaded_file(f):
         new_file.write(chunk)
 
     new_file.close()
-    
+
     fp = FilePath(destination)
     url = fp.get_specify_url()
     return HttpResponseRedirect(url)
@@ -163,10 +173,14 @@ def specify_file(request, file_path):
     fp = FilePath(file_path)
     file_path_abs = fp.abs_path
 
-    process = subprocess.Popen(
-        [settings.PDFTOTEXT, "-layout", file_path_abs, "-"],
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    )
+    try:
+        process = subprocess.Popen(
+            [settings.PDFTOTEXT, "-layout", file_path_abs, "-"],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
+    except OSError, err:
+        raise OSError("error running %r: %s (Is 'xpdf-utils' installed ?)" % (settings.PDFTOTEXT, err))
+
     process.wait()
     returncode = process.returncode
     stderr = process.stderr.read()
@@ -189,11 +203,11 @@ def specify_file(request, file_path):
         init_data = {
             "lieferant": lieferant,
         }
-        
+
         datum = fp.get_date_from_filename()
         if datum:
             init_data["datum"] = datum.strftime(FORM_DATE_FORMAT)
-        
+
         print init_data
         form = SpecifyForm(initial=init_data)
 #        .fields["lieferant"]
