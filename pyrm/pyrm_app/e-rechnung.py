@@ -52,7 +52,7 @@ from django.conf import settings
 from django import forms
 
 from django_addons.forms_addons import ExtFileField
-from pyrm_app.models import Lieferant
+from pyrm_app.models import Lieferant, Firma
 
 NEU_E_RECHNUNG = os.path.join(settings.E_RECHNUNGEN_DIR, "neu")
 
@@ -87,6 +87,10 @@ class FilePath(object):
         self.path, self.filename = os.path.split(file_path)
 
     def get_lieferant_from_path(self):
+        """
+        return Lieferant instance from path info.
+        Create Lieferant + Firma if not exist.
+        """
         last_path = os.path.split(self.path)[-1]
         try:
             no, name = last_path.split("-", 1)
@@ -97,11 +101,11 @@ class FilePath(object):
 
         try:
             return Lieferant.objects.get(nummer=no)
-        except:
-            etype, evalue, etb = sys.exc_info()
-            evalue = etype("Can't get lieferant with 'nummer==%r': %s" % (no, evalue))
-            raise etype, evalue, etb
-
+        except Lieferant.DoesNotExist:
+            firma, created = Firma.objects.get_or_create(name1=name)
+            lieferant = Lieferant(nummer=no, firma=firma)
+            lieferant.save()
+            return lieferant
 
     def get_date_from_filename(self):
         date_string = self.filename.split("_", 1)[0]
