@@ -31,7 +31,7 @@ class BaseModel(models.Model):
     """
     Grundmodell für fast alle Klassen.
     """
-    erstellt_am = models.DateTimeField(default = datetime.now,
+    erstellt_am = models.DateTimeField(default=datetime.now,
         editable=False,
         help_text="Zeitpunkt der Erstellung",
     )
@@ -53,7 +53,7 @@ class BaseModel(models.Model):
 
     notizen = models.TextField(blank=True, null=False)
 
-    def save(self):
+    def save(self, *args, **kwargs):
         current_user = threadlocals.get_current_user()
 
         if self.erstellt_von == None:
@@ -63,7 +63,7 @@ class BaseModel(models.Model):
             self.geaendert_von = current_user
             self.geaendert_am = datetime.now()
 
-        super(BaseModel,self).save()
+        super(BaseModel, self).save(*args, **kwargs)
 
     class Meta:
         app_label = "pyrm_app"
