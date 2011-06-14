@@ -1,6 +1,8 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
+
 
 import os
+import sys
 
 #______________________________________________________________________________
 # pyrm_app
@@ -42,14 +44,6 @@ LOGIN_URL = "/login/"
 #______________________________________________________________________________
 # DATABASE SETUP
 
-# Database connection info.
-DATABASE_ENGINE = 'sqlite3'    # 'postgresql', 'mysql', 'sqlite3' or 'ado_mssql'.
-DATABASE_NAME = 'test.db3'     # Or path to database file if using sqlite3.
-DATABASE_USER = ''             # Not used with sqlite3.
-DATABASE_PASSWORD = ''         # Not used with sqlite3.
-DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
-DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
-
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -60,14 +54,6 @@ TIME_ZONE = 'Europe/Berlin'
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'de-DE'
-
-#DATE_FORMAT
-#DATETIME_FORMAT
-#TIME_FORMAT
-#MONTH_DAY_FORMAT
-#YEAR_MONTH_FORMAT
-
-SITE_ID = 1
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
@@ -119,8 +105,24 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-#    'django.contrib.sites',
     'django.contrib.admin',
-    "modelvcs",
+
+    'reversion', # https://github.com/etianen/django-reversion
+
     "pyrm_app",
 )
+
+
+try:
+    from local_settings import *
+except ImportError, err:
+    if str(err) == "No module named local_settings":
+        msg = (
+            "There is no local_settings.py file in '%s' !"
+            " (Original error was: %s)\n"
+        ) % (os.getcwd(), err)
+        sys.stderr.write(msg)
+        #from django.core.exceptions import ImproperlyConfigured
+        #raise ImproperlyConfigured(msg)
+    else:
+        raise

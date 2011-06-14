@@ -5,9 +5,6 @@
 # local django packages and not with a normal installed django instance.
 #
 
-export DJANGO_SETTINGS_MODULE=PyRM.settings
+export DJANGO_SETTINGS_MODULE=pyrm_app.settings
 
-# use the local django packages
-export PYTHONPATH=${PWD}
-
-python ./django/bin/django-admin.py $*
+python ../bin/django-admin.py $*
