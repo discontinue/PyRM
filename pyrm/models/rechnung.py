@@ -85,6 +85,7 @@ class RechnungsPosten(BaseModel):
 
     class Meta:
         app_label = "pyrm"
+        ordering = ("-lastupdatetime",)
         verbose_name = verbose_name_plural = "Rechnungsposten"
 
 

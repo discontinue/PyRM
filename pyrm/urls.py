@@ -18,7 +18,7 @@ urlpatterns = patterns('',
         name="pyrm-MMS-import"
     ),
     (
-        r'^mms_import/(?P<unit>\w*?)/$',
+        r'^mms_import/(?P<unit>.+?)/$',
         'pyrm.importer.MMS_view.start_view'
     ),
 
@@ -27,7 +27,7 @@ urlpatterns = patterns('',
         name="pyrm-CAO-import"
     ),
     (
-        r'^cao_import/(?P<unit>[a-z]*?)/$',
+        r'^cao_import/(?P<unit>.+?)/$',
         'pyrm.importer.CAO_view.start_view'
     ),
 
@@ -36,7 +36,7 @@ urlpatterns = patterns('',
         name="pyrm-KRB-import"
     ),
     (
-        r'^krb_import/(?P<unit>[a-z]*?)/$',
+        r'^krb_import/(?P<unit>.+?)/$',
         'pyrm.importer.KRB_view.start_view'
     ),
 

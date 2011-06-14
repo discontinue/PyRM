@@ -18,16 +18,17 @@ from pyrm.utils.csv_utils import get_dictlist
 
 
 
-KUNDENLISTE = "./_daten/20080729 KRB Kundenliste.csv"
-BUCHUNGEN = "./_daten/20080805 KRB Buchungen.csv"
+KUNDENLISTE = os.path.expanduser("~/20110614 KRB Kundenliste.csv")
+BUCHUNGEN = os.path.expanduser("~/20110614 KRB Buchungen.csv")
 
 
 def _get_dictlist(filename):
-    f = file(filename, "r")
+    # python csv module doesn't work with unicode! So no codecs.open() here!
+    f = file(filename, "rb")
     data = f.readlines()
     f.close()
 
-    dictlist = get_dictlist(data, used_fieldnames=None)
+    dictlist = get_dictlist(data, encoding="latin-1", used_fieldnames=None)
     return dictlist
 
 
@@ -252,6 +253,8 @@ def buchungen():
             continue
 
         rechnung = Rechnung(
+            createtime=datum,
+
             nummer=re_nr,
             kunde=kunde,
             datum=datum,
@@ -274,12 +277,12 @@ def buchungen():
 #------------------------------------------------------------------------------
 
 views = {
-    "kundenliste": kundenliste,
-    "buchungen": buchungen,
+    "1. Kundenliste": kundenliste,
+    "2. Buchungen": buchungen,
 }
 @login_required
 def menu(request):
-    return _sub_menu(request, views.keys())
+    return _sub_menu(request, sorted(views.keys()))
 
 @login_required
 def start_view(request, unit=""):

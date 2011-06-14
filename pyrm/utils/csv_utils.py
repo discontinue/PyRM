@@ -47,7 +47,20 @@ def get_all_fieldnames(table_data):
     fieldnames = csv.reader(table_data, **CSV_READER_KWARGS).next()
     return fieldnames
 
-def get_dictlist(table_data, used_fieldnames=None):
+MASK = (
+    (u"\x80", u"\N{EURO SIGN}"),
+    (u"\x96", u'-'),
+    (u"\x84", u'"'),
+    (u"\x93", u'"'),
+)
+def unmask(value):
+    for s, d in MASK:
+        value = value.replace(s, d)
+#    if r"\x" in repr(value):
+#        print "***", repr(value)
+    return value
+
+def get_dictlist(table_data, encoding="latin-1", used_fieldnames=None):
     """
     used_fieldnames = A list of used fieldnames. If definied: Filter the fields.
     """
@@ -63,7 +76,9 @@ def get_dictlist(table_data, used_fieldnames=None):
         for k in fields.keys():
             value = fields[k]
             if value != None:
-                fields[k] = unicode(value, "utf8")
+                value = unicode(value, encoding)
+                value = unmask(value)
+                fields[k] = value
 
         dictlist.append(fields)
 
