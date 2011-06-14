@@ -27,12 +27,11 @@ def menu(request):
 
 
 @login_required
+@render_to(template_name="import/output.html", debug=False)
 def setup(request):
     """
     initialisiere alle Models
     """
-    response = HttpResponse(mimetype='text/plain')
-
     old_stdout = sys.stdout
     sys.stdout = UnicodeStringIO()
 
@@ -54,6 +53,4 @@ def setup(request):
     }
     sys.stdout = old_stdout
 
-    return render_to_response(
-        "import_output.html", context, context_instance=RequestContext(request)
-    )
+    return context

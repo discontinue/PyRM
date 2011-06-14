@@ -1,9 +1,9 @@
-{% extends "pyrm_base.html" %}
+{% extends "pyrm/pyrm_base.html" %}
 {% block content %}
 <h1>Import menu:</h1>
 <ul class="selection_menu">
   <li><a href="{% url pyrm-CAO-import %}">CAO import</a></li>
-  {# <li><a href="{% url pyrm-MMS-import %}">MMS import</a></li> #}
+  <li><a href="{% url pyrm-MMS-import %}">MMS import</a></li>
   <li><a href="{% url pyrm-KRB-import %}">KRB import</a></li>
 </ul>
 {% endblock %}

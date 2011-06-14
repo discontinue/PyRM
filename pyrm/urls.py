@@ -13,14 +13,14 @@ urlpatterns = patterns('',
     #__________________________________________________________________________
     # IMPORT VIEWS
 
-#    url(
-#        r'^mms_import/$', 'pyrm.importer.MMS_view.menu',
-#        name="pyrm-MMS-import"
-#    ),
-#    (
-#        r'^mms_import/(?P<unit>\w*?)/$',
-#        'pyrm.importer.MMS_view.start_view'
-#    ),
+    url(
+        r'^mms_import/$', 'pyrm.importer.MMS_view.menu',
+        name="pyrm-MMS-import"
+    ),
+    (
+        r'^mms_import/(?P<unit>\w*?)/$',
+        'pyrm.importer.MMS_view.start_view'
+    ),
 
     url(
         r'^cao_import/$', 'pyrm.importer.CAO_view.menu',
@@ -105,4 +105,3 @@ urlpatterns = patterns('',
     ),
 )
 
-print urlpatterns

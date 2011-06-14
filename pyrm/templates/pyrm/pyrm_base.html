@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex,nofollow" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <link rel="stylesheet" type="text/css" href="/static/base.css" />
-<script type="text/javascript" src="/static/jquery.js"></script>
+<script type="text/javascript" src="/media/js/jquery.js"></script>
 {% block base_head %}{% endblock %}
 </head>
 <body {% block body_tag %}{% endblock %}>
@@ -15,12 +15,7 @@
 
 {% block base_header_nav %}
 <div id="header_nav" class="pyrm_header_nav">
-<ul class="pyrm_selection_menu">
-  <li><a href="/">index</a></li>
-  <li><a href="{% url pyrm-setup %}">setup</a></li>
-  <li><a href="{% url pyrm-import-menu %}">import</a>/<a href="#">export</a></li>
-  <li><a href="/{{ admin_url_prefix }}/">django admin panel</a></li>
-</ul>
+{% include "pyrm/includes/quick_links.html" %}
 </div>{% endblock %}
 
 
@@ -28,12 +23,7 @@
 
 {% block base_footer %}
 <div id="footer" class="pyrm_footer">
-<ul class="pyrm_selection_menu">
-  <li><a href="/">index</a></li>
-  <li><a href="{% url pyrm-setup %}">setup</a></li>
-  <li><a href="{% url pyrm-import-menu %}">import</a>/<a href="#">export</a></li>
-  <li><a href="/{{ admin_url_prefix }}/">django admin panel</a></li>
-</ul>
+{% include "pyrm/includes/quick_links.html" %}
 </div>{% endblock %}
 
 </body></html>
