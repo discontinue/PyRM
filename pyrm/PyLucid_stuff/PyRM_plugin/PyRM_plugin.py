@@ -1,15 +1,11 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
 """
     PyRM - PyLucid plugin
     ~~~~~~~~~~~~~~~~~~~~~
 
     http://sourceforge.net/projects/pyrm/
 
-    Last commit info:
-    ~~~~~~~~~~~~~~~~~
-    $LastChangedDate: $
-    $Rev: $
-    $Author: $
+
 
     :copyright: 2008 by Jens Diemer
     :license: GNU GPL v3, see LICENSE.txt for more details.

@@ -1,16 +1,12 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
 
 """
     django forms addons
     ~~~~~~~~~~~~~~~~~~~
 
-    Last commit info:
-    ~~~~~~~~~~~~~~~~~
-    $LastChangedDate: $
-    $Rev: $
-    $Author: $
 
-    :copyleft: 2008 by Jens Diemer
+
+    :copyleft: 2008-2011 by the PyRM team, see AUTHORS for more details.
     :license: GNU GPL v3, see LICENSE.txt for more details.
 """
 
@@ -22,9 +18,9 @@ import calendar
 from django import forms
 
 ROMAN_QUARTER_DATA = {
-    "I"  : (1,3),
-    "II" : (4,6),
-    "III": (7,9),
+    "I"  : (1, 3),
+    "II" : (4, 6),
+    "III": (7, 9),
     "IV" : (10, 12),
 }
 ROMAN_NUMERALS = ROMAN_QUARTER_DATA.keys() # ['I', 'II', 'III', 'IV']
@@ -51,6 +47,9 @@ class QuarterChoiceField(forms.ChoiceField):
     >>> t.clean(2)
     (datetime.date(2007, 7, 1), datetime.date(2007, 9, 30))
 
+    >>> t = QuarterChoiceField(epoch = (None, None), reverse=True)
+    >>> t.choices
+
     >>> t = QuarterChoiceField(epoch = (end, start))
     Traceback (most recent call last):
     ...
@@ -60,19 +59,28 @@ class QuarterChoiceField(forms.ChoiceField):
         """
         kwarg 'epoch' must be two datetime objects.
         """
-        self.oldest, self.newest = kwargs.pop("epoch")
-        assert(self.oldest<self.newest)
-        
+        epoch = kwargs.pop("epoch")
+        self.oldest = min(epoch)
+        self.newest = max(epoch)
+
+#        self.oldest, self.newest = kwargs.pop("epoch")
+        if self.oldest == None and self.newest == None:
+            self.newest = datetime.datetime.now()
+            delta = datetime.timedelta(days=365)
+            self.oldest = self.newest - delta
+
+        assert(self.oldest < self.newest), "Wrong: %r < %r" % (self.oldest, self.newest)
+
         self.reverse = kwargs.pop("reverse", False)
         super(QuarterChoiceField, self).__init__(*args, **kwargs)
-        
-        self.time_range = range(self.oldest.year, self.newest.year+1)
-        
+
+        self.time_range = range(self.oldest.year, self.newest.year + 1)
+
         self.roman_range = copy.copy(ROMAN_NUMERALS)
         if self.reverse:
             self.time_range.reverse()
             self.roman_range.reverse()
-        
+
         self.choices = self._build_choices()
 
     def clean(self, value):
@@ -85,14 +93,14 @@ class QuarterChoiceField(forms.ChoiceField):
         string_repr = self.choices[index][1]
         quarter, year = string_repr.split(".")
         year = int(year)
-        
+
         start_month, end_month = ROMAN_QUARTER_DATA[quarter]
-        
+
         start = datetime.date(year, start_month, 1)
-        
+
         day_count = calendar.monthrange(year, end_month)[1]
         end = datetime.date(year, end_month, day_count)
-            
+
         return start, end
 
     def _build_choices(self):

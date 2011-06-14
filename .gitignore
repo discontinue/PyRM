@@ -1,0 +1,8 @@
+local_settings.py
+*.pyc
+*.log
+*~
+/PyRM.egg-info
+/dist
+*.db3
+/.settings

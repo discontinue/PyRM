@@ -2,11 +2,11 @@
 
 import os
 
-os.environ["DJANGO_SETTINGS_MODULE"] = "pyrm_app.settings"
+os.environ["DJANGO_SETTINGS_MODULE"] = "pyrm.settings"
 
 from django.core.management import execute_manager
 
-from pyrm_app import settings
+from pyrm import settings
 
 if __name__ == "__main__":
     execute_manager(settings)

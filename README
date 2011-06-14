@@ -27,8 +27,6 @@ with commit rights:
 (pyrm_env)~/pyrm_env/bin$ ./pip install --verbose -e git+git@github.com:jedie/PyRM.git#egg=pyrm
 
 
-(pyrm_env)~/pyrm_env/bin$ cd ..
-(pyrm_env)~/pyrm_env$ mkdir instance
-(pyrm_env)~/pyrm_env$ cd instance
-(pyrm_env)~/pyrm_env/instance$ cp ~/pyrm_env/src/pyrm/support/example_local_settings.py local_settings.py
-(pyrm_env)~/pyrm_env/instance$ ln -s ~/pyrm_env/src/pyrm/support/manage.sh .
+(pyrm_env)~/pyrm_env/bin$ cd ~/pyrm_env/src/pyrm/testproject
+(pyrm_env)~/pyrm_env/src/pyrm/testproject$ ./manage.sh syncdb
+(pyrm_env)~/pyrm_env/src/pyrm/testproject$ ./manage.sh runserver

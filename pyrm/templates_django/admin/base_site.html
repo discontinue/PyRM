@@ -1,0 +1,50 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block title %}{{ title|escape }} | {% trans 'pyrm site admin' %}{% endblock %}
+
+{% block extrastyle %}
+<link rel="stylesheet" type="text/css" href="/static/base.css" />
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">{% trans 'pyrm Administration' %}</h1>
+&nbsp;<a href="/">&nbsp;&#xAB; {% trans 'back to' %} {{ request.META.HTTP_HOST }}/</a>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+{% block footer %}
+<script type="text/javascript">
+/* <![CDATA[ */
+function textarea_resize() {
+    //
+    // Resize all textareas
+    //
+    textareas = document.getElementsByTagName("textarea");
+    for (var i = 0; i <= textareas.length-1; i++) {
+        try {
+            textarea = textareas[i];
+            try {
+                rows = textarea.firstChild.data.split("\n").length;
+                if (rows > 30) {
+                    rows = 30;
+                }
+            } catch(e) {
+                rows = 2;
+            }
+            textarea.rows = rows;
+        } catch (e) {
+            alert("textarea_resize() error:" + e);
+        }
+    }
+}
+textarea_resize()
+/* ]]> */
+</script>
+<div id="footer" class="pyrm_footer">
+<ul>
+  <li><a href="/">index</a></li>
+  <li><a href="/{{ admin_url_prefix }}/">django admin panel</a></li>
+  <li><a href="{% url pyrm-import-menu %}">import menu</a></li>
+</ul>
+</div>{% endblock %}
