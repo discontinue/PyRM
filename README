@@ -1,0 +1,25 @@
+Python Rechnungs-Manager
+
+
+https://github.com/jedie/PyRM
+http://sourceforge.net/projects/pyrm/
+
+
+
+How to create a PyRM environment
+
+
+~$ virtualenv pyrm_env
+~$ cd pyrm_env/bin/
+~/pyrm_env/bin$ source activate
+(pyrm_env)~/pyrm_env/bin$ ./pip install --verbose -e git+git://github.com/django/django.git#egg=django
+
+
+without commit rights:
+
+(pyrm_env)~/pyrm_env/bin$ ./pip install --verbose -e git+git://github.com:jedie/PyRM.git#egg=pyrm
+
+with commit rights:
+
+(pyrm_env)~/pyrm_env/bin$ ./pip install --verbose -e git+git@github.com:jedie/PyRM.git#egg=pyrm
+
