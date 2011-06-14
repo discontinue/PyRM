@@ -31,7 +31,7 @@ def get_authors():
 
 def get_long_description():
     try:
-        f = file(os.path.join(PACKAGE_ROOT, "README.rst"), "r")
+        f = file(os.path.join(PACKAGE_ROOT, "README"), "r")
         long_description = f.read().strip()
         f.close()
     except Exception, err:
