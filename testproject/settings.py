@@ -63,6 +63,11 @@ LANGUAGE_CODE = 'de-DE'
 # to load the internationalization machinery.
 USE_I18N = True
 
+# A boolean that specifies if data will be localized by default or not.
+# If this is set to True, e.g. Django will display numbers and dates using the format of the current locale.
+USE_L10N = True
+
+
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
 MEDIA_ROOT = os.path.join(BASE_PATH, 'static')
@@ -93,6 +98,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.doc.XViewMiddleware',
 
     # From http://code.google.com/p/django-tools/
