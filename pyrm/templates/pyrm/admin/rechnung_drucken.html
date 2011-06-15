@@ -1,0 +1,18 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_modify adminmedia %}
+
+{% block content %}
+<div id="content-main">
+<form action="{{ form_url }}" method="post">
+	<fieldset class="module aligned">
+	  {{ obj }}
+	</fieldset>
+
+	<div class="submit-row">
+	    {% csrf_token %}
+	    <input type="submit" name="_print" class="default" value="print"/>
+	</div>
+
+</form>
+</div>
+{% endblock %}

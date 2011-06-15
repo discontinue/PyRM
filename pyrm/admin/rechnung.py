@@ -7,11 +7,18 @@
     :license: GNU GPL v3, see LICENSE.txt for more details.
 """
 
-from django.contrib import admin
+from django.conf.urls.defaults import patterns, url
+from django.contrib import admin, messages
+from django.template.loader import render_to_string
+from django.shortcuts import get_object_or_404
 
 from reversion.admin import VersionAdmin
 
+from django_tools.decorators import render_to
+
+from pyrm.models.base_models import BASE_FIELDSET
 from pyrm.models.rechnung import RechnungsPosten, Rechnung
+from pyrm.utils.django_modeladmin import add_missing_fields
 
 
 class RechnungsPostenAdmin(VersionAdmin):
@@ -40,12 +47,13 @@ class PostenInline(admin.TabularInline):
 
 class RechnungAdmin(VersionAdmin):
     inlines = (PostenInline,)
-    list_display = ("nummer", "kunde", "datum", "valuta", "summe")
+    list_display = ("nummer", "kunde", "datum", "print_link", "valuta", "summe")
     list_display_links = ("nummer", "kunde")
     list_filter = ("mahnstufe", "kunde",)
     list_per_page = 20
     list_select_related = True
-#    search_fields = ['foreign_key__related_fieldname']
+    search_fields = ['foreign_key__related_fieldname']
+
 #    fieldsets = (
 #        (None, {
 #            'fields': (
@@ -60,3 +68,30 @@ class RechnungAdmin(VersionAdmin):
 #        BASE_FIELDSET,
 #    )
 #    fieldsets = add_missing_fields(Rechnung, fieldsets)
+
+    def print_link(self, instance):
+        """ For adding a edit link into django admin interface """
+        context = {
+            "instance": instance,
+        }
+        return render_to_string('pyrm/admin/print_link.html', context)
+    print_link.allow_tags = True
+
+    @render_to("pyrm/admin/rechnung_drucken.html")
+    def rechnung_drucken(self, request, pk):
+        obj = get_object_or_404(Rechnung, pk=pk)
+        messages.info(request, "TODO: print %r" % obj)
+        context = {
+            "obj": obj,
+        }
+        return context
+
+    def get_urls(self):
+        urls = super(RechnungAdmin, self).get_urls()
+        my_urls = patterns('',
+            url(r'^(?P<pk>\d+)/rechnung_drucken/$', self.admin_site.admin_view(self.rechnung_drucken),
+            name="rechnung_drucken")
+        )
+        return my_urls + urls
+
+
