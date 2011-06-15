@@ -10,7 +10,7 @@
 <key>USERNAME</key>
 <value>Please insert your Username here!</value>
 <key>PYTHON_VERSION</key>
-<value>2.7</value>
+<value>2.6</value>
 </pydev_variables_property>
 <pydev_pathproperty name="org.python.pydev.PROJECT_SOURCE_PATH">
 <path>/PyRM</path>
@@ -19,6 +19,7 @@
 <path>/home/${USERNAME}/PyLucid_env/lib/python${PYTHON_VERSION}</path>
 <path>/usr/lib/python${PYTHON_VERSION}</path>
 <path>/home/${USERNAME}/pyrm_env/src/django-tools</path>
+<path>/home/${USERNAME}/pyrm_env/src/python-creole</path>
 <path>/home/${USERNAME}/pyrm_env/src/django</path>
 </pydev_pathproperty>
 </pydev_project>
