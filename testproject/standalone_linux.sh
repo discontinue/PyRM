@@ -15,17 +15,29 @@ fi
 if [ ! -z $CHECK_LINUX ]; then
 	echo 'found Linux ...'
 	ADDR=`/sbin/ifconfig eth0 | awk '/inet Adr/ {split ($2,A,":"); print A[2]}'`
-	
-    if [ ${ADDR}=="" ]
-        then
-            echo "use eth1"
-            ADDR=`/sbin/ifconfig eth1 | awk '/inet Adr/ {split ($2,A,":"); print A[2]}'`
+
+    if [ $ADDR = "" ]; then
+        echo "use eth1"
+        ADDR=`/sbin/ifconfig eth1 | awk '/inet Adr/ {split ($2,A,":"); print A[2]}'`
     fi
 fi
 
-if [ ! -z $ADDR ]; then
-	echo 'Starting django development server...'
-	python ./manage.py runserver ${ADDR}":$PORT" $*
-else
-	echo 'can not detect your IP-Adress'
+if [ $ADDR = "" ]; then
+	echo 'can not detect your IP-Adress use localhost'
+	ADDR=localhost
 fi
+
+echo '\nStarting django development server...\n'
+
+export DJANGO_SETTINGS_MODULE=testproject.settings
+(
+	set -x
+	django-admin.py runserver $ADDR":$PORT" $*
+)
+
+if [ $? != 0 ]; then
+	echo "\ncommand failed\n"
+	echo "Have you activate this environment?"
+	echo "e.g.:"
+	echo "source ~/pyrm_env/bin/activate"
+fi 
