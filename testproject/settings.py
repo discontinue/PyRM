@@ -43,8 +43,6 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-LOGIN_URL = "/login/"
-
 #______________________________________________________________________________
 # DATABASE SETUP
 
@@ -83,6 +81,8 @@ MEDIA_URL = '/static/'
 ADMIN_MEDIA_PREFIX = '/media/'
 
 ADMIN_URL_PREFIX = "admin"
+
+LOGIN_URL = "/%s/login/" % ADMIN_URL_PREFIX # TODO: Redirect after django login seems not to work
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = ''
