@@ -16,7 +16,7 @@ if [ ! -z $CHECK_LINUX ]; then
 	echo 'found Linux ...'
 	ADDR=`/sbin/ifconfig eth0 | awk '/inet Adr/ {split ($2,A,":"); print A[2]}'`
 
-    if [ $ADDR = "" ]; then
+    if [ ! $ADDR ]; then
         echo "use eth1"
         ADDR=`/sbin/ifconfig eth1 | awk '/inet Adr/ {split ($2,A,":"); print A[2]}'`
     fi
