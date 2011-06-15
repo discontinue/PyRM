@@ -19,11 +19,13 @@ How to create a PyRM environment
 without commit rights:
 
 (pyrm_env)~/pyrm_env/bin$ ./pip install --verbose -e git+git://github.com/jedie/django-tools.git#egg=django-tools
+(pyrm_env)~/pyrm_env/bin$ ./pip install --verbose -e git+git://github.com/jedie/python-creole.git#egg=python-creole
 (pyrm_env)~/pyrm_env/bin$ ./pip install --verbose -e git+git://github.com:jedie/PyRM.git#egg=pyrm
 
 with commit rights:
 
 (pyrm_env)~/pyrm_env/bin$ ./pip install --verbose -e git+git@github.com:jedie/django-tools.git#egg=django-tools
+(pyrm_env)~/pyrm_env/bin$ ./pip install --verbose -e git+git@github.com:jedie/python-creole.git#egg=python-creole
 (pyrm_env)~/pyrm_env/bin$ ./pip install --verbose -e git+git@github.com:jedie/PyRM.git#egg=pyrm
 
 
