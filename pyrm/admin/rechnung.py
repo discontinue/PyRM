@@ -23,10 +23,10 @@ from pyrm.utils.django_modeladmin import add_missing_fields
 
 class RechnungsPostenAdmin(VersionAdmin):
     list_display = (
-        "anzahl", "beschreibung", "einzelpreis", "rechnung"
+        "beschreibung", "menge", "einzelpreis", "einheit", "rechnung"
     )
     list_display_links = ("beschreibung",)
-    list_filter = ("rechnung",)
+    list_filter = ("rechnung", "einheit")
     list_per_page = 20
     list_select_related = True
     search_fields = ("beschreibung",)
@@ -82,6 +82,7 @@ class RechnungAdmin(VersionAdmin):
         obj = get_object_or_404(Rechnung, pk=pk)
         messages.info(request, "TODO: print %r" % obj)
         context = {
+            "title": "Rechnung drucken",
             "obj": obj,
         }
         return context

@@ -1,0 +1,54 @@
+<style type="text/css">
+table#posten td, table#posten th { border:1px solid black; }
+#own_ci { float:right;}
+</style>
+
+{% if instance.anschrift %}
+	{{ instance.anschrift }}
+{% else %}
+	{{ instance.kunde.address_as_html }}
+{% endif %}
+
+{% include "pyrm/html_print/corporate_identity.html" %}
+
+<p id="re_nr">Re.Nr.: <strong>{{ instance.nummer }}</strong></p>
+<p id="re_date">{{ instance.datum }}</p>
+<p id="lieferdatum">Lieferdatum: {{ instance.lieferdatum|default_if_none:"-" }}</p>
+<p id="bestellnummer">Bestell- bzw. Auftragsnummer: {{ instance.bestellnummer|default_if_none:"-" }}</p>
+
+<table id="posten" border=2 cellpadding=2 cellspacing=2>
+<tr>
+	<th>Art.Nr./Bezeichnung</th>
+	<th>Menge</th>
+	<th>Einheit</th>
+	<th>Preis/Einheit</th>
+	<th>MwSt.</th>
+	<th>Gesamtpreis</th>
+</tr>
+{% for item in posten %}
+	<tr>
+		<td>{{ item.beschreibung_html }}</td>
+		<td>{{ item.menge }}</td>
+		<td>{{ item.einheit|default_if_none:"" }}</td>
+		<td>{{ item.einzelpreis }}€</td>
+		<td>{{ item.mwst }}%</td>
+		<td>{{ item.summe }}€</td>
+	</tr>
+{% endfor %}
+<tr id="summe_netto">
+	<td colspan=5>Netto:</td>
+	<td>{{ instance.get_total.0 }}€</td>
+</tr>
+{% for mwst_info in instance.get_total.2 %}
+<tr class="mwst_info">
+	<td colspan=5>zzgl. {{ mwst_info.0 }}% MwSt:</td>
+	<td>{{ mwst_info.1 }}€</td>
+</tr>
+{% endfor %}
+<tr id="summe_brutto">
+	<td colspan=5><strong>Gesamtbetrag:</strong></td>
+	<td><strong>{{ instance.get_total.1 }}€</strong></td>
+</tr>
+</table>
+
+{{ instance }}

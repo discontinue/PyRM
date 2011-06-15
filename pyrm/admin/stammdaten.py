@@ -35,7 +35,7 @@ class FirmaInline(admin.TabularInline):
 
 class FirmaAdmin(VersionAdmin):
     list_display = (
-        "name1", "plz", "ort",
+        "name1", "plz", "ort", "lastupdatetime", "createtime"
         #"erstellt_von", "erstellt_am", "geaendert_von", "geaendert_am",
     )
     list_display_links = ("name1",)

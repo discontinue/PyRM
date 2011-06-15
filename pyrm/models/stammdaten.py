@@ -21,6 +21,7 @@ from django.db import models
 from django.conf import settings
 
 from pyrm.models.base_models import BaseModel
+from django.template.loader import render_to_string
 #from pyrm.utils.django_modeladmin import add_missing_fields
 
 
@@ -147,6 +148,7 @@ class Firma(FirmaPersonBaseModel):
         app_label = "pyrm"
         verbose_name = "Firma"
         verbose_name_plural = "Firmen"
+        ordering = ['-lastupdatetime']
 
     def __unicode__(self):
         return self.name1
@@ -270,6 +272,12 @@ class Kunde(KundeLieferantBase):
         default=settings.PYRM.DEFAULT_MAHNFRIST,
         help_text="Frist in Tagen."
     )
+
+    def address_as_html(self):
+        context = {
+            "instance": self,
+        }
+        return render_to_string("pyrm/html_print/kunde.html", context)
 
     def __unicode__(self):
         if self.firma:

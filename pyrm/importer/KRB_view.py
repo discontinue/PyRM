@@ -64,6 +64,10 @@ def get_kunden_obj(line):
     orts_name = line["Ort"]
     if orts_name:
         ort, created = Ort.objects.get_or_create(name=orts_name)
+        if created:
+            print "Ort erstellt:", ort
+        else:
+            print "Vorhanden Ort genutzt:", ort
     else:
         ort = None
 
@@ -94,8 +98,28 @@ def get_kunden_obj(line):
         person.save()
 
     if line["Firma"] != "":
-        firma, created = Firma.objects.get_or_create(name1=line["Firma"])
-#        add_message(firma, "KRB import")
+        firma, created = Firma.objects.get_or_create(
+            name1=line["Firma"],
+            defaults={
+                "name2": line["Volle Firmenbezeichnung"],
+                "internet": line["Homepage"],
+                "email": line["Email"],
+                "strasse": line["Strasse"],
+                "telefon": line["Telefon"],
+                "fax": line["Fax"],
+                #"strassen_zusatz"=daten[3],
+                "plz": int(line["PLZ"]),
+                "ort": ort,
+            }
+        )
+        if created:
+            print "neue Firma erstellt:", firma
+        else:
+            print "Vorhandene Firma genutzt:", firma
+        firma.save()
+
+        createtime = datetime.strptime(line["Eintritt"], "%d.%m.%y")
+        firma.createtime = createtime
         firma.save()
     else:
         firma = None
@@ -162,13 +186,13 @@ def _get_re_posten(raw_text, summe):
     for text_line in text_lines:
         posten = RE_TEXT_REXP.findall(text_line.strip())
         if posten == []:
-            return [(1, raw_text, summe)]
+            return [(Decimal(1), raw_text, summe)]
 
         assert len(posten) == 1
         posten = posten[0]
 
         raw_anzahl, txt, raw_preis = posten
-        anzahl = int(raw_anzahl)
+        anzahl = Decimal(str(raw_anzahl))
         preis = _get_decimal(raw_preis)
 
         result.append((anzahl, txt, preis))
@@ -259,14 +283,13 @@ def buchungen():
             kunde=kunde,
             datum=datum,
             valuta=valuta,
-            summe=summe,
         )
 #        add_message(rechnung, "KRB import")
         rechnung.save()
 
-        for anzahl, txt, preis in re_posten:
+        for menge, txt, preis in re_posten:
             p = RechnungsPosten(
-                anzahl=anzahl,
+                menge=menge,
                 beschreibung=txt,
                 einzelpreis=preis,
                 rechnung=rechnung

@@ -12,48 +12,21 @@
 
 from django.conf import settings
 from django.db import models
+from django.template.loader import render_to_string
+from django.utils.safestring import mark_safe
+
+from creole import creole2html
 
 from pyrm.models.base_models import BaseModel
+from decimal import Decimal
+
 #from pyrm.models.base_models import BASE_FIELDSET
 #from pyrm.utils.django_modeladmin import add_missing_fields
 
 #______________________________________________________________________________
 
 class RechnungsPostenManager(models.Manager):
-    def all_with_summ(self):
-        """
-        Liefert alle Positionen zurück, fügt das Attribute 'summe' hinzu.
-        """
-        # Alle Positionen
-        positionen = self.get_query_set()
-
-        # Summe ausrechnen und Attribute anhängen
-        for position in positionen:
-            position.summe = position.anzahl * position.einzelpreis
-
-        return positionen
-
-    def create_all(self, positionen, rechnung):
-        """
-        -Speichert alle Positionen zu einer Rechnung.
-        -Aktualisiert Rechnung.summe
-        """
-        preis_summe = 0
-        for anzahl, txt, preis in positionen:
-            preis_summe += anzahl * preis
-
-            # Erstellt einen neuen Eintrag
-            position = self.model(
-                anzahl=anzahl,
-                beschreibung=txt,
-                einzelpreis=preis,
-                rechnung=rechnung,
-            )
-            position.save()
-
-        # Rechnung Summe aktualisieren
-        rechnung.summe = preis_summe
-        rechnung.save()
+    pass
 
 
 class RechnungsPosten(BaseModel):
@@ -62,26 +35,47 @@ class RechnungsPosten(BaseModel):
     """
     objects = RechnungsPostenManager()
 
-    anzahl = models.PositiveIntegerField(
-#        help_text = u"Rechnungstext für diese Position."
+    rechnung = models.ForeignKey(
+        "Rechnung", #related_name="positionen"
     )
+
     beschreibung = models.TextField(
         help_text=u"Rechnungstext für diese Position."
     )
     lieferdatum = models.DateField(null=True, blank=True,
         help_text="Zeitpunkt der Leistungserbringung"
     )
-    einzelpreis = models.DecimalField(
-        max_digits=6, decimal_places=2,
-        help_text=u"Preis pro Einheit"
+    menge = models.DecimalField(
+        max_digits=4, decimal_places=2,
+        null=True, blank=True,
+        help_text=u"Anzahl der Posten (optional, wenn alle Posten der Rechnung ohne Anzahl ist.)",
     )
+    einzelpreis = models.DecimalField(
+        max_digits=7, decimal_places=2,
+        null=True, blank=True,
+        help_text=u"Preis pro Einheit (Netto, einheitlich-optional)"
+    )
+    einheit = models.CharField(
+        max_length=64, null=True, blank=True,
+        help_text=u"Einheit z.B. 'std.', 'kg' etc. (optional, nur für Anzeige)"
+    )
+    mwst = models.DecimalField(
+        max_digits=4, decimal_places=2,
+        default=Decimal(str(settings.PYRM.DEFAULT_MWST)),
+        help_text=u"MwSt. für diese Position.",
+    )
+
+    def summe(self):
+        """ Summe dieses Rechnungsposten Netto """
+        return self.menge * self.einzelpreis
+
+    def beschreibung_html(self):
+        html = creole2html(self.beschreibung)
+        html = mark_safe(html)
+        return html
 
     def __unicode__(self):
         return self.beschreibung
-
-    rechnung = models.ForeignKey(
-        "Rechnung", #related_name="positionen"
-    )
 
     class Meta:
         app_label = "pyrm"
@@ -168,12 +162,6 @@ class Rechnung(BaseModel):
         help_text="Datum der Buchung laut Kontoauszug."
     )
 
-    summe = models.DecimalField(
-        max_digits=6, decimal_places=2,
-        help_text="Summe aller einzelnen Posten.",
-        null=True, blank=True
-    )
-
     versand = models.DateField(null=True, blank=True,
         help_text="Versanddatum der Rechnung."
     )
@@ -182,8 +170,43 @@ class Rechnung(BaseModel):
         help_text="Anzahl der verschickten Mahnungen."
     )
 
+    def summe(self):
+        """ Rechnungs Summe Netto """
+        posten = RechnungsPosten.objects.filter(rechnung=self).only("menge", "einzelpreis")
+        total_netto = Decimal(0)
+        for item in posten:
+            total_netto += item.summe()
+        return total_netto
+
+    def get_total(self):
+        posten = RechnungsPosten.objects.filter(rechnung=self).only("menge", "einzelpreis", "mwst")
+        total_netto = Decimal(0)
+        total_brutto = Decimal(0)
+        mwst_data = {}
+        for item in posten:
+            netto = item.summe()
+            total_netto += netto
+
+            mwst_proz = item.mwst
+            mwst_betrag = netto * mwst_proz / Decimal(100)
+            total_brutto += netto + mwst_betrag
+
+            if mwst_proz not in mwst_data:
+                mwst_data[mwst_proz] = mwst_betrag
+            else:
+                mwst_data[mwst_proz] += mwst_betrag
+
+        return total_netto, total_brutto, sorted(mwst_data.items())
+
+    def get_as_html(self):
+        context = {
+            "instance": self,
+            "posten": RechnungsPosten.objects.filter(rechnung=self),
+        }
+        return render_to_string("pyrm/html_print/rechnung.html", context)
+
     def __unicode__(self):
-        return u"Re.Nr.%s %s %i€" % (self.nummer, self.datum, self.summe)
+        return u"Re.Nr.%s %s %i€" % (self.nummer, self.datum, self.summe())
 
     class Meta:
         app_label = "pyrm"

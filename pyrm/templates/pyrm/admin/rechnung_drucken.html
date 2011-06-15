@@ -5,7 +5,7 @@
 <div id="content-main">
 <form action="{{ form_url }}" method="post">
 	<fieldset class="module aligned">
-	  {{ obj }}
+	  {{ obj.get_as_html }}
 	</fieldset>
 
 	<div class="submit-row">
