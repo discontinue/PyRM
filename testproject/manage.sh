@@ -7,4 +7,13 @@
 
 export DJANGO_SETTINGS_MODULE=testproject.settings
 
-django-admin.py $*
+(
+	set -x
+	django-admin.py $*
+)
+if [ $? != 0 ]; then
+	echo "\ncommand failed\n"
+	echo "Have you activate this environment?"
+	echo "e.g.:"
+	echo "source ~/pyrm_env/bin/activate"
+fi 
