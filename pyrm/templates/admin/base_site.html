@@ -49,20 +49,12 @@ jQuery(document).ready(function($) {
 {% endblock %}
 
 
-{% block branding %}
-<a name="top" \><h1 class="admin_headline">PyRM</h1>
-&nbsp;<a href="/">&nbsp;&#xAB; {% trans 'back to' %} {{ request.META.HTTP_HOST }}/</a>
-{% endblock %}
+{% block branding %}<a name="top" \><h1 class="admin_headline">PyRM</h1>{% endblock %}
 
-
-{% block nav-global %}{% endblock %}
-
+{% block nav-global %}{% include "pyrm/includes/quick_links.html" %}{% endblock %}
 
 {% block footer %}
 <div id="footer" class="pyrm_footer">
-<ul>
-  <li><a href="/">index</a></li>
-  <li><a href="/{{ admin_url_prefix }}/">django admin panel</a></li>
-  <li><a href="{% url pyrm-import-menu %}">import menu</a></li>
-</ul>
-</div>{% endblock %}
+{% include "pyrm/includes/quick_links.html" %}
+</div>
+{% endblock %}

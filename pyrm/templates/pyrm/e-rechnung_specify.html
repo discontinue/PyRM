@@ -1,5 +1,7 @@
-{% extends "pyrm_base.html" %}
-{% block base_head %}
+{% extends "admin/base_site.html" %}
+{% load i18n admin_modify adminmedia %}
+
+{% block extrahead %}{{ block.super }}
 <script type="text/javascript">
   $(document).ready(function(){
     $('#id_date').datepicker();
