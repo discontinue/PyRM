@@ -1,8 +1,11 @@
 # coding: utf-8
 
-
 import os
 import sys
+
+_cwd = os.getcwd()
+sys.path.insert(0, _cwd)
+print "Current work dir:", _cwd
 
 try:
     #from django_tools.utils import info_print;info_print.redirect_stdout()
@@ -145,3 +148,25 @@ DATABASES = {
         'NAME': 'pyrm_database.db3',
     }
 }
+
+
+#_______________________________________________________________________________
+
+
+try:
+    import local_settings as _local_settings
+    from local_settings import *
+except ImportError, err:
+    if str(err) == "No module named local_settings":
+        msg = (
+            "You should create a local_settings.py file in '%s' !"
+            " (Original error was: %s)\n"
+        ) % (_cwd, err)
+        sys.stderr.write(msg)
+        #from django.core.exceptions import ImproperlyConfigured
+        #raise ImproperlyConfigured(msg)
+    else:
+        raise
+else:
+    print "Use %r, ok." % _local_settings.__file__
+    del(_local_settings)

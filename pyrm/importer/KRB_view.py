@@ -1,7 +1,6 @@
 # coding: utf-8
 
-import sys, os, csv, re
-import codecs
+import os, re
 from datetime import datetime
 from pprint import pprint
 from decimal import Decimal
@@ -15,11 +14,8 @@ from pyrm.models import Firma, Person, Kunde, Lieferant, Ort, \
                                                     Rechnung, RechnungsPosten
 
 from pyrm.utils.csv_utils import get_dictlist
+from django.contrib import messages
 
-
-
-KUNDENLISTE = os.path.expanduser("~/20110614 KRB Kundenliste.csv")
-BUCHUNGEN = os.path.expanduser("~/20110614 KRB Buchungen.csv")
 
 
 def _get_dictlist(filename):
@@ -133,7 +129,7 @@ def kundenliste():
     Firma.objects.all().delete()
     Kunde.objects.all().delete()
 
-    for line in _get_dictlist(KUNDENLISTE):
+    for line in _get_dictlist(settings.KUNDENLISTE):
         print "_" * 80
         if line["ID.1"] == "" or line["Vorname"] == "sonstiges":
             print line
@@ -209,7 +205,7 @@ def buchungen():
     Lieferant.objects.all().delete()
 
 
-    for line in _get_dictlist(BUCHUNGEN):
+    for line in _get_dictlist(settings.BUCHUNGEN):
         notiz = ""
         raw_summe = line["Wert"]
 
@@ -305,6 +301,19 @@ views = {
 }
 @login_required
 def menu(request):
+    buchungs_filename = getattr(settings, "BUCHUNGEN", None)
+    kunden_filename = getattr(settings, "KUNDENLISTE", None)
+
+    if not buchungs_filename:
+        messages.error(request, "Please add csv filepath BUCHUNGEN to your local_settings.py!")
+    elif not os.path.exists(buchungs_filename):
+        messages.error(request, "csv filepath BUCHUNGEN %r doesn't exists!" % buchungs_filename)
+
+    if not kunden_filename:
+        messages.error(request, "Please add csv filepath KUNDENLISTE to your local_settings.py!")
+    elif not os.path.exists(kunden_filename):
+        messages.error(request, "csv filepath KUNDENLISTE %r doesn't exists!" % kunden_filename)
+
     return _sub_menu(request, sorted(views.keys()))
 
 @login_required
