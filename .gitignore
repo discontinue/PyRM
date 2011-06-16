@@ -3,6 +3,7 @@ local_settings.py
 *.log
 *~
 /PyRM.egg-info
+.pydevproject
 /dist
 *.db3
 /.settings
