@@ -1,0 +1,21 @@
+
+#rechnung * {
+	font-family:"Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+address#kunde {
+	padding: 2em 1em 2em 1em;
+	float:left;
+}
+#own_ci {
+	float: right;
+}
+#posten {
+	width: 90%;
+}
+#re_date {
+	float: right;
+}
+.addresses {
+    height: 150px;
+}

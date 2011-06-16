@@ -19,6 +19,7 @@ from django_tools.decorators import render_to
 from pyrm.models.base_models import BASE_FIELDSET
 from pyrm.models.rechnung import RechnungsPosten, Rechnung
 from pyrm.utils.django_modeladmin import add_missing_fields
+from django.contrib.auth.decorators import login_required
 
 
 class RechnungsPostenAdmin(VersionAdmin):
@@ -77,13 +78,12 @@ class RechnungAdmin(VersionAdmin):
         return render_to_string('pyrm/admin/print_link.html', context)
     print_link.allow_tags = True
 
-    @render_to("pyrm/admin/rechnung_drucken.html")
+    @render_to("pyrm/admin/rechnung_drucken.html", debug=False)
     def rechnung_drucken(self, request, pk):
-        obj = get_object_or_404(Rechnung, pk=pk)
-        messages.info(request, "TODO: print %r" % obj)
+        rechnung = get_object_or_404(Rechnung, pk=pk)
         context = {
             "title": "Rechnung drucken",
-            "obj": obj,
+            "rechnung": rechnung,
         }
         return context
 
@@ -94,5 +94,3 @@ class RechnungAdmin(VersionAdmin):
             name="rechnung_drucken")
         )
         return my_urls + urls
-
-

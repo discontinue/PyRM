@@ -170,6 +170,10 @@ class Rechnung(BaseModel):
         help_text="Anzahl der verschickten Mahnungen."
     )
 
+    def posten(self):
+        posten = RechnungsPosten.objects.filter(rechnung=self)
+        return posten
+
     def summe(self):
         """ Rechnungs Summe Netto """
         posten = RechnungsPosten.objects.filter(rechnung=self).only("menge", "einzelpreis")

@@ -1,0 +1,68 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block title %}PyRM - {{ title }}{% endblock %}
+
+{% block extrahead %}{{ block.super }}
+<script type="text/javascript" src="{{ Django_media_prefix }}js/jquery.min.js" onerror="JavaScript:alert('Error loading file [{{ Django_media_prefix }}js/jquery.min.js] !');" ></script>
+<script type="text/javascript">
+function textarea_resize() {
+    //
+    // Resize all textareas
+    //
+    textareas = document.getElementsByTagName("textarea");
+    for (var i = 0; i <= textareas.length-1; i++) {
+        try {
+            textarea = textareas[i];
+            try {
+                rows = textarea.firstChild.data.split("\n").length;
+                if (rows > 30) {
+                    rows = 30;
+                }
+            } catch(e) {
+                rows = 2;
+            }
+            textarea.rows = rows;
+        } catch (e) {
+            alert("textarea_resize() error:" + e);
+        }
+    }
+}
+jQuery(document).ready(function($) {
+	textarea_resize()
+});
+</script>
+{% endblock extrahead %}
+
+
+{% block extrastyle %}
+<link rel="stylesheet" type="text/css" href="/static/base.css" />
+{% endblock %}
+
+
+{% block pretitle %}
+<!-- app pretitle block start -->
+{% if request.user.is_authenticated %}
+{# {% include "admin_menu/includes/pylucid_admin_menu.html" %} #}
+{% endif %}
+<!-- app pretitle block end -->
+{% endblock %}
+
+
+{% block branding %}
+<a name="top" \><h1 class="admin_headline">PyRM</h1>
+&nbsp;<a href="/">&nbsp;&#xAB; {% trans 'back to' %} {{ request.META.HTTP_HOST }}/</a>
+{% endblock %}
+
+
+{% block nav-global %}{% endblock %}
+
+
+{% block footer %}
+<div id="footer" class="pyrm_footer">
+<ul>
+  <li><a href="/">index</a></li>
+  <li><a href="/{{ admin_url_prefix }}/">django admin panel</a></li>
+  <li><a href="{% url pyrm-import-menu %}">import menu</a></li>
+</ul>
+</div>{% endblock %}

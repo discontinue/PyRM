@@ -1,18 +1,40 @@
 {% extends "admin/base_site.html" %}
 {% load i18n admin_modify adminmedia %}
 
+
+{% block extrahead %}{{ block.super }}
+<script type="text/javascript">                                         
+jQuery(document).ready(function($) {
+   	$("#print_link").click(function() {
+   		
+   		window.print()
+
+     	return false;
+   });
+});                 
+</script> 
+{% endblock extrahead %}
+
+
+{% block extrastyle %}
+<link rel="stylesheet" type="text/css" href="/static/base.css" />
+<link rel="stylesheet" type="text/css" href="/static/html_print/rechnung_base.css" />
+<link rel="stylesheet" type="text/css" media="print" href="/static/html_print/rechnung_print.css" />
+{% endblock extrastyle %}
+
+
 {% block content %}
 <div id="content-main">
-<form action="{{ form_url }}" method="post">
-	<fieldset class="module aligned">
-	  {{ obj.get_as_html }}
-	</fieldset>
-
-	<div class="submit-row">
-	    {% csrf_token %}
-	    <input type="submit" name="_print" class="default" value="print"/>
+<fieldset class="module aligned"><legend>Drucken von {{ rechnung }}</legend>
+	<div id="rechnung">
+		{% include "pyrm/html_print/rechnung.html" %}
 	</div>
+</fieldset>
 
-</form>
+<div class="submit-row">
+    {% csrf_token %}
+    <a href="{% url admin:pyrm_rechnung_change rechnung.pk %}">bearbeiten</a>
+    <input type="submit" name="_print" class="default" value="print" id="print_link"/>
+</div>
 </div>
 {% endblock %}

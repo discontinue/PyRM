@@ -1,20 +1,16 @@
-<style type="text/css">
-table#posten td, table#posten th { border:1px solid black; }
-#own_ci { float:right;}
-</style>
-
-{% if instance.anschrift %}
-	{{ instance.anschrift }}
+<div class="addresses">
+{% if rechnung.anschrift %}
+	{{ rechnung.anschrift }}
 {% else %}
-	{{ instance.kunde.address_as_html }}
+	{{ rechnung.kunde.address_as_html }}
 {% endif %}
 
 {% include "pyrm/html_print/corporate_identity.html" %}
+</div>
 
-<p id="re_nr">Re.Nr.: <strong>{{ instance.nummer }}</strong></p>
-<p id="re_date">{{ instance.datum }}</p>
-<p id="lieferdatum">Lieferdatum: {{ instance.lieferdatum|default_if_none:"-" }}</p>
-<p id="bestellnummer">Bestell- bzw. Auftragsnummer: {{ instance.bestellnummer|default_if_none:"-" }}</p>
+<p id="re_nr">Re.Nr.: <strong>{{ rechnung.nummer }}</strong></p>
+<p id="re_date">{{ rechnung.datum }}</p>
+<p id="bestellnummer">Bestell- bzw. Auftragsnummer: {{ rechnung.bestellnummer|default_if_none:"-" }}</p>
 
 <table id="posten" border=2 cellpadding=2 cellspacing=2>
 <tr>
@@ -25,7 +21,7 @@ table#posten td, table#posten th { border:1px solid black; }
 	<th>MwSt.</th>
 	<th>Gesamtpreis</th>
 </tr>
-{% for item in posten %}
+{% for item in rechnung.posten %}
 	<tr>
 		<td>{{ item.beschreibung_html }}</td>
 		<td>{{ item.menge }}</td>
@@ -37,9 +33,9 @@ table#posten td, table#posten th { border:1px solid black; }
 {% endfor %}
 <tr id="summe_netto">
 	<td colspan=5>Netto:</td>
-	<td>{{ instance.get_total.0 }}€</td>
+	<td>{{ rechnung.get_total.0 }}€</td>
 </tr>
-{% for mwst_info in instance.get_total.2 %}
+{% for mwst_info in rechnung.get_total.2 %}
 <tr class="mwst_info">
 	<td colspan=5>zzgl. {{ mwst_info.0 }}% MwSt:</td>
 	<td>{{ mwst_info.1 }}€</td>
@@ -47,8 +43,8 @@ table#posten td, table#posten th { border:1px solid black; }
 {% endfor %}
 <tr id="summe_brutto">
 	<td colspan=5><strong>Gesamtbetrag:</strong></td>
-	<td><strong>{{ instance.get_total.1 }}€</strong></td>
+	<td><strong>{{ rechnung.get_total.1 }}€</strong></td>
 </tr>
 </table>
 
-{{ instance }}
+<p id="lieferdatum">Lieferdatum: {{ rechnung.lieferdatum|default_if_none:"-" }}</p>
