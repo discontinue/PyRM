@@ -32,3 +32,11 @@ with commit rights:
 (pyrm_env)~/pyrm_env/bin$ cd ~/pyrm_env/src/pyrm/testproject
 (pyrm_env)~/pyrm_env/src/pyrm/testproject$ ./manage.sh syncdb
 (pyrm_env)~/pyrm_env/src/pyrm/testproject$ ./manage.sh runserver
+
+Flush and recreate database and test user with:
+
+(pyrm_env)~/pyrm_env/src/pyrm/testproject$ ./reinit.py
+
+Start a "public" server (not for productiv environments!) with:
+
+(pyrm_env)~/pyrm_env/src/pyrm/testproject$ ./standalone_linux.sh
