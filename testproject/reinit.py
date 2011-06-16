@@ -2,10 +2,18 @@
 # coding: utf-8
 
 import os
+import sys
 
 os.environ["DJANGO_SETTINGS_MODULE"] = "testproject.settings"
-#from django.conf import settings
-import settings
+
+try:
+    import settings
+except ImportError, err:
+    import traceback
+    print traceback.format_exc()
+    print "-" * 79
+    print "evtl. PyRM virtualenv nicht aktiviert???\n"
+    sys.exit()
 
 DATABASE_NAME = settings.DATABASES['default']['NAME']
 IS_SQLITE = settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3'
