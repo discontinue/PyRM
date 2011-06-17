@@ -44,6 +44,18 @@ class RechnungsPostenAdmin(VersionAdmin):
 class PostenInline(admin.TabularInline):
 #class PostenInline(admin.StackedInline):
     model = RechnungsPosten
+#    class Media:
+#        css = {"all":("/static/rechnungsposten.css",)}
+    fieldsets = (
+        (None, {
+            "fields": ("order", "menge", "einheit", "beschreibung", "einzelpreis", "mwst")
+        }),
+        ("sonstiges", {
+            'classes': ('collapse',),
+            "fields": ("notizen",)
+        })
+    )
+
 
 
 class RechnungAdmin(VersionAdmin):
