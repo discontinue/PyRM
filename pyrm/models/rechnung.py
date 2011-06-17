@@ -61,13 +61,50 @@ class RechnungsPosten(BaseModel):
     )
     mwst = models.DecimalField(
         max_digits=4, decimal_places=2,
+        null=True, blank=True,
         default=Decimal(str(settings.PYRM.DEFAULT_MWST)),
         help_text=u"MwSt. für diese Position.",
     )
 
+    order = models.SmallIntegerField(
+        null=True, blank=True,
+        help_text=u"interne Sortierungsnummer (änderbar, wird automatisch gesetzt, steht nicht auf der Rechnung)"
+    )
+
+    def auto_order_posten(self):
+        if self.order is not None:
+            return
+
+        posten = RechnungsPosten.objects.filter(rechnung=self.rechnung).order_by("-order", "-id").only("id", "order")
+        if not posten:
+            self.order = 1
+        else:
+            self.order = posten[0].order + 1
+
+    def save(self, *args, **kwargs):
+        self.auto_order_posten()
+        super(RechnungsPosten, self).save(*args, **kwargs)
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+
+        if self.menge is None and self.einzelpreis is None:
+            self.mwst = None
+
+        if self.menge is None and self.einzelpreis is not None:
+            raise ValidationError("'Menge' fehlt.")
+        if self.menge is not None and self.einzelpreis is None:
+            raise ValidationError("'Einzelpreis' fehlt.")
+
+        if self.menge is not None and self.einzelpreis is not None and self.mwst is None:
+            raise ValidationError("'MwSt.' fehlt.")
+
     def summe(self):
         """ Summe dieses Rechnungsposten Netto """
-        return self.menge * self.einzelpreis
+        if self.menge and self.einzelpreis:
+            return self.menge * self.einzelpreis
+        else:
+            return None
 
     def beschreibung_html(self):
         html = creole2html(self.beschreibung)
@@ -79,7 +116,7 @@ class RechnungsPosten(BaseModel):
 
     class Meta:
         app_label = "pyrm"
-        ordering = ("-lastupdatetime",)
+        ordering = ("order", "id")
         verbose_name = verbose_name_plural = "Rechnungsposten"
 
 
@@ -179,7 +216,9 @@ class Rechnung(BaseModel):
         posten = RechnungsPosten.objects.filter(rechnung=self).only("menge", "einzelpreis")
         total_netto = Decimal(0)
         for item in posten:
-            total_netto += item.summe()
+            summe = item.summe()
+            if summe is not None:
+                total_netto += item.summe()
         return total_netto
 
     def get_total(self):
@@ -189,6 +228,8 @@ class Rechnung(BaseModel):
         mwst_data = {}
         for item in posten:
             netto = item.summe()
+            if netto is None:
+                continue
             total_netto += netto
 
             mwst_proz = item.mwst
