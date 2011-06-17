@@ -24,11 +24,11 @@
 {% for item in rechnung.posten %}
 	<tr>
 		<td>{{ item.beschreibung_html }}</td>
-		<td>{{ item.menge }}</td>
+		<td>{{ item.menge|default_if_none:"" }}</td>
 		<td>{{ item.einheit|default_if_none:"" }}</td>
-		<td>{{ item.einzelpreis }}€</td>
-		<td>{{ item.mwst }}%</td>
-		<td>{{ item.summe }}€</td>
+		<td>{% if item.einzelpreis != None %}{{ item.einzelpreis }}€{% endif %}</td>
+		<td>{% if item.mwst != None %}{{ item.mwst }}%{% endif %}</td>
+		<td>{% if item.summe != None %}{{ item.summe }}€{% endif %}</td>
 	</tr>
 {% endfor %}
 <tr id="summe_netto">
