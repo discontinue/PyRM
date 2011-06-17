@@ -4,7 +4,8 @@
 {% block title %}PyRM - {{ title }}{% endblock %}
 
 {% block extrahead %}{{ block.super }}
-<script type="text/javascript" src="{{ Django_media_prefix }}js/jquery.min.js" onerror="JavaScript:alert('Error loading file [{{ Django_media_prefix }}js/jquery.min.js] !');" ></script>
+<script type="text/javascript" src="{{ Django_media_prefix }}js/jquery.min.js" onerror="JavaScript:alert('Error loading file ['+this.src+'] !');" ></script>
+<script type="text/javascript" src="{{ media_url }}save_me_genie.js" onerror="JavaScript:alert('Error loading file ['+this.src+'] !');" ></script>
 <script type="text/javascript">
 function textarea_resize() {
     //
