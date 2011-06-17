@@ -29,6 +29,12 @@ from pyrm import app_settings as PYRM
 
 DEBUG = True
 
+
+if DEBUG:
+    from django.contrib.messages import constants as message_constants
+    MESSAGE_LEVEL = message_constants.DEBUG
+
+
 # A boolean that turns on/off template debug mode. If this is True, the fancy
 # error page will display a detailed report for any TemplateSyntaxError.
 # Note that Django only displays fancy error pages if DEBUG is True!

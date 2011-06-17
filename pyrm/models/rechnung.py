@@ -19,6 +19,8 @@ from creole import creole2html
 
 from pyrm.models.base_models import BaseModel
 from decimal import Decimal
+from django_tools.middlewares import ThreadLocal
+from django.contrib import messages
 
 #from pyrm.models.base_models import BASE_FIELDSET
 #from pyrm.utils.django_modeladmin import add_missing_fields
@@ -67,22 +69,30 @@ class RechnungsPosten(BaseModel):
     )
 
     order = models.SmallIntegerField(
-        null=True, blank=True,
+        default=None, null=True, blank=True,
         help_text=u"interne Sortierungsnummer (änderbar, wird automatisch gesetzt, steht nicht auf der Rechnung)"
     )
 
     def auto_order_posten(self):
-        if self.order is not None:
-            return
-
-        posten = RechnungsPosten.objects.filter(rechnung=self.rechnung).order_by("-order", "-id").only("id", "order")
-        if not posten:
+        queryset = RechnungsPosten.objects.filter(rechnung=self.rechnung).exclude(pk=self.pk).order_by("-order").only("order")
+        try:
+            last_order = queryset[0].order
+        except IndexError:
+            # This is the first RechnungsPosten
             self.order = 1
         else:
-            self.order = posten[0].order + 1
+            print "last:", last_order
+            if last_order is None:
+                self.order = 1
+            else:
+                self.order = last_order + 1
+
+            request = ThreadLocal.get_current_request()
+            messages.debug(request, "Auto add order numer %i to %r" % (self.order, self.beschreibung))
 
     def save(self, *args, **kwargs):
-        self.auto_order_posten()
+        if self.order is None:
+            self.auto_order_posten()
         super(RechnungsPosten, self).save(*args, **kwargs)
 
     def clean(self):
@@ -112,7 +122,7 @@ class RechnungsPosten(BaseModel):
         return html
 
     def __unicode__(self):
-        return self.beschreibung
+        return "%r - %s - %r x %r" % (self.order, self.beschreibung, self.menge, self.einzelpreis)
 
     class Meta:
         app_label = "pyrm"
