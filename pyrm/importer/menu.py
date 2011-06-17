@@ -30,6 +30,7 @@ def menu(request):
     Simple main menu
     """
     context = {
+        "title": "import menu",
         "admin_url_prefix": settings.ADMIN_URL_PREFIX,
     }
     return context
@@ -42,6 +43,7 @@ def _sub_menu(request, views):
     Simple sub menu
     """
     context = {
+        "title": "import sub menu",
         "views": views,
         "admin_url_prefix": settings.ADMIN_URL_PREFIX,
     }
@@ -61,5 +63,4 @@ def _start_view(request, views, unit):
         "output": output,
         "admin_url_prefix": settings.ADMIN_URL_PREFIX,
     }
-
     return context

@@ -21,6 +21,7 @@ def menu(request):
     Simple main menu
     """
     context = {
+        "title": "Main menu",
         "admin_url_prefix": settings.ADMIN_URL_PREFIX,
     }
     return context
