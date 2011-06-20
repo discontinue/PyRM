@@ -1,19 +1,17 @@
 #rechnung * {
     font-family:"Helvetica Neue", Arial, Helvetica, sans-serif;
     border: 0;
+    box-shadow: 0;
 }
 
-address#kunde, address#own_ci {
-    /* border: 1px solid red; */
+.head_adresses {
     padding: 0;
-    height: 10em;
 }
-address#kunde{
+address#kunde, address#own_ci {
     padding: 3em 0em 0em 3em;
 }
 address#own_ci {
     text-align: right;
-    padding: 0em 0em 3em 0em;
 }
 
 #posten * {
@@ -55,6 +53,7 @@ address#own_ci {
 	text-align: right;
 }
 footer {
+	width: 100%;
     font-size: 0.8em;
     text-align: center;
 }

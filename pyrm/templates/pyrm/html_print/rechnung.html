@@ -1,13 +1,15 @@
 <div class="container">
-	<div class="addresses span-12">
-		{% if rechnung.anschrift %}
-			{{ rechnung.anschrift }}
-		{% else %}
-			{{ rechnung.kunde.address_as_html }}
-		{% endif %}
-	</div>
-	<div class="span-12 last">
-		{% include "pyrm/html_print/corporate_identity.html" %}
+	<div class="span-24 clear head_adresses">
+		<div class="addresses span-12">
+			{% if rechnung.anschrift %}
+				{{ rechnung.anschrift }}
+			{% else %}
+				{{ rechnung.kunde.address_as_html }}
+			{% endif %}
+		</div>
+		<div class="span-12 last">
+			{% include "pyrm/html_print/corporate_identity.html" %}
+		</div>
 	</div>
 	
 	<div class="span-12">
