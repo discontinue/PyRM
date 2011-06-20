@@ -4,7 +4,11 @@
 			{% if rechnung.anschrift %}
 				{{ rechnung.anschrift }}
 			{% else %}
-				{{ rechnung.kunde.address_as_html }}
+				{% if rechnung.kunde %}
+					{{ rechnung.kunde.address_as_html }}
+				{% else %}
+					<p></p>
+				{% endif %}
 			{% endif %}
 		</div>
 		<div class="span-12 last">
