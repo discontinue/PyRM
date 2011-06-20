@@ -12,15 +12,13 @@ jQuery(document).ready(function($) {
 	$("#print_preview").click(function() {
         $("link[media=print]").each( function() {
         	$(this).removeAttr("media");
-        });
-     	
+        });     	
      	$("#container").attr("title", "Klicke um Preview zu beenden.");
      	$("#container").click(function() {
      		location.reload();
      	});
-
+        window.scrollTo(0,0);
      	return false;
-     	
 	});
 });
 </script> 
