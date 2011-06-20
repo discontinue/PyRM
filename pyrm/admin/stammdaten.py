@@ -65,7 +65,8 @@ class SkontoAdmin(VersionAdmin):
 
 class KundeAdmin(VersionAdmin):
 #    inlines = (PersonInline,FirmaInline)
-    list_display = list_display_links = ("nummer", "person", "firma",)
+    list_display = ("nummer", "person", "firma", "lastupdatetime", "createtime")
+    list_display_links = ("person", "firma")
 #    fieldsets = (
 #        ("Basis Daten", {
 #            'fields': (
