@@ -230,6 +230,8 @@ class KundeLieferantBase(BaseModel):
         related_name="%(class)s_firma"
     )
 
+    lieferranten_nr = models.TextField(blank=True, null=True)
+
     seid = models.DateField(auto_now_add=True, null=True, blank=True)
 
     lieferstop_datum = models.DateField(blank=True, null=True)
@@ -239,7 +241,10 @@ class KundeLieferantBase(BaseModel):
         default=settings.PYRM.DEFAULT_ZAHLUNGSZIEL,
         help_text="max. Zahlungseingangsdauer in Tagen"
     )
-    skonto = models.ManyToManyField(Skonto, verbose_name="Skonto liste")
+    skonto = models.ManyToManyField(Skonto, verbose_name="Skonto liste",
+        blank=True, null=True,
+        help_text="FIXME"
+    )
 
     class Meta:
         # http://www.djangoproject.com/documentation/model-api/#abstract-base-classes
@@ -290,6 +295,7 @@ class Kunde(KundeLieferantBase):
 
     class Meta:
         app_label = "pyrm"
+        ordering = ('-lastupdatetime',)
         verbose_name = "Kunde"
         verbose_name_plural = "Kunden"
 
