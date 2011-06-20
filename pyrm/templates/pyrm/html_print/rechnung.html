@@ -10,40 +10,43 @@
 
 <p id="re_nr">Re.Nr.: <strong>{{ rechnung.nummer }}</strong></p>
 <p id="re_date">{{ rechnung.datum }}</p>
-<p id="bestellnummer">Bestell- bzw. Auftragsnummer: {{ rechnung.bestellnummer|default_if_none:"-" }}</p>
+{% if rechnung.bestellnummer %}<p id="bestellnummer">Bestell- bzw. Auftragsnummer: {{ rechnung.bestellnummer }}</p>{% endif %}
+{% if rechnung.kunde.lieferranten_nr %}<p id="lieferranten_nr">Lieferanten-Nr.: {{ rechnung.kunde.lieferranten_nr }}</p>{% endif %}
 
 <table id="posten" border=2 cellpadding=2 cellspacing=2>
-<tr>
+<tr class="head">
 	<th>Art.Nr./Bezeichnung</th>
 	<th>Menge</th>
-	<th>Einheit</th>
-	<th>Preis/Einheit</th>
+	<th>Einzelpreis</th>
 	<th>MwSt.</th>
 	<th>Gesamtpreis</th>
 </tr>
 {% for item in rechnung.posten %}
-	<tr>
-		<td>{{ item.beschreibung_html }}</td>
-		<td>{{ item.menge|default_if_none:"" }}</td>
-		<td>{{ item.einheit|default_if_none:"" }}</td>
-		<td>{% if item.einzelpreis != None %}{{ item.einzelpreis }}€{% endif %}</td>
-		<td>{% if item.mwst != None %}{{ item.mwst }}%{% endif %}</td>
-		<td>{% if item.summe != None %}{{ item.summe }}€{% endif %}</td>
+	<tr class="{% if forloop.first %}first{% endif %}{% if forloop.last %}last{% endif %}">
+	{% if item.einzelpreis == None %}
+		<td class="info beschreibung" colspan=5>{{ item.beschreibung_html }}</td>
+	{% else %}
+		<td class="beschreibung">{{ item.beschreibung_html }}</td>
+		<td class="menge">{{ item.menge|default_if_none:"" }} {{ item.einheit|default_if_none:"" }}</td>
+		<td class="einzelpreis money">{% if item.einzelpreis != None %}{{ item.einzelpreis|floatformat:2 }} €{% endif %}</td>
+		<td class="mwst">{% if item.mwst != None %}{{ item.mwst }}%{% endif %}</td>
+		<td class="summe money">{% if item.summe != None %}{{ item.summe|floatformat:2 }} €{% endif %}</td>
+	{% endif %}
 	</tr>
 {% endfor %}
 <tr id="summe_netto">
-	<td colspan=5>Netto:</td>
-	<td>{{ rechnung.get_total.0 }}€</td>
+	<td colspan=4>Netto:</td>
+	<td class="money">{{ rechnung.get_total.0|floatformat:2 }} €</td>
 </tr>
 {% for mwst_info in rechnung.get_total.2 %}
 <tr class="mwst_info">
-	<td colspan=5>zzgl. {{ mwst_info.0 }}% MwSt:</td>
-	<td>{{ mwst_info.1 }}€</td>
+	<td colspan=4>zzgl. {{ mwst_info.0 }}% MwSt:</td>
+	<td class="money">{{ mwst_info.1|floatformat:2 }} €</td>
 </tr>
 {% endfor %}
 <tr id="summe_brutto">
-	<td colspan=5><strong>Gesamtbetrag:</strong></td>
-	<td><strong>{{ rechnung.get_total.1 }}€</strong></td>
+	<td colspan=4><strong>Gesamtbetrag:</strong></td>
+	<td class="money"><strong>{{ rechnung.get_total.1|floatformat:2 }} €</strong></td>
 </tr>
 </table>
 

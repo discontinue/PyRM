@@ -10,8 +10,40 @@ address#kunde {
 #own_ci {
 	float: right;
 }
+#posten * {
+    border: 0;
+    padding: 0;
+    margin: 0;
+}
+#posten * {
+    text-align: right;
+}
+#posten th {
+    text-align: center;
+}
+#posten .beschreibung p {
+    text-align: left;
+}
 #posten {
-	width: 90%;
+    width: 100%;
+    margin: auto;
+}
+#posten td {
+    padding: 5px;
+}
+#posten .info p {
+	text-align: center;
+	color: #555;
+	padding-top: 1em;
+}
+#posten .first {
+    border-top: 1px solid #000;
+}
+#posten .last {
+    border-bottom: 1px solid #000;
+}
+#summe_brutto .money strong{
+    border-bottom: 3px double #000;    
 }
 #re_date {
 	float: right;
