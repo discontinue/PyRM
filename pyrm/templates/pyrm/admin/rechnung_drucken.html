@@ -5,12 +5,18 @@
 {% block extrahead %}{{ block.super }}
 <script type="text/javascript">                                         
 jQuery(document).ready(function($) {
-   	$("#print_link").click(function() {
-   		
-   		window.print()
-
+	$("#print_link").click(function() {
+		window.print();
      	return false;
-   });
+	});
+	$("#print_preview").click(function() {
+        $("link[media=print]").each( function() {
+        	$(this).removeAttr("media");
+        });
+        //alert("Reload the page (F5) to revert the preview ;)");
+        $("#exit_preview").slideDown();
+     	return false;
+	});
 });                 
 </script> 
 {% endblock extrahead %}
@@ -20,10 +26,31 @@ jQuery(document).ready(function($) {
 <link rel="stylesheet" type="text/css" href="/static/base.css" />
 <link rel="stylesheet" type="text/css" href="/static/html_print/rechnung_base.css" />
 <link rel="stylesheet" type="text/css" media="print" href="/static/html_print/rechnung_print.css" />
+<style>
+#exit_preview {
+	display:none;
+    text-align:center;
+}
+#exit_preview a {
+    width: 100%;
+    padding: 0.6em 2em 0.6em 2em;
+    margin: 0px;
+    color: #fff;
+    background-color: #aaa;
+    border: 1px solid #000;
+}
+#exit_preview a:hover {
+    color: #000;
+    background-color: #eee;
+}
+</style>
 {% endblock extrastyle %}
 
 
 {% block content %}
+<div id="exit_preview">
+	<p><a href="javascript:location.reload();">exit preview</a></p>
+</div>
 <div id="content-main">
 <fieldset class="module aligned"><legend>Drucken von {{ rechnung }}</legend>
 	<div id="rechnung">
@@ -34,6 +61,7 @@ jQuery(document).ready(function($) {
 <div class="submit-row">
     {% csrf_token %}
     <a href="{% url admin:pyrm_rechnung_change rechnung.pk %}">bearbeiten</a>
+    <input type="submit" name="_print" class="default" value="print preview" id="print_preview"/>
     <input type="submit" name="_print" class="default" value="print" id="print_link"/>
 </div>
 </div>
