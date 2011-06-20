@@ -81,7 +81,6 @@ class RechnungsPosten(BaseModel):
             # This is the first RechnungsPosten
             self.order = 1
         else:
-            print "last:", last_order
             if last_order is None:
                 self.order = 1
             else:
