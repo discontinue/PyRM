@@ -31,16 +31,6 @@ urlpatterns = patterns('',
         'pyrm.importer.CAO_view.start_view'
     ),
 
-    url(
-        r'^krb_import/$', 'pyrm.importer.KRB_view.menu',
-        name="pyrm-KRB-import"
-    ),
-    (
-        r'^krb_import/(?P<unit>.+?)/$',
-        'pyrm.importer.KRB_view.start_view'
-    ),
-
-
     #__________________________________________________________________________
     # DJANGO ADMIN PANEL
     (

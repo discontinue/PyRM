@@ -21,6 +21,8 @@ from pyrm.models.base_models import BaseModel
 from decimal import Decimal
 from django_tools.middlewares import ThreadLocal
 from django.contrib import messages
+from django.core.exceptions import ValidationError
+import datetime
 
 #from pyrm.models.base_models import BASE_FIELDSET
 #from pyrm.utils.django_modeladmin import add_missing_fields
@@ -87,7 +89,8 @@ class RechnungsPosten(BaseModel):
                 self.order = last_order + 1
 
             request = ThreadLocal.get_current_request()
-            messages.debug(request, "Auto add order numer %i to %r" % (self.order, self.beschreibung))
+            if request: # also called from a management command
+                messages.debug(request, "Auto add order numer %i to %r" % (self.order, self.beschreibung))
 
     def save(self, *args, **kwargs):
         if self.order is None:
@@ -179,10 +182,13 @@ class RechnungManager(models.Manager):
 class Rechnung(BaseModel):
     """
     Rechnungen die man selber erstellt.
+    
+    TODO:
+        * raise ValidationError() wenn eine Rechnung ohne eine RechnungsPosition erstellt wird.
     """
     objects = RechnungManager()
 
-    nummer = models.PositiveIntegerField(
+    nummer = models.AutoField(
         primary_key=True,
         help_text="Rechnungs Nummer"
     )
@@ -199,6 +205,7 @@ class Rechnung(BaseModel):
     )
 
     datum = models.DateField(null=True, blank=True,
+        default=datetime.datetime.now(),
         help_text="Datum der Rechung."
     )
     lieferdatum = models.DateField(null=True, blank=True,
@@ -216,7 +223,26 @@ class Rechnung(BaseModel):
         help_text="Anzahl der verschickten Mahnungen."
     )
 
-    def posten(self):
+    def check_posten(self, rechnungs_posten):
+        """
+        Prüft ob es mindestens einen RechnungsPosten gibt,
+        der einen Endpreis + Beschreibung hat.
+        """
+        for posten in rechnungs_posten:
+            print posten.summe(), posten.beschreibung
+            if posten.summe() is not None and posten.beschreibung is not None:
+                return True
+        return False
+
+#    def clean(self):
+#        rechnungs_posten = self.get_all_rechnungs_posten()
+#        if rechnungs_posten.count() == 0:
+#            raise ValidationError("Diese Rechnung hat keinen einzigen Rechnungs-Posten!")
+#
+#        if not self.check_posten(rechnungs_posten):
+#            raise ValidationError("Diese Rechnung hat keinen gültigen Rechnungs-Posten!")
+
+    def get_all_rechnungs_posten(self):
         posten = RechnungsPosten.objects.filter(rechnung=self)
         return posten
 
@@ -255,18 +281,16 @@ class Rechnung(BaseModel):
     def get_as_html(self):
         context = {
             "instance": self,
-            "posten": RechnungsPosten.objects.filter(rechnung=self),
+            "get_all_rechnungs_posten": RechnungsPosten.objects.filter(rechnung=self),
         }
         return render_to_string("pyrm/html_print/rechnung.html", context)
 
     def __unicode__(self):
-        return u"Re.Nr.%s %s %i€" % (self.nummer, self.datum, self.summe())
+        return u"Re.Nr.%s - %s - %i€" % (self.nummer, self.datum, self.summe())
 
     class Meta:
         app_label = "pyrm"
         ordering = ['-datum']
         verbose_name = "Rechnung"
         verbose_name_plural = "Rechnungen"
-
-
 
