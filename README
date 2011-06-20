@@ -22,6 +22,7 @@ without commit rights:
 (pyrm_env)~/pyrm_env/bin$ ./pip install --verbose -e git+git://github.com/jedie/python-creole.git#egg=python-creole
 (pyrm_env)~/pyrm_env/bin$ ./pip install --verbose -e git+git://github.com/jedie/PyRM.git#egg=pyrm
 
+
 with commit rights:
 
 (pyrm_env)~/pyrm_env/bin$ ./pip install --verbose -e git+git@github.com:jedie/django-tools.git#egg=django-tools
@@ -33,10 +34,17 @@ with commit rights:
 (pyrm_env)~/pyrm_env/src/pyrm/testproject$ ./manage.sh syncdb
 (pyrm_env)~/pyrm_env/src/pyrm/testproject$ ./manage.sh runserver
 
+
 Flush and recreate database and test user with:
 
 (pyrm_env)~/pyrm_env/src/pyrm/testproject$ ./reinit.py
 
+
 Start a "public" server (not for productiv environments!) with:
 
 (pyrm_env)~/pyrm_env/src/pyrm/testproject$ ./standalone_linux.sh
+
+
+You must create a own local_settings.py in you project directory. e.g.:
+
+(pyrm_env)~/pyrm_env/src/pyrm/testproject$ touch local_settings.py
