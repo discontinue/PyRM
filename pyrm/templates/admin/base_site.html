@@ -33,12 +33,14 @@ jQuery(document).ready(function($) {
 	textarea_resize()
 });
 </script>
+
+<link rel="stylesheet" href="{{ media_url }}blueprint/screen.css" type="text/css" media="screen, projection" onerror="JavaScript:alert('Error loading file ['+this.src+'] !');" >
+<link rel="stylesheet" href="{{ media_url }}blueprint/print.css" type="text/css" media="print" onerror="JavaScript:alert('Error loading file ['+this.src+'] !');" > 
+<!--[if lt IE 8]>
+	<link rel="stylesheet" href="{{ media_url }}blueprint/ie.css" type="text/css" media="screen, projection" onerror="JavaScript:alert('Error loading file ['+this.src+'] !');" >
+<![endif]-->
+<link rel="stylesheet" type="text/css" href="{{ media_url }}base.css" onerror="JavaScript:alert('Error loading file ['+this.src+'] !');" />
 {% endblock extrahead %}
-
-
-{% block extrastyle %}
-<link rel="stylesheet" type="text/css" href="/static/base.css" />
-{% endblock %}
 
 
 {% block pretitle %}

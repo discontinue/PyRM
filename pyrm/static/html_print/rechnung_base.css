@@ -1,15 +1,21 @@
-
 #rechnung * {
-	font-family:"Helvetica Neue", Arial, Helvetica, sans-serif;
+    font-family:"Helvetica Neue", Arial, Helvetica, sans-serif;
+    border: 0;
 }
 
-address#kunde {
-	padding: 2em 1em 2em 1em;
-	float:left;
+address#kunde, address#own_ci {
+    /* border: 1px solid red; */
+    padding: 0;
+    height: 10em;
 }
-#own_ci {
-	float: right;
+address#kunde{
+    padding: 3em 0em 0em 3em;
 }
+address#own_ci {
+    text-align: right;
+    padding: 0em 0em 3em 0em;
+}
+
 #posten * {
     border: 0;
     padding: 0;
@@ -46,8 +52,17 @@ address#kunde {
     border-bottom: 3px double #000;    
 }
 #re_date {
-	float: right;
+	text-align: right;
 }
-.addresses {
-    height: 150px;
+footer {
+    font-size: 0.8em;
+    text-align: center;
+}
+footer table * {
+    padding: 0px;
+}
+footer table {
+    width: 300px;
+    padding: 0;
+    margin: auto;
 }

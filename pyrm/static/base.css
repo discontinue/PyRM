@@ -3,12 +3,6 @@
 ---------------------------------------------------------------------------- */
 * {
   font-family: tahoma, arial, sans-serif;
-  color: #000;
-  padding: 0px;
-  margin: 0px;
-  border: 0px;
-  background-repeat: no-repeat;
-  outline: none;
 }
 html, body {
   padding: 1em 3em 1em 3em;
@@ -19,6 +13,7 @@ body {
   background-color: #eef;
   margin: 1em 3em 1em 3em;
   border: 3px solid #05d;
+  min-width: 990px;
   border-radius: 10px;
   box-shadow: #555 0px 0px 8px;
 }
@@ -147,3 +142,4 @@ textarea {
     width: auto;
     height: auto;
 }
+tbody tr:nth-child(even) td, tbody tr.even td {background:#fff;}

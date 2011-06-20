@@ -1,0 +1,50 @@
+{% block footer %}
+<footer>
+<div class="span-24 small">
+	<p>
+		Die gelieferte Ware bleibt bis zur vollständigen Bezahlung Eigentum des Lieferanten.<br />
+		Soweit nicht anders angegeben gilt der Zeitpunkt der Rechnungsausstellung als Zeitpunkt der Leistung.
+	</p>
+</div>
+<div class="span-12 small">
+	<table id="inhaber_info">
+		<tr>
+			<td colspan=2>FirmenName</td>
+		</tr>
+		<tr>
+			<td>Inhaber</td>
+			<td>Max Musterman</td>
+		</tr>
+		<tr>
+			<td>USt-IdNr.</td>
+			<td>123 456 789</td>
+		</tr>	
+	</table>
+</div>
+<div class="span-12 small last">
+	<table id="bank_info">
+		<tr>
+			<td>KontoNr.</td>
+			<td>123 456 789</td>
+		</tr>
+		<tr>
+			<td>BLZ</td>
+			<td>123 456 789</td>
+		</tr>
+		<tr>
+			<td>IBAN</td>
+			<td>DE00 1234 5678 9000 1234 00</td>
+		</tr>	
+		<tr>
+			<td>BIC</td>
+			<td>AAAAAAA0000</td>
+		</tr>	
+	</table>
+</div>
+{% if debug %}
+	<div class="span-24">
+		<p>Please create a own Footer, by create this file: templates/pyrm/html_print/rechnung_footer.html</p>
+	</div>
+{% endif %}
+</footer>
+{% endblock %}

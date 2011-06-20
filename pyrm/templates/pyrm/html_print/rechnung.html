@@ -1,53 +1,64 @@
-<div class="addresses">
-{% if rechnung.anschrift %}
-	{{ rechnung.anschrift }}
-{% else %}
-	{{ rechnung.kunde.address_as_html }}
-{% endif %}
-
-{% include "pyrm/html_print/corporate_identity.html" %}
-</div>
-
-<p id="re_nr">Re.Nr.: <strong>{{ rechnung.nummer }}</strong></p>
-<p id="re_date">{{ rechnung.datum }}</p>
-{% if rechnung.bestellnummer %}<p id="bestellnummer">Bestell- bzw. Auftragsnummer: {{ rechnung.bestellnummer }}</p>{% endif %}
-{% if rechnung.kunde.lieferranten_nr %}<p id="lieferranten_nr">Lieferanten-Nr.: {{ rechnung.kunde.lieferranten_nr }}</p>{% endif %}
-
-<table id="posten" border=2 cellpadding=2 cellspacing=2>
-<tr class="head">
-	<th>Art.Nr./Bezeichnung</th>
-	<th>Menge</th>
-	<th>Einzelpreis</th>
-	<th>MwSt.</th>
-	<th>Gesamtpreis</th>
-</tr>
-{% for item in rechnung.posten %}
-	<tr class="{% if forloop.first %}first{% endif %}{% if forloop.last %}last{% endif %}">
-	{% if item.einzelpreis == None %}
-		<td class="info beschreibung" colspan=5>{{ item.beschreibung_html }}</td>
-	{% else %}
-		<td class="beschreibung">{{ item.beschreibung_html }}</td>
-		<td class="menge">{{ item.menge|default_if_none:"" }} {{ item.einheit|default_if_none:"" }}</td>
-		<td class="einzelpreis money">{% if item.einzelpreis != None %}{{ item.einzelpreis|floatformat:2 }} €{% endif %}</td>
-		<td class="mwst">{% if item.mwst != None %}{{ item.mwst }}%{% endif %}</td>
-		<td class="summe money">{% if item.summe != None %}{{ item.summe|floatformat:2 }} €{% endif %}</td>
-	{% endif %}
+<div class="container">
+	<div class="addresses span-12">
+		{% if rechnung.anschrift %}
+			{{ rechnung.anschrift }}
+		{% else %}
+			{{ rechnung.kunde.address_as_html }}
+		{% endif %}
+	</div>
+	<div class="span-12 last">
+		{% include "pyrm/html_print/corporate_identity.html" %}
+	</div>
+	
+	<div class="span-12">
+		<p id="re_nr">Re.Nr.: <strong>{{ rechnung.nummer }}</strong></p>
+		{% if rechnung.bestellnummer %}<p id="bestellnummer">Bestell- bzw. Auftragsnummer: {{ rechnung.bestellnummer }}</p>{% endif %}
+		{% if rechnung.kunde.lieferranten_nr %}<p id="lieferranten_nr">Lieferanten-Nr.: {{ rechnung.kunde.lieferranten_nr }}</p>{% endif %}
+	</div>
+	<div class="span-12 last" id="re_date">
+		<p>{{ rechnung.datum }}</p>
+	</div>
+	
+	<div class="span-24">
+	<table id="posten" border=2 cellpadding=2 cellspacing=2>
+	<tr class="head">
+		<th>Art.Nr./Bezeichnung</th>
+		<th>Menge</th>
+		<th>Einzelpreis</th>
+		<th>MwSt.</th>
+		<th>Gesamtpreis</th>
 	</tr>
-{% endfor %}
-<tr id="summe_netto">
-	<td colspan=4>Netto:</td>
-	<td class="money">{{ rechnung.get_total.0|floatformat:2 }} €</td>
-</tr>
-{% for mwst_info in rechnung.get_total.2 %}
-<tr class="mwst_info">
-	<td colspan=4>zzgl. {{ mwst_info.0 }}% MwSt:</td>
-	<td class="money">{{ mwst_info.1|floatformat:2 }} €</td>
-</tr>
-{% endfor %}
-<tr id="summe_brutto">
-	<td colspan=4><strong>Gesamtbetrag:</strong></td>
-	<td class="money"><strong>{{ rechnung.get_total.1|floatformat:2 }} €</strong></td>
-</tr>
-</table>
-
-<p id="lieferdatum">Lieferdatum: {{ rechnung.lieferdatum|default_if_none:"-" }}</p>
+	{% for item in rechnung.posten %}
+		<tr class="{% if forloop.first %}first{% endif %}{% if forloop.last %}last{% endif %}">
+		{% if item.einzelpreis == None %}
+			<td class="info beschreibung" colspan=5>{{ item.beschreibung_html }}</td>
+		{% else %}
+			<td class="beschreibung">{{ item.beschreibung_html }}</td>
+			<td class="menge">{{ item.menge|default_if_none:"" }} {{ item.einheit|default_if_none:"" }}</td>
+			<td class="einzelpreis money">{% if item.einzelpreis != None %}{{ item.einzelpreis|floatformat:2 }} €{% endif %}</td>
+			<td class="mwst">{% if item.mwst != None %}{{ item.mwst }}%{% endif %}</td>
+			<td class="summe money">{% if item.summe != None %}{{ item.summe|floatformat:2 }} €{% endif %}</td>
+		{% endif %}
+		</tr>
+	{% endfor %}
+	<tr id="summe_netto">
+		<td colspan=4>Netto:</td>
+		<td class="money">{{ rechnung.get_total.0|floatformat:2 }} €</td>
+	</tr>
+	{% for mwst_info in rechnung.get_total.2 %}
+	<tr class="mwst_info">
+		<td colspan=4>zzgl. {{ mwst_info.0 }}% MwSt:</td>
+		<td class="money">{{ mwst_info.1|floatformat:2 }} €</td>
+	</tr>
+	{% endfor %}
+	<tr id="summe_brutto">
+		<td colspan=4><strong>Gesamtbetrag:</strong></td>
+		<td class="money"><strong>{{ rechnung.get_total.1|floatformat:2 }} €</strong></td>
+	</tr>
+	</table>
+	{% if rechnung.lieferdatum %}<p id="lieferdatum">Lieferdatum: {{ rechnung.lieferdatum }}</p>{% endif %}
+	</div>
+	<div class="span-24">
+		{% include "pyrm/html_print/rechnung_footer.html" %}
+	</div>
+</div>

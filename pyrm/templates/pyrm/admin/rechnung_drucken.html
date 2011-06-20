@@ -13,44 +13,25 @@ jQuery(document).ready(function($) {
         $("link[media=print]").each( function() {
         	$(this).removeAttr("media");
         });
-        //alert("Reload the page (F5) to revert the preview ;)");
-        $("#exit_preview").slideDown();
+     	
+     	$("#container").attr("title", "Klicke um Preview zu beenden.");
+     	$("#container").click(function() {
+     		location.reload();
+     	});
+
      	return false;
+     	
 	});
 });                 
 </script> 
-{% endblock extrahead %}
 
-
-{% block extrastyle %}
 <link rel="stylesheet" type="text/css" href="/static/base.css" />
 <link rel="stylesheet" type="text/css" href="/static/html_print/rechnung_base.css" />
 <link rel="stylesheet" type="text/css" media="print" href="/static/html_print/rechnung_print.css" />
-<style>
-#exit_preview {
-	display:none;
-    text-align:center;
-}
-#exit_preview a {
-    width: 100%;
-    padding: 0.6em 2em 0.6em 2em;
-    margin: 0px;
-    color: #fff;
-    background-color: #aaa;
-    border: 1px solid #000;
-}
-#exit_preview a:hover {
-    color: #000;
-    background-color: #eee;
-}
-</style>
-{% endblock extrastyle %}
+{% endblock %}
 
 
 {% block content %}
-<div id="exit_preview">
-	<p><a href="javascript:location.reload();">exit preview</a></p>
-</div>
 <div id="content-main">
 <fieldset class="module aligned"><legend>Drucken von {{ rechnung }}</legend>
 	<div id="rechnung">

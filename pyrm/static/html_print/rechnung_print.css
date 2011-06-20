@@ -1,8 +1,11 @@
-
 #header, #footer, .breadcrumbs, .submit-row, legend, #content h1 {display:none;}
-html, body, .module {
+html, body, .module, #content {
 	background-color: #fff;
 	border: 0;
 	margin: 0;
 	padding: 0;
+}
+a:link:after, a:visited:after {
+	/* revert added link content by blueprint css */
+	content:"";
 }
