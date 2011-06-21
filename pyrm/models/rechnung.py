@@ -15,6 +15,8 @@ from django.db import models
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
+import reversion # django-reversion
+
 from creole import creole2html
 
 from pyrm.models.base_models import BaseModel
@@ -131,6 +133,8 @@ class RechnungsPosten(BaseModel):
         ordering = ("order", "id")
         verbose_name = verbose_name_plural = "Rechnungsposten"
 
+
+reversion.register(RechnungsPosten)
 
 
 
@@ -278,6 +282,9 @@ class Rechnung(BaseModel):
 
         return total_netto, total_brutto, sorted(mwst_data.items())
 
+    def get_total_brutto(self):
+        return self.get_total()[1]
+
     def get_as_html(self):
         context = {
             "instance": self,
@@ -294,3 +301,4 @@ class Rechnung(BaseModel):
         verbose_name = "Rechnung"
         verbose_name_plural = "Rechnungen"
 
+reversion.register(Rechnung)

@@ -20,6 +20,8 @@
 from django.db import models
 from django.conf import settings
 
+import reversion # django-reversion
+
 from pyrm.models.base_models import BaseModel
 from django.template.loader import render_to_string
 #from pyrm.utils.django_modeladmin import add_missing_fields
@@ -56,6 +58,7 @@ class Ort(models.Model):
         else:
             return "%s (%s)" % (self.name, self.land)
 
+reversion.register(Ort)
 
 #______________________________________________________________________________
 
@@ -154,6 +157,8 @@ class Firma(FirmaPersonBaseModel):
         return self.name1
 
 
+reversion.register(Firma)
+
 #______________________________________________________________________________
 
 class Person(FirmaPersonBaseModel):
@@ -180,7 +185,7 @@ class Person(FirmaPersonBaseModel):
         else:
             return self.nachname
 
-
+reversion.register(Person)
 
 
 #______________________________________________________________________________
@@ -213,7 +218,7 @@ class Skonto(BaseModel):
         ordering = ("zahlungsziel", "skonto")
 
 
-
+reversion.register(Skonto)
 
 #______________________________________________________________________________
 
@@ -301,7 +306,7 @@ class Kunde(KundeLieferantBase):
 
 
 
-
+reversion.register(Kunde)
 
 
 #______________________________________________________________________________
@@ -331,3 +336,4 @@ class Lieferant(KundeLieferantBase):
         ordering = ("firma", "person")
 
 
+reversion.register(Lieferant)
