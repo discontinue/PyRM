@@ -4,12 +4,12 @@ import os
 from datetime import datetime
 import pprint
 
-from pyrm.models import Firma, Person, Kunde, Ort
-from pyrm.utils.csv_utils import get_dictlist
-
-
 from django.core.management.base import BaseCommand, CommandError
 
+import reversion # django-reversion
+
+from pyrm.models import Firma, Person, Kunde, Ort
+from pyrm.utils.csv_utils import get_dictlist
 
 
 
@@ -33,6 +33,7 @@ class Command(BaseCommand):
     help = 'Import KRB Kundenliste.'
     args = "/path/to/KRB_kudenliste.csv"
 
+    @reversion.revision.create_on_success
     def handle(self, filepath, **options):
         if not os.path.isfile(filepath):
             raise CommandError("Filepath %r doesn't exist." % filepath)
@@ -81,8 +82,8 @@ class Command(BaseCommand):
     #        self.stdout.write(repr(kwargs)
             try:
                 kunde = Kunde(**kwargs)
-    #            add_message(kunde, "KRB import")
                 kunde.save()
+                reversion.revision.comment = "KRB import"
             except Exception, err:
                 self.stdout.write("Fehler: %s\n" % err)
 
@@ -99,8 +100,9 @@ class Command(BaseCommand):
             self.stdout.write("*" * 79)
             self.stdout.write("\n")
             ort = Ort(name=ort_name, land="Frankreich")
-    #        add_message(ort, "KRB import")
             ort.save()
+            reversion.revision.comment = "KRB import"
+
             firma = Firma(
                 name1=daten[0],
                 strasse=daten[2],
@@ -108,15 +110,16 @@ class Command(BaseCommand):
                 plz=int(plz),
                 ort=ort,
             )
-    #        add_message(firma, "KRB import")
             firma.save()
+            reversion.revision.comment = "KRB import"
+
             person = Person(
                 vorname="Thorsten",
                 nachname="Beitzel",
                 geschlecht="M",
             )
-    #        add_message(person, "KRB import")
             person.save()
+            reversion.revision.comment = "KRB import"
             return person, firma
 
         orts_name = line["Ort"]
@@ -154,6 +157,7 @@ class Command(BaseCommand):
             )
     #        add_message(person, "KRB import")
             person.save()
+            reversion.revision.comment = "KRB import"
 
         if line["Firma"] != "":
             firma, created = Firma.objects.get_or_create(

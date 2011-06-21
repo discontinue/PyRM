@@ -5,16 +5,11 @@ from datetime import datetime
 import pprint
 from decimal import Decimal
 
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
-from django.conf import settings
+import reversion # django-reversion
 
-from pyrm.importer.menu import _sub_menu, _start_view
-from pyrm.models import Firma, Person, Kunde, Lieferant, Ort, \
-                                                    Rechnung, RechnungsPosten
+from pyrm.models import Kunde, Lieferant, Rechnung, RechnungsPosten
 
 from pyrm.utils.csv_utils import get_dictlist
-from django.contrib import messages
 
 
 from django.core.management.base import BaseCommand, CommandError
@@ -69,6 +64,7 @@ class Command(BaseCommand):
     help = 'Import KRB Buchungen.'
     args = "/path/to/KRB_buchungen.csv"
 
+    @reversion.revision.create_on_success
     def handle(self, filepath, **options):
         if not os.path.isfile(filepath):
             raise CommandError("Filepath %r doesn't exist." % filepath)
@@ -179,6 +175,7 @@ class Command(BaseCommand):
                 valuta=valuta,
             )
             rechnung.save()
+            reversion.revision.comment = "KRB import"
 
             for menge, txt, preis in re_posten:
                 p = RechnungsPosten(
@@ -188,6 +185,7 @@ class Command(BaseCommand):
                     rechnung=rechnung
                 )
                 p.save()
+                reversion.revision.comment = "KRB import"
 
             self.stdout.write("Einnahme - Rechnung %s erstellt.\n" % rechnung)
 
