@@ -45,8 +45,9 @@ def get_buchungen(filepath):
     return data
 
 
-def to_datetime(raw_date):
-    return datetime.datetime.strptime(raw_date, "%d.%m.%Y")
+def to_datetime_date(raw_date):
+    d = datetime.datetime.strptime(raw_date, "%d.%m.%Y")
+    return d.date()
 
 
 class Command(BaseCommand):
@@ -76,7 +77,7 @@ class Command(BaseCommand):
                     self.stdout.write("Skip, kein valuta Datum vorhanden.\n")
                     continue
 
-                valuta = to_datetime(raw_valuta)
+                valuta = to_datetime_date(raw_valuta)
                 if self.verbosity >= 2:
                     self.stdout.write("Konvertiertes Valuta-Datum: %r\n" % valuta)
 
@@ -88,10 +89,20 @@ class Command(BaseCommand):
                 start_date = valuta - datetime.timedelta(days=40)
                 end_date = valuta
                 rechnungen = Rechnung.objects.filter(datum__range=(start_date, end_date))
-                self.stdout.write("Anzahl der Rechnungen in dem Zeitraum: %i\n" % rechnungen.count())
+                if self.verbosity:
+                    self.stdout.write("Anzahl der Rechnungen im Zeitraum %s - %s: %i\n" % (start_date, end_date, rechnungen.count()))
 
-                rechnungen = rechnungen.exclude(valuta__isnull=True)
-                self.stdout.write("Anzahl der Rechnungen ohne Valuta-Datum: %i\n" % rechnungen.count())
+                if self.verbosity >= 3:
+                    for no, r in enumerate(rechnungen):
+                        self.stdout.write("%i: %s\n" % (no, r))
+
+                rechnungen = rechnungen.exclude(valuta__isnull=False)
+                if self.verbosity:
+                    self.stdout.write("Anzahl der Rechnungen ohne Valuta-Datum: %i\n" % rechnungen.count())
+
+                if self.verbosity >= 3:
+                    for no, r in enumerate(rechnungen):
+                        self.stdout.write("%i: %s\n" % (no, r))
 
                 matched_rechnungen = []
                 for rechnung in rechnungen:
@@ -107,14 +118,17 @@ class Command(BaseCommand):
 
                 if len(matched_rechnungen) == 1:
                     rechnung = matched_rechnungen[0]
-                    self.stdout.write("*** Eine passende Rechnung gefunden: %s - speichere Valuta-Datum.\n" % rechnung)
+                    self.stdout.write("Passende Rechnung gefunden: %s - speichere Valuta-Datum.\n" % rechnung)
 
                     rechnung.valuta = valuta
                     rechnung.save()
-                    reversion.comment = "Setzten vom Valuta-Datum nach cronbank csv Abgleich."
+                    reversion.revision.comment = "Setzten vom Valuta-Datum auf %s nach cronbank csv Abgleich." % valuta
+
+                self.stdout.write("-"*79)
+                self.stdout.write("\n")
 
 
 
 
 if __name__ == "__main__":
-    management.call_command("import_cronbank", settings.CRONBANK_FILEPATH, verbosity=2)
+    management.call_command("import_cronbank", settings.CRONBANK_FILEPATH, verbosity=3)
