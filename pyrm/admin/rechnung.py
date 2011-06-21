@@ -60,7 +60,7 @@ class PostenInline(admin.TabularInline):
 
 class RechnungAdmin(VersionAdmin):
     inlines = (PostenInline,)
-    list_display = ("nummer", "kunde", "datum", "print_link", "valuta", "summe")
+    list_display = ("nummer", "kunde", "datum", "print_link", "valuta", "summe", "lastupdatetime")
     list_display_links = ("nummer", "kunde")
     list_filter = ("mahnstufe", "kunde",)
     list_per_page = 20
