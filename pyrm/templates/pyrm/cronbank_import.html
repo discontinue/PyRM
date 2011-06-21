@@ -1,0 +1,13 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_modify adminmedia %}
+
+{% block content %}
+<form enctype="multipart/form-data" method="post" action="">
+{% csrf_token %}
+{{ form }}
+<div class="submit-row">
+    <input type="submit" name="_import" class="default" value="import" />
+</div>
+</form>
+
+{% endblock %}

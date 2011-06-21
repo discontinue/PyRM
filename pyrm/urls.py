@@ -31,6 +31,11 @@ urlpatterns = patterns('',
         'pyrm.importer.CAO_view.start_view'
     ),
 
+    url(
+        r'^conbank_import/$', 'pyrm.importer.conbank.import_view',
+        name="pyrm-conbank-import"
+    ),
+
     #__________________________________________________________________________
     # DJANGO ADMIN PANEL
     (
