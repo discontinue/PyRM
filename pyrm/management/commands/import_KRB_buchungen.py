@@ -130,12 +130,12 @@ class Command(BaseCommand):
             #----------------------------------------------------------------------
 
             datum = _get_datum(raw_datum=line["R.Datum"])
-            raw_valute_datum = line["gezahlt\nEingang"]
+            raw_valuta_datum = line["gezahlt\nEingang"]
             try:
-                valuta = _get_datum(raw_datum=raw_valute_datum)
+                valuta = _get_datum(raw_datum=raw_valuta_datum)
             except ValueError, err:
                 self.stdout.write("ValueError: %s\n" % err)
-                notiz += raw_valute_datum
+                notiz += raw_valuta_datum
 
             #----------------------------------------------------------------------
 
