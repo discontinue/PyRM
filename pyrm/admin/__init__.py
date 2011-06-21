@@ -8,6 +8,8 @@
 """
 
 from django.contrib import admin
+from django.http import HttpResponse
+from django.core import serializers
 
 from pyrm.models.rechnung import RechnungsPosten, Rechnung
 from pyrm.admin.rechnung import RechnungsPostenAdmin, RechnungAdmin
@@ -26,3 +28,15 @@ admin.site.register(Firma, FirmaAdmin)
 admin.site.register(Skonto, SkontoAdmin)
 admin.site.register(Kunde, KundeAdmin)
 
+
+def export_as_json(modeladmin, request, queryset):
+    """
+    from:
+    http://docs.djangoproject.com/en/dev/ref/contrib/admin/actions/#actions-that-provide-intermediate-pages
+    """
+    response = HttpResponse(mimetype="text/javascript")
+    serializers.serialize("json", queryset, stream=response, indent=4)
+    return response
+
+# Make export actions available site-wide
+admin.site.add_action(export_as_json, 'export_selected_as_json')
