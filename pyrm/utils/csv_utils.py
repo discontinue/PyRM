@@ -31,7 +31,7 @@ def get_csv_tables(filename):
             tables[table_no] = []
             continue
 
-        line = line.decode("latin-1").encode("utf-8")
+#        line = line.decode("latin-1").encode("utf-8")
 
         tables[table_no].append(line)
 
@@ -76,6 +76,7 @@ def get_dictlist(table_data, encoding="latin-1", used_fieldnames=None):
         for k in fields.keys():
             value = fields[k]
             if value != None:
+#                print repr(value)
                 value = unicode(value, encoding)
                 value = unmask(value)
                 fields[k] = value
