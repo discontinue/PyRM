@@ -10,6 +10,8 @@
     :license: GNU GPL v3, see LICENSE.txt for more details.
 """
 
+import datetime
+
 from django.conf import settings
 from django.db import models
 from django.template.loader import render_to_string
@@ -24,7 +26,7 @@ from decimal import Decimal
 from django_tools.middlewares import ThreadLocal
 from django.contrib import messages
 from django.core.exceptions import ValidationError
-import datetime
+import warnings
 
 #from pyrm.models.base_models import BASE_FIELDSET
 #from pyrm.utils.django_modeladmin import add_missing_fields
@@ -238,6 +240,30 @@ class Rechnung(BaseModel):
                 return True
         return False
 
+    def _fix_date_fields(self):
+        """
+        Auto convert datetime.datetime() valued to datetime.date() in all DateField.
+        See also: https://code.djangoproject.com/ticket/16312
+        """
+        for field in self._meta.fields:
+            field_class_name = field.__class__.__name__
+            if field_class_name == "DateField":
+                attname = field.attname
+
+                current_value = getattr(self, attname)
+                if current_value is None:
+                    continue
+
+                if isinstance(current_value, datetime.datetime) and hasattr(current_value, "second"):
+                    new_value = current_value.date()
+                    setattr(self, attname, new_value)
+                    warnings.warn("Konvertiere datetime %r zu %r bei %r" % (current_value, new_value, attname))
+
+    def save(self, *args, **kwargs):
+        self._fix_date_fields()
+        super(Rechnung, self).save(*args, **kwargs)
+
+
 #    def clean(self):
 #        rechnungs_posten = self.get_all_rechnungs_posten()
 #        if rechnungs_posten.count() == 0:
@@ -293,7 +319,7 @@ class Rechnung(BaseModel):
         return render_to_string("pyrm/html_print/rechnung.html", context)
 
     def __unicode__(self):
-        return u"Re.Nr.%s - %s - %i€" % (self.nummer, self.datum, self.summe())
+        return u"Re.Nr.%s vom %s (valuta: %s) - %i€" % (self.nummer, self.datum, self.valuta, self.summe())
 
     class Meta:
         app_label = "pyrm"
