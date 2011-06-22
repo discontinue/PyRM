@@ -90,19 +90,19 @@ class RechnungAdmin(VersionAdmin):
         return render_to_string('pyrm/admin/print_link.html', context)
     print_link.allow_tags = True
 
-    @render_to("pyrm/admin/rechnung_drucken.html", debug=False)
-    def rechnung_drucken(self, request, pk):
-        rechnung = get_object_or_404(Rechnung, pk=pk)
-        context = {
-            "title": "Rechnung drucken",
-            "rechnung": rechnung,
-        }
-        return context
-
-    def get_urls(self):
-        urls = super(RechnungAdmin, self).get_urls()
-        my_urls = patterns('',
-            url(r'^(?P<pk>\d+)/rechnung_drucken/$', self.admin_site.admin_view(self.rechnung_drucken),
-            name="rechnung_drucken")
-        )
-        return my_urls + urls
+#    @render_to("pyrm/admin/rechnung_drucken.html", debug=False)
+#    def rechnung_drucken(self, request, pk):
+#        rechnung = get_object_or_404(Rechnung, pk=pk)
+#        context = {
+#            "title": "Rechnung drucken",
+#            "rechnung": rechnung,
+#        }
+#        return context
+#
+#    def get_urls(self):
+#        urls = super(RechnungAdmin, self).get_urls()
+#        my_urls = patterns('',
+#            url(r'^(?P<pk>\d+)/rechnung_drucken/$', self.admin_site.admin_view(self.rechnung_drucken),
+#            name="rechnung_drucken")
+#        )
+#        return my_urls + urls

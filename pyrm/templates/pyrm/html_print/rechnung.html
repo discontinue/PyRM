@@ -1,3 +1,11 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Rechnung {{ rechnung }}</title>
+<link rel="stylesheet" type="text/css" href="{{ media_url }}pyrm/blueprint/grid.css" onerror="JavaScript:alert('Error loading file ['+this.src+'] !');" >
+<link rel="stylesheet" type="text/css" href="{{ media_url }}pyrm/html_print/rechnung.css" onerror="JavaScript:alert('Error loading file ['+this.src+'] !');" />
+</head><body>
+
 <div class="container">
 	<div class="span-24 clear head_adresses">
 		<div class="addresses span-12">
@@ -66,5 +74,10 @@
 	</table>
 	{% if rechnung.lieferdatum %}<p id="lieferdatum">Lieferdatum: {{ rechnung.lieferdatum }}</p>{% endif %}
 	</div>
-	{% include "pyrm/html_print/rechnung_footer.html" %}
+	
+	<div class="span-24">
+		{% include "pyrm/html_print/rechnung_footer.html" %}
+	</div>
 </div>
+
+</body></html> 

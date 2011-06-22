@@ -4,12 +4,21 @@ from django.conf import settings
 from django.conf.urls.defaults import url, patterns, include
 from django.contrib import admin
 
+from pyrm.views.rechnung import rechnung_drucken
+
 media_url = settings.MEDIA_URL.strip("/")
 assert media_url != ""
 
 admin.autodiscover()
 
 urlpatterns = patterns('',
+
+    url(
+        r'^rechnung_drucken/(?P<pk>\d+)/$', rechnung_drucken,
+        name="pyrm-rechnung_drucken"
+    ),
+
+
     #__________________________________________________________________________
     # IMPORT VIEWS
 

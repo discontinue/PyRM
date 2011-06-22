@@ -1,20 +1,21 @@
-#rechnung * {
+body {
     font-family:"Helvetica Neue", Arial, Helvetica, sans-serif;
-    border: 0;
-    box-shadow: 0;
+    font-size: 1.1em;
 }
-p {
-	margin: 0;
+.container {
+    height: 1400px;
 }
-
-.head_adresses {
-    padding: 0;
+.small {
+    font-size: 0.8em;
 }
 address#kunde, address#own_ci {
     padding: 3em 0em 0em 3em;
 }
 address#own_ci {
     text-align: right;
+}
+#info_block {
+    margin-top: 3em;
 }
 
 #posten * {
@@ -34,6 +35,7 @@ address#own_ci {
 #posten {
     width: 100%;
     margin: auto;
+    margin-bottom: 3em;
 }
 #posten td {
     padding: 5px;
@@ -56,7 +58,9 @@ address#own_ci {
 	text-align: right;
 }
 footer {
-	width: 100%;
+    position: absolute;
+    top: 1250px;
+    margin: auto;
     font-size: 0.8em;
     text-align: center;
 }
@@ -67,4 +71,7 @@ footer table {
     width: 300px;
     padding: 0;
     margin: auto;
+}
+#posten {
+	margin:auto;
 }

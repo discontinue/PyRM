@@ -54,14 +54,14 @@ legend {
    forms
 ---------------------------------------------------------------------------- */
 input, textarea, select {
-  font-family: tahoma, arial, sans-serif;
+	font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
 }
 .forms ul {
     list-style-type:none;
 }
 .forms li {
-  padding: 3px;
-  margin: 3px;
+	padding: 3px;
+	margin: 3px;
 }
 .forms label {
     font-size: 0.8em;
@@ -167,4 +167,3 @@ textarea {
     width: auto;
     height: auto;
 }
-tbody tr:nth-child(even) td, tbody tr.even td {background:#fff;}
