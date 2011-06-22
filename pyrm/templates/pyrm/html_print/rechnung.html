@@ -16,13 +16,15 @@
 		</div>
 	</div>
 	
-	<div class="span-12">
-		<p id="re_nr">Re.Nr.: <strong>{{ rechnung.nummer }}</strong></p>
-		{% if rechnung.bestellnummer %}<p id="bestellnummer">Bestell- bzw. Auftragsnummer: {{ rechnung.bestellnummer }}</p>{% endif %}
-		{% if rechnung.kunde.lieferranten_nr %}<p id="lieferranten_nr">Lieferanten-Nr.: {{ rechnung.kunde.lieferranten_nr }}</p>{% endif %}
-	</div>
-	<div class="span-12 last" id="re_date">
-		<p>{{ rechnung.datum }}</p>
+	<div class="span-24" id="info_block">
+		<div class="span-12">
+			<p id="re_nr">Re.Nr.: <strong>{{ rechnung.nummer }}</strong></p>
+			{% if rechnung.bestellnummer %}<p id="bestellnummer">Bestell- bzw. Auftragsnummer: {{ rechnung.bestellnummer }}</p>{% endif %}
+			{% if rechnung.kunde.lieferranten_nr %}<p id="lieferranten_nr">Lieferanten-Nr.: {{ rechnung.kunde.lieferranten_nr }}</p>{% endif %}
+		</div>
+		<div class="span-12 last" id="re_date">
+			<p>{{ rechnung.datum }}</p>
+		</div>
 	</div>
 	
 	<div class="span-24">
@@ -34,10 +36,10 @@
 		<th>MwSt.</th>
 		<th>Gesamtpreis</th>
 	</tr>
-	{% for item in rechnung.posten %}
+	{% for item in rechnung.get_all_rechnungs_posten %}
 		<tr class="{% if forloop.first %}first{% endif %}{% if forloop.last %}last{% endif %}">
 		{% if item.einzelpreis == None %}
-			<td class="info beschreibung" colspan=5>{{ item.beschreibung_html }}</td>
+			<td class="info_posten" colspan=5>{{ item.beschreibung_html }}</td>
 		{% else %}
 			<td class="beschreibung">{{ item.beschreibung_html }}</td>
 			<td class="menge">{{ item.menge|default_if_none:"" }} {{ item.einheit|default_if_none:"" }}</td>
@@ -64,7 +66,5 @@
 	</table>
 	{% if rechnung.lieferdatum %}<p id="lieferdatum">Lieferdatum: {{ rechnung.lieferdatum }}</p>{% endif %}
 	</div>
-	<div class="span-24">
-		{% include "pyrm/html_print/rechnung_footer.html" %}
-	</div>
+	{% include "pyrm/html_print/rechnung_footer.html" %}
 </div>

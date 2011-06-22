@@ -3,6 +3,9 @@
     border: 0;
     box-shadow: 0;
 }
+p {
+	margin: 0;
+}
 
 .head_adresses {
     padding: 0;
@@ -35,7 +38,7 @@ address#own_ci {
 #posten td {
     padding: 5px;
 }
-#posten .info p {
+#posten .info_posten p {
 	text-align: center;
 	color: #555;
 	padding-top: 1em;

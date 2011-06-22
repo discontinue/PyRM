@@ -3,8 +3,11 @@
 
 
 {% block extrahead %}{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{{ media_url }}pyrm/html_print/rechnung_base.css" onerror="JavaScript:alert('Error loading file ['+this.src+'] !');" />
+<link rel="stylesheet" type="text/css" media="print" href="{{ media_url }}pyrm/html_print/rechnung_print.css" onerror="JavaScript:alert('Error loading file ['+this.src+'] !');" />
+{% include "pyrm/includes/rechnung_extrahead.html" %}
 <script type="text/javascript">                                         
-jQuery(document).ready(function($) {
+jQuery(document).ready(function($) { 
 	$("#print_link").click(function() {
 		window.print();
      	return false;
@@ -21,11 +24,7 @@ jQuery(document).ready(function($) {
      	return false;
 	});
 });
-</script> 
-
-<link rel="stylesheet" type="text/css" href="/static/base.css" />
-<link rel="stylesheet" type="text/css" href="/static/html_print/rechnung_base.css" />
-<link rel="stylesheet" type="text/css" media="print" href="/static/html_print/rechnung_print.css" />
+</script>
 {% endblock %}
 
 
