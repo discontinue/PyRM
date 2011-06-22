@@ -6,34 +6,7 @@
 {% block extrahead %}{{ block.super }}
 <script type="text/javascript" src="{{ Django_media_prefix }}js/jquery.min.js" onerror="JavaScript:alert('Error loading file ['+this.src+'] !');" ></script>
 <script type="text/javascript" src="{{ media_url }}save_me_genie.js" onerror="JavaScript:alert('Error loading file ['+this.src+'] !');" ></script>
-<script type="text/javascript">
-function textarea_resize() {
-    //
-    // Resize all textareas
-    //
-    textareas = document.getElementsByTagName("textarea");
-    for (var i = 0; i <= textareas.length-1; i++) {
-        try {
-            textarea = textareas[i];
-            try {
-                rows = textarea.firstChild.data.split("\n").length;
-                if (rows > 30) {
-                    rows = 30;
-                }
-            } catch(e) {
-                rows = 2;
-            }
-            textarea.rows = rows;
-        } catch (e) {
-            alert("textarea_resize() error:" + e);
-        }
-    }
-}
-jQuery(document).ready(function($) {
-	textarea_resize()
-});
-</script>
-
+<script type="text/javascript" src="{{ media_url }}pyrm_js_tools.js" onerror="JavaScript:alert('Error loading file ['+this.src+'] !');" ></script>
 <link rel="stylesheet" href="{{ media_url }}blueprint/screen.css" type="text/css" onerror="JavaScript:alert('Error loading file ['+this.src+'] !');" >
 <link rel="stylesheet" type="text/css" href="{{ media_url }}base.css" onerror="JavaScript:alert('Error loading file ['+this.src+'] !');" />
 {% endblock extrahead %}
