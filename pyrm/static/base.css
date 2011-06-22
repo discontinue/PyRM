@@ -113,6 +113,31 @@ textarea {
   box-shadow: #999 2px 2px 4px;	
 }
 /* ----------------------------------------------------------------------------
+   Grayout non importand models in django admin panel
+------------------------------------------------------------------------------- */
+.module th a[href="pyrm/rechnungsposten/"],
+.module th a[href="reversion/revision/"],
+.module th a[href="reversion/version/"],
+.module th a[href="tagging/taggeditem/"],
+.module th a[href="tagging/tag/"] {
+    color: #aaa;
+}
+/* Highlight importand models  in django admin panel */
+.module th a[href="pyrm/kunde/"],
+.module th a[href="pyrm/rechnung/"] {
+    background-color: #e8eff6;
+    border-left: 5px solid #acc5e1;
+    display: block;
+}
+.module th {
+    padding: 0px;
+    vertical-align:middle;
+}
+.module th a {
+    padding: 5px;
+    vertical-align:middle;
+}
+/* ----------------------------------------------------------------------------
    PyRM
 ---------------------------------------------------------------------------- */
 .selection_menu {
