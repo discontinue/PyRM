@@ -1,0 +1,2 @@
+{% for rechnung in queryset %}{{ rechnung.nummer }};{{ rechnung.kunde.nummer }};4400;"{% for item in rechnung.get_all_rechnungs_posten %}{{ item.beschreibung }}{% endfor %}";{{ rechnung.summe }};{{ rechnung.datum|date:"d.m.Y" }};
+{% endfor %}

@@ -20,6 +20,8 @@ from pyrm.models.base_models import BASE_FIELDSET
 from pyrm.models.rechnung import RechnungsPosten, Rechnung
 from pyrm.utils.django_modeladmin import add_missing_fields
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from django.core import serializers
 
 
 class RechnungsPostenAdmin(VersionAdmin):
@@ -57,6 +59,16 @@ class PostenInline(admin.TabularInline):
     )
 
 
+@render_to("pyrm/export/rechnung_KRB.csv", mimetype="text/plain")
+def export_rechnung_as_csv(modeladmin, request, queryset):
+    """
+    Export as pseudo CSV (for copy&paste into LibreOffice ;)
+    """
+    context = {
+        "queryset": queryset,
+    }
+    return context
+
 
 class RechnungAdmin(VersionAdmin):
     inlines = (PostenInline,)
@@ -81,6 +93,11 @@ class RechnungAdmin(VersionAdmin):
 #        BASE_FIELDSET,
 #    )
 #    fieldsets = add_missing_fields(Rechnung, fieldsets)
+
+    def get_actions(self, request):
+        actions = super(RechnungAdmin, self).get_actions(request)
+        actions["export_rechnung_as_csv"] = (export_rechnung_as_csv, "export_rechnung_as_csv", "Export Rechnung as CSV")
+        return actions
 
     def print_link(self, instance):
         """ For adding a edit link into django admin interface """
