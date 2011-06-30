@@ -29,6 +29,7 @@
 	<div class="span-24 last" id="info_block">
 		<div class="span-12">
 			<p id="re_nr">Re.Nr.: <strong>{{ rechnung.nummer }}</strong></p>
+			<p id="kundennummer">Kundenummer: {{ rechnung.kunde.nummer }}</p>
 			{% if rechnung.bestellnummer %}<p id="bestellnummer">Bestell- bzw. Auftragsnummer: {{ rechnung.bestellnummer }}</p>{% endif %}
 			{% if rechnung.kunde.lieferranten_nr %}<p id="lieferranten_nr">Lieferanten-Nr.: {{ rechnung.kunde.lieferranten_nr }}</p>{% endif %}
 		</div>
