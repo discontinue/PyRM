@@ -1,3 +1,14 @@
+html {
+	background-color: #555;
+	padding: 15px;
+}
+body {
+	background-color: #fff;
+  	width: 950px;
+  	margin: 0 auto;
+    padding: 15px;
+}
+
 body {
     font-family:"Helvetica Neue", Arial, Helvetica, sans-serif;
     font-size: 1.1em;
@@ -13,6 +24,15 @@ address#kunde, address#own_ci {
 }
 address#own_ci {
     text-align: right;
+}
+#copy_info {
+	font-size: 1.5em;
+	color: #666;
+	text-align: center;
+	position: absolute;
+	top: 20px;
+	width: 950px;
+	margin: 0 auto;
 }
 #info_block {
     margin-top: 3em;
@@ -59,7 +79,7 @@ address#own_ci {
 }
 footer {
     position: absolute;
-    top: 1250px;
+    top: 1300px;
     margin: auto;
     font-size: 0.8em;
     text-align: center;

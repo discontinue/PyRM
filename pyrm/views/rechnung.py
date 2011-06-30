@@ -12,5 +12,6 @@ def rechnung_drucken(request, pk):
     rechnung = get_object_or_404(Rechnung, pk=pk)
     context = {
         "rechnung": rechnung,
+        "is_copy": "is_copy" in request.GET,
     }
     return context

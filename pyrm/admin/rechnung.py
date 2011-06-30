@@ -60,7 +60,7 @@ class PostenInline(admin.TabularInline):
 
 class RechnungAdmin(VersionAdmin):
     inlines = (PostenInline,)
-    list_display = ("nummer", "kunde", "datum", "print_link", "valuta", "summe", "lastupdatetime")
+    list_display = ("nummer", "kunde", "datum", "print_link", "print_copy_link", "valuta", "summe", "lastupdatetime")
     list_display_links = ("nummer", "kunde")
     list_filter = ("mahnstufe", "kunde",)
     list_per_page = 20
@@ -86,9 +86,21 @@ class RechnungAdmin(VersionAdmin):
         """ For adding a edit link into django admin interface """
         context = {
             "instance": instance,
+            "is_copy": False,
         }
         return render_to_string('pyrm/admin/print_link.html', context)
     print_link.allow_tags = True
+    print_link.short_description = "drucken"
+
+    def print_copy_link(self, instance):
+        """ For adding a edit link into django admin interface """
+        context = {
+            "instance": instance,
+            "is_copy": True,
+        }
+        return render_to_string('pyrm/admin/print_link.html', context)
+    print_copy_link.allow_tags = True
+    print_copy_link.short_description = "Kopie drucken"
 
 #    @render_to("pyrm/admin/rechnung_drucken.html", debug=False)
 #    def rechnung_drucken(self, request, pk):

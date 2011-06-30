@@ -1,13 +1,15 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-<title>Rechnung {{ rechnung }}</title>
+<title>Rechnung {% if is_copy %}- Kopie{% endif %} - {{ rechnung }}</title>
 <link rel="stylesheet" type="text/css" href="{{ media_url }}pyrm/blueprint/grid.css" onerror="JavaScript:alert('Error loading file ['+this.src+'] !');" >
 <link rel="stylesheet" type="text/css" href="{{ media_url }}pyrm/html_print/rechnung.css" onerror="JavaScript:alert('Error loading file ['+this.src+'] !');" />
+{% include "pyrm/includes/rechnung_extrahead.html" %}
 </head><body>
 
 <div class="container">
 	<div class="span-24 clear head_adresses">
+		<p id="copy_info">{% if is_copy %}<strong>Kopie</strong>{% endif %}</p>
 		<div class="addresses span-12">
 			{% if rechnung.anschrift %}
 				{{ rechnung.anschrift }}
@@ -24,7 +26,7 @@
 		</div>
 	</div>
 	
-	<div class="span-24" id="info_block">
+	<div class="span-24 last" id="info_block">
 		<div class="span-12">
 			<p id="re_nr">Re.Nr.: <strong>{{ rechnung.nummer }}</strong></p>
 			{% if rechnung.bestellnummer %}<p id="bestellnummer">Bestell- bzw. Auftragsnummer: {{ rechnung.bestellnummer }}</p>{% endif %}
