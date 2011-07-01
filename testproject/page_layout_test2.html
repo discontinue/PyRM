@@ -1,0 +1,212 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Rechnung  - Re.Nr.1 vom 2011-06-22 (valuta: None) - 230€</title>
+
+<style>
+html {
+    background-color: #555;
+    padding: 15px;
+}
+body {
+    font-family:"Helvetica Neue", Arial, Helvetica, sans-serif;
+    font-size: 1.1em;
+    background-color: #fff;
+    margin: 0 auto;
+    padding: 15px;
+    /*
+        DIN A4 = 210 x 297
+        760px / 210*297 = 1074,9
+        1085px / 297*210 = 767,2
+
+    */
+    width: 760px;
+    height: 1085px;
+}
+@media print {
+    html, body {
+        border: 0;
+        padding: 0;
+        margin: 0 auto;
+    }
+}
+body div {
+    width: 90%;
+    margin: 0 auto;
+}
+
+#head_adresses {
+    background-color: #eee;
+    height: 250px;
+}
+#head_adresses div {
+    width: 50%;
+    float:left;
+}
+#recipient {
+    padding-top: 100px;
+}
+#ci_address {
+    text-align: right;
+}
+#date {
+    text-align: right;
+}
+#rechnungs_posten {
+    border: 1px solid #000;
+}
+#rechnungs_posten table {
+    border-spacing: 0px;
+    width: 100%;
+}
+#rechnungs_posten table tr.first td {
+    border-top: 1px solid #000;
+}
+#rechnungs_posten table tr.last td {
+    border-bottom: 1px solid #000;
+}
+#summe_brutto .money strong {
+    border-bottom: 3px double #000;
+}
+#rechnungs_posten table td {
+    padding: 0px 10px 0px 10px;
+}
+#rechnungs_posten table #summe_netto td {
+    padding-top: 10px;
+}
+#rechnungs_posten table #summe_brutto td {
+    padding-bottom: 10px;
+}
+
+#rechnungs_footer {
+    border: 1px solid #000;
+    position: absolute;
+    top: 880px;
+    height: auto;
+    width: 758px;
+    margin: 0 auto;
+    font-size: 0.8em;
+    text-align: center;
+}
+#inhaber_info, #bank_info {
+    width: 50%;
+    float: left;
+}
+</style>
+</head>
+<body>
+<p id="copy_info"></p>
+<div id="head_adresses">
+    <div id="recipient">
+        Anschrift
+        Bla
+        Blub
+    </div>
+    <div id="ci_address">
+        <address>
+            <strong>Beispiel Firma</strong><br />
+            www.pyrm.org<br />
+        </address>
+    </div>
+</div>
+
+<div id="info_block">
+    <p id="date">22. Juni 2011</p>
+    <p id="re_nr">Re.Nr.: <strong>1</strong></p>
+</div>
+
+<div id="rechnungs_posten">
+    <table>
+	<tr class="head">
+		<th>Art.Nr./Bezeichnung</th>
+		<th>Menge</th>
+		<th>Einzelpreis</th>
+		<th>MwSt.</th>
+		<th>Gesamtpreis</th>
+	</tr>
+
+		<tr class="first">
+
+			<td class="info_posten" colspan=5><p>erstens</p></td>
+
+		</tr>
+
+		<tr class="">
+
+			<td class="beschreibung"><p>Staubsauger</p></td>
+			<td class="menge">1 </td>
+			<td class="einzelpreis money">180,00 €</td>
+			<td class="mwst">19%</td>
+			<td class="summe money">180,00 €</td>
+
+		</tr>
+
+		<tr class="last">
+
+			<td class="beschreibung"><p>Rohlinge</p></td>
+			<td class="menge">10 </td>
+			<td class="einzelpreis money">5,00 €</td>
+			<td class="mwst">19%</td>
+			<td class="summe money">50,00 €</td>
+
+		</tr>
+
+	<tr id="summe_netto">
+		<td colspan=4>Netto:</td>
+		<td class="money">230,00 €</td>
+	</tr>
+
+	<tr class="mwst_info">
+		<td colspan=4>zzgl. 19% MwSt:</td>
+		<td class="money">43,70 €</td>
+	</tr>
+
+	<tr id="summe_brutto">
+		<td colspan=4><strong>Gesamtbetrag:</strong></td>
+		<td class="money"><strong>273,70 €</strong></td>
+	</tr>
+    </table>
+</div>
+
+<div id="rechnungs_footer">
+    <footer>
+        <p>
+			Die gelieferte Ware bleibt bis zur vollständigen Bezahlung Eigentum des Lieferanten.<br />
+			Soweit nicht anders angegeben gilt der Zeitpunkt der Rechnungsausstellung als Zeitpunkt der Leistung.
+        </p>
+
+        <table id="inhaber_info">
+                <tr>
+                        <td colspan=2>FirmenName</td>
+                </tr>
+                <tr>
+                        <td>Inhaber</td>
+                        <td>Max Musterman</td>
+                </tr>
+                <tr>
+                        <td>USt-IdNr.</td>
+                        <td>123 456 789</td>
+                </tr>
+        </table>
+
+        <table id="bank_info">
+                <tr>
+                        <td>KontoNr.</td>
+                        <td>123 456 789</td>
+                </tr>
+                <tr>
+                        <td>BLZ</td>
+                        <td>123 456 789</td>
+                </tr>
+                <tr>
+                        <td>IBAN</td>
+                        <td>DE00 1234 5678 9000 1234 00</td>
+                </tr>
+                <tr>
+                        <td>BIC</td>
+                        <td>AAAAAAA0000</td>
+                </tr>
+        </table>
+    </footer>
+</div>
+</body></html>
