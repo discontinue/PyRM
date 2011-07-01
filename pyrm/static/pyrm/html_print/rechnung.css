@@ -1,28 +1,46 @@
 html {
-	background-color: #555;
-	padding: 15px;
-}
-body {
-	background-color: #fff;
-  	width: 950px;
-  	margin: 0 auto;
+    background-color: #555;
     padding: 15px;
 }
-
 body {
     font-family:"Helvetica Neue", Arial, Helvetica, sans-serif;
     font-size: 1.1em;
+    background-color: #fff;
+    margin: 0 auto;
+    padding: 15px;
+    /*
+        DIN A4 = 210 x 297
+        760px / 210*297 = 1074,9
+        1085px / 297*210 = 767,2
+
+    */
+    width: 760px;
+    height: 1085px;
+}
+.border {
+	border: 1px solid #000;
 }
 .container {
-    height: 1400px;
+    border: 2px dotted #000;
+    height: 1085px;
 }
+@media print {
+	html, body {
+	    padding: 0px;
+	    margin: 0 auto;
+	}
+	.container {
+		border: 0;
+	}
+}
+
 .small {
     font-size: 0.8em;
 }
-address#kunde, address#own_ci {
-    padding: 3em 0em 0em 3em;
+.head_adresses {
+    padding: 100px 0 10px 0;
 }
-address#own_ci {
+#ci_address address {
     text-align: right;
 }
 #copy_info {
@@ -38,10 +56,11 @@ address#own_ci {
     margin-top: 3em;
 }
 
-#posten * {
+table {
+	border-spacing: 0px;
+}
+td, th {
     border: 0;
-    padding: 0;
-    margin: 0;
 }
 #posten * {
     text-align: right;
@@ -77,10 +96,12 @@ address#own_ci {
 #re_date {
 	text-align: right;
 }
-footer {
+#rechnungs_footer {
     position: absolute;
-    top: 1300px;
-    margin: auto;
+    top: 950px;
+    height: auto;
+    width: 758px;
+    margin: 0 auto;
     font-size: 0.8em;
     text-align: center;
 }
