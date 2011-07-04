@@ -17,6 +17,9 @@ body {
     width: 760px;
     height: 1085px;
 }
+p {
+	margin: 0px;
+}
 .border {
 	border: 1px solid #000;
 }
