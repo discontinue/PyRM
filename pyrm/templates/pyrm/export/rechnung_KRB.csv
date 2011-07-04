@@ -1,4 +1,6 @@
-{% for rechnung in queryset %}{{ rechnung.nummer }};{{ rechnung.kunde.nummer }};4400;"{% spaceless %}
+{% for rechnung in queryset %}{{ rechnung.nummer }};{{ rechnung.kunde.nummer }};4400;"{% if rechnung.kunde.lieferranten_nr %}Lieferanten-Nr.: {{ rechnung.kunde.lieferranten_nr }}
+
+{% endif %}{% spaceless %}
 {% for item in rechnung.get_all_rechnungs_posten %}{% if item.summe %}{{ item.summe }}€ - {% else %}
 {% endif %}{{ item.beschreibung }}
 {% endfor %}{% endspaceless %}";{{ rechnung.summe }};{{ rechnung.datum|date:"d.m.Y" }};
