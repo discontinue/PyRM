@@ -1,121 +1,124 @@
-html {
-    background-color: #555;
-    padding: 15px;
+@page {
+	/* DIN A4: 21cm * 29,7cm */
+	size: a4 portrait;
+  	margin: 1cm;
+  	margin-bottom: 2.5cm;
+  	
+  	@frame anschrift {
+  		-pdf-frame-content: anschrift;
+  		/*-pdf-frame-border: 1;*/
+  		top: 4.5cm;
+  		left: 2.5cm;
+  		height: 5cm;
+  		width: 15cm;
+  	}
+  	
+  	@frame ci_address {
+  		-pdf-frame-content: ci_address;
+  		/*-pdf-frame-border: 1;*/
+  		top: 2cm;
+  		right: 0cm;
+  		height: 5cm;
+  		width: 4cm;
+  	}
+  	
+  	@frame content {
+  		-pdf-frame-content: content;
+  		/*-pdf-frame-border: 1;*/
+  		top: 10cm;
+  		margin: 2cm;
+  	}  	
+  	
+  	@frame footer {
+	    -pdf-frame-content: footer;
+	    /*-pdf-frame-border: 1;*/
+	    bottom: 3cm;
+	    margin: 2cm;
+	    height: 3cm;
+  	}
+  	@frame inhaber_info {
+  		-pdf-frame-content: inhaber_info;
+	    /*-pdf-frame-border: 1;*/
+	    bottom: 0cm;
+	    left: 2cm;
+	    height: 3cm;
+  		width: 6cm;
+  	} 
+  	@frame bank_info {
+  		-pdf-frame-content: bank_info;
+	    /*-pdf-frame-border: 1;*/
+	    bottom: 0cm;
+	    right: 2cm;
+	    height: 3cm;
+  		width: 6cm;
+  	}
 }
 body {
     font-family:"Helvetica Neue", Arial, Helvetica, sans-serif;
-    font-size: 1.1em;
-    background-color: #fff;
-    margin: 0 auto;
-    padding: 15px;
-    /*
-        DIN A4 = 210 x 297
-        760px / 210*297 = 1074,9
-        1085px / 297*210 = 767,2
-
-    */
-    width: 760px;
-    height: 1085px;
 }
-p {
-	margin: 0px;
-}
-.border {
-	border: 1px solid #000;
-}
-.container {
-    border: 2px dotted #000;
-    height: 1085px;
-}
-@media print {
-	html, body {
-	    padding: 0px;
-	    margin: 0 auto;
-	}
-	.container {
-		border: 0;
-	}
-}
-
-.small {
-    font-size: 0.8em;
-}
-.head_adresses {
-    padding: 100px 0 10px 0;
-}
-#ci_address address {
-    text-align: right;
+ul {
+    list-style-type: none;
+	padding: 0;
+	margin: 0;
 }
 #copy_info {
-	font-size: 1.5em;
+	font-size: 2em;
 	color: #666;
 	text-align: center;
-	position: absolute;
-	top: 20px;
-	width: 950px;
-	margin: 0 auto;
 }
-#info_block {
-    margin-top: 3em;
-}
-
-table {
-	border-spacing: 0px;
-}
-td, th {
-    border: 0;
-}
-#posten * {
-    text-align: right;
-}
-#posten th {
-    text-align: center;
-}
-#posten .beschreibung p {
-    text-align: left;
-}
-#posten {
-    width: 100%;
-    margin: auto;
-    margin-bottom: 3em;
-}
-#posten td {
-    padding: 5px;
-}
-#posten .info_posten p {
+#footer {
 	text-align: center;
-	color: #555;
-	padding-top: 1em;
 }
-#posten .first {
-    border-top: 1px solid #000;
-}
-#posten .last {
-    border-bottom: 1px solid #000;
-}
-#summe_brutto .money strong{
-    border-bottom: 3px double #000;    
-}
-#re_date {
+table#posten {
+	width: 100%;
 	text-align: right;
+	border: 1px solid #000;
 }
-#rechnungs_footer {
-    position: absolute;
-    top: 950px;
-    height: auto;
-    width: 758px;
-    margin: 0 auto;
-    font-size: 0.8em;
-    text-align: center;
+table#posten th {
+	text-align: center;    
 }
-footer table * {
-    padding: 0px;
+table#posten .beschreibung {
+	text-align: left;
+	width: 100%;
 }
-footer table {
-    width: 300px;
-    padding: 0;
-    margin: auto;
+table#posten td, table#posten th {
+	vertical-align:middle;
+    margin: 0.1cm;
+    padding: 0.1cm;
 }
-#posten {
-	margin:auto;
+@media print {
+	#anschrift {
+		font-size: 0.5cm;
+	}
+	#rechnungs_info {
+		font-size: 0.4cm;		
+	}
+	#footer, #inhaber_info, #bank_info {
+		font-size: 0.3cm;
+	} 
+}
+@media screen {
+	/* for preview in browser only */
+	html {
+	    background-color: #555;
+	    padding: 15px;
+	}
+	body {
+	    background-color: #fff;
+	    margin: 0 auto;
+	    padding: 15px;
+	    /*
+			DIN A4 = 210 x 297
+			760px / 210*297 = 1074,9
+			1085px / 297*210 = 767,2
+		*/
+	    width: 760px;
+	    /*height: 1085px;*/
+	}
+	#ci_address {
+		text-align: right;
+	}
+	table#posten, table#posten td, table#posten th {
+	    border: 1px solid #000;
+	}
 }

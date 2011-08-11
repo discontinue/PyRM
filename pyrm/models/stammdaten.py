@@ -24,6 +24,7 @@ import reversion # django-reversion
 
 from pyrm.models.base_models import BaseModel
 from django.template.loader import render_to_string
+from django.core.exceptions import ValidationError
 #from pyrm.utils.django_modeladmin import add_missing_fields
 
 
@@ -251,6 +252,16 @@ class KundeLieferantBase(BaseModel):
         help_text="FIXME"
     )
 
+    def clean_fields(self, exclude):
+        super(KundeLieferantBase, self).clean_fields(exclude)
+
+        if "person" not in exclude and "firma" not in exclude:
+            if self.person is None and self.firma is None:
+                msg = ("Person und Firma können nicht beide leer sein!",)
+                raise ValidationError({
+                    "person": msg, "firma": msg
+                })
+
     class Meta:
         # http://www.djangoproject.com/documentation/model-api/#abstract-base-classes
         abstract = True # Abstract base classes
@@ -278,16 +289,30 @@ class Kunde(KundeLieferantBase):
         )
     )
 
+    anzahl_rechnungen = models.PositiveSmallIntegerField(
+        default=2,
+        help_text=(
+            "Wieviel Rechnungen sollen gedruckt werden?"
+            " (z.B. 2x: eine zum Verschicken, eine für die Buchhaltung"
+        )
+    )
+    anzahl_rechnungskopie = models.PositiveSmallIntegerField(
+        default=0,
+        help_text=(
+            "Wieviel Rechnungens-Kopien sollen gedruckt werden?"
+        )
+    )
+
     mahnfrist = models.PositiveIntegerField(
         default=settings.PYRM.DEFAULT_MAHNFRIST,
         help_text="Frist in Tagen."
     )
 
-    def address_as_html(self):
-        context = {
-            "instance": self,
-        }
-        return render_to_string("pyrm/html_print/kunde.html", context)
+    def range_rechnung(self):
+        # http://stackoverflow.com/questions/1107737/numeric-for-loop-in-django-templates
+        return xrange(self.anzahl_rechnungen)
+    def range_kopie(self):
+        return xrange(self.anzahl_rechnungskopie)
 
     def __unicode__(self):
         if self.firma:

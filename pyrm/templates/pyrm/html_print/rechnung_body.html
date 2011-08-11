@@ -1,0 +1,77 @@
+<div id="anschrift">
+	{% if rechnung.anschrift %}
+		{{ rechnung.anschrift }}
+	{% else %}
+		{% if rechnung.kunde.firma %}
+			<strong>{{ rechnung.kunde.firma.name1 }}</strong><br />
+			{% if rechnung.kunde.firma.name2 %}
+				{{ rechnung.kunde.firma.name2 }}<br />			
+			{% endif %}
+			{% if rechnung.kunde.anzeigen and rechnung.kunde.person %}{{ rechnung.kunde.person }}<br />{% endif %}
+			{{ rechnung.kunde.firma.strasse }}<br />
+			{% if rechnung.kunde.firma.strassen_zusatz %}{{ rechnung.kunde.firma.strassen_zusatz }}<br />{% endif %}
+			{{ rechnung.kunde.firma.plz|default_if_none:"" }} {{ rechnung.kunde.firma.ort|default_if_none:"" }}			
+		{% else %}
+			<strong>{{ rechnung.kunde.person }}</strong><br />
+			{{ rechnung.kunde.person.strasse }}<br />
+			{% if rechnung.kunde.person.strassen_zusatz %}{{ rechnung.kunde.person.strassen_zusatz }}<br />{% endif %}
+			{{ rechnung.kunde.person.plz|default_if_none:"" }} {{ rechnung.kunde.person.ort|default_if_none:"" }}
+		{% endif %}
+	{% endif %}
+</div>
+	
+<div id="ci_address">
+	<address>
+		{% include "pyrm/html_print/ci_address.html" %}
+	</address>
+</div>
+
+<div id="content">
+	<ul id="rechnungs_info">
+		<li id="re_nr">Rechnungs Nr.: <strong>{{ rechnung.nummer }}</strong></li>
+		{% if rechnung.kunde %}<li id="kundennummer">Kundenummer: {{ rechnung.kunde.nummer }}</li>{% endif %}
+		{% if rechnung.bestellnummer %}<li id="bestellnummer">Bestell- bzw. Auftragsnummer: {{ rechnung.bestellnummer }}</li>{% endif %}
+		{% if rechnung.kunde.lieferranten_nr %}<li id="lieferranten_nr">Lieferanten-Nr.: {{ rechnung.kunde.lieferranten_nr }}</li>{% endif %}
+		<li id="re_datum">Rechnungsdatum: {{ rechnung.datum }}</li>
+		{% if rechnung.lieferdatum %}<li id="liefer_datum">Lieferdatum: {{ rechnung.lieferdatum }}</li>{% endif %}
+	</ul>	
+	
+	<table id="posten">
+	<tr class="head">
+		<th>Art.Nr./Bezeichnung</th>
+		<th>Menge</th>
+		<th>Einzelpreis</th>
+		<th>MwSt.</th>
+		<th>Gesamtpreis</th>
+	</tr>
+	{% for item in rechnung.get_all_rechnungs_posten %}
+		<tr class="{% if forloop.first %}first{% endif %}{% if forloop.last %}last{% endif %}">
+		{% if item.einzelpreis == None %}
+			<td class="info_posten" colspan=5>{{ item.beschreibung_html }}</td>
+		{% else %}
+			<td class="beschreibung">{{ item.beschreibung_html }}</td>
+			<td class="menge">{{ item.menge|default_if_none:"" }} {{ item.einheit|default_if_none:"" }}</td>
+			<td class="einzelpreis money">{% if item.einzelpreis != None %}{{ item.einzelpreis|floatformat:2 }} €{% endif %}</td>
+			<td class="mwst">{% if item.mwst != None %}{{ item.mwst }}%{% endif %}</td>
+			<td class="summe money">{% if item.summe != None %}{{ item.summe|floatformat:2 }} €{% endif %}</td>
+		{% endif %}
+		</tr>
+	{% endfor %}
+	<tr id="summe_netto">
+		<td colspan=4>Netto:</td>
+		<td class="money">{{ rechnung.get_total.0|floatformat:2 }} €</td>
+	</tr>
+	{% for mwst_info in rechnung.get_total.2 %}
+	<tr class="mwst_info">
+		<td colspan=4>zzgl. {{ mwst_info.0 }}% MwSt:</td>
+		<td class="money">{{ mwst_info.1|floatformat:2 }} €</td>
+	</tr>
+	{% endfor %}
+	<tr id="summe_brutto">
+		<td colspan=4><strong>Gesamtbetrag:</strong></td>
+		<td class="money"><strong>{{ rechnung.get_total.1|floatformat:2 }} €</strong></td>
+	</tr>
+	</table>
+</div>
+	
+{% include "pyrm/html_print/footer.html" %}
