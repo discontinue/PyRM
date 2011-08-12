@@ -1,5 +1,7 @@
 # coding: utf-8
 
+from __future__ import division, absolute_import
+
 import sys, os, csv, re
 from pprint import pprint
 from decimal import Decimal
