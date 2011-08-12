@@ -59,5 +59,6 @@ You must create a own local_settings.py in you project directory. e.g.:
 == Links
 
 | GitHub      | https://github.com/jedie/PyRM
+| PyPi        | http://pypi.python.org/pypi/PyRM/
 | Sourceforge | http://sourceforge.net/projects/pyrm/
 | Google code | https://code.google.com/p/pyrm/
