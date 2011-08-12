@@ -224,7 +224,7 @@ reversion.register(Skonto)
 
 #______________________________________________________________________________
 
-class KundeLieferantBase(BaseModel):
+class KundeBase(BaseModel):
     """
     Basis Klasse für Kunde und Lieferant
     """
@@ -254,7 +254,7 @@ class KundeLieferantBase(BaseModel):
     )
 
     def clean_fields(self, exclude):
-        super(KundeLieferantBase, self).clean_fields(exclude)
+        super(KundeBase, self).clean_fields(exclude)
 
         if "person" not in exclude and "firma" not in exclude:
             if self.person is None and self.firma is None:
@@ -270,7 +270,7 @@ class KundeLieferantBase(BaseModel):
 #______________________________________________________________________________
 
 
-class Kunde(KundeLieferantBase):
+class Kunde(KundeBase):
     """
     Firmen- und Privat-Kunden für Rechnungen.
     """
@@ -337,11 +337,10 @@ reversion.register(Kunde)
 
 #______________________________________________________________________________
 
-class Lieferant(KundeLieferantBase):
+class Lieferant(KundeBase):
     """
-    Lieferanten für die Eingansrechnungen
+    Lieferanten für die Ausgaben/Eingansrechnungen
     """
-#    nummer = models.IntegerField(
     nummer = models.AutoField(
         primary_key=True,
         help_text="Lieferranten Nummer"
@@ -359,7 +358,8 @@ class Lieferant(KundeLieferantBase):
         app_label = "pyrm"
         verbose_name = "Lieferant"
         verbose_name_plural = "Lieferanten"
-        ordering = ("firma", "person")
+        ordering = ('-lastupdatetime',)
+#        ordering = ("firma", "person")
 
 
 reversion.register(Lieferant)

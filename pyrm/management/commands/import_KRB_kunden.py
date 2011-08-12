@@ -30,8 +30,8 @@ def _get_dictlist(filename):
 
 
 class Command(BaseCommand):
-    help = 'Import KRB Kundenliste.'
-    args = "/path/to/KRB_kudenliste.csv"
+    help = 'Import KRB Kunden.'
+    args = "/path/to/KRB_kuden.csv"
 
     @reversion.revision.create_on_success
     def handle(self, filepath, **options):
@@ -40,10 +40,10 @@ class Command(BaseCommand):
 
         self.verbosity = int(options.get('verbosity', 1))
 
-        Ort.objects.all().delete()
-        Person.objects.all().delete()
-        Firma.objects.all().delete()
-        Kunde.objects.all().delete()
+#        Ort.objects.all().delete()
+#        Person.objects.all().delete()
+#        Firma.objects.all().delete()
+#        Kunde.objects.all().delete()
 
         for line in _get_dictlist(filepath):
             if self.verbosity >= 3:

@@ -8,19 +8,23 @@
 """
 
 from __future__ import division, absolute_import
-from django.contrib import admin
-from django.http import HttpResponse
-from django.core import serializers
 
-from pyrm.models.rechnung import RechnungsPosten, Rechnung
+from django.contrib import admin
+from django.core import serializers
+from django.http import HttpResponse
+
+from pyrm.admin.ausgaben import AusgabenAdmin
 from pyrm.admin.rechnung import RechnungsPostenAdmin, RechnungAdmin
-from pyrm.models.stammdaten import Ort, Person, Firma, Skonto, Kunde
 from pyrm.admin.stammdaten import OrtAdmin, PersonAdmin, FirmaAdmin, SkontoAdmin, \
-    KundeAdmin
+    KundeAdmin, LieferantAdmin
+from pyrm.models.ausgaben import Ausgaben
+from pyrm.models.rechnung import RechnungsPosten, Rechnung
+from pyrm.models.stammdaten import Ort, Person, Firma, Skonto, Kunde, Lieferant
 
 
 admin.site.register(RechnungsPosten, RechnungsPostenAdmin)
 admin.site.register(Rechnung, RechnungAdmin)
+admin.site.register(Ausgaben, AusgabenAdmin)
 
 admin.site.register(Ort, OrtAdmin)
 admin.site.register(Person, PersonAdmin)
@@ -28,6 +32,8 @@ admin.site.register(Firma, FirmaAdmin)
 
 admin.site.register(Skonto, SkontoAdmin)
 admin.site.register(Kunde, KundeAdmin)
+
+admin.site.register(Lieferant, LieferantAdmin)
 
 
 def export_as_json(modeladmin, request, queryset):

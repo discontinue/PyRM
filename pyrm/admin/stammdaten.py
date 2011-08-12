@@ -13,7 +13,7 @@ from django.contrib import admin
 
 from reversion.admin import VersionAdmin
 
-from pyrm.models.stammdaten import Person, Firma
+from pyrm.models.stammdaten import Person, Firma, Lieferant
 
 
 class OrtAdmin(VersionAdmin):
@@ -91,5 +91,6 @@ class KundeAdmin(VersionAdmin):
 
 
 
-
+class LieferantAdmin(VersionAdmin):
+    pass
 

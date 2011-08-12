@@ -1,5 +1,7 @@
 # coding: utf-8
 
+from __future__ import division, absolute_import
+
 import os, re
 from datetime import datetime
 import pprint
@@ -7,12 +9,12 @@ from decimal import Decimal
 
 import reversion # django-reversion
 
-from pyrm.models import Kunde, Lieferant, Rechnung, RechnungsPosten
-
-from pyrm.utils.csv_utils import get_dictlist
-
-
 from django.core.management.base import BaseCommand, CommandError
+
+from pyrm.models import Kunde, Lieferant, Rechnung, RechnungsPosten
+from pyrm.utils.csv_utils import get_dictlist
+from pyrm.models.ausgaben import Ausgaben
+
 
 
 def _get_dictlist(filename):
@@ -82,10 +84,9 @@ class Command(BaseCommand):
             pass
 
         try:
-            Lieferant.objects.all().delete()
-        except Lieferant.DoesNotExist:
+            Ausgaben.objects.all().delete()
+        except Ausgaben.DoesNotExist:
             pass
-
 
         for line in _get_dictlist(filepath):
             notiz = ""
@@ -113,15 +114,27 @@ class Command(BaseCommand):
 
             #----------------------------------------------------------------------
 
+            kunde = None
+            lieferant = None
+
             kunden_nummer1 = line["K.Nr."]
             if kunden_nummer1 == "" or kunden_nummer1 == "999":
                 # Kein kunde eingetragen
-                kunde = None
+                kunden_nummer2 = None
             else:
                 kunden_nummer2 = int(kunden_nummer1)
-                kunde = Kunde.objects.get(nummer=kunden_nummer2)
-            if self.verbosity >= 3:
-                self.stdout.write("Kunde: %r\n" % kunde)
+
+
+            if summe > 0: # Ausgangsrechnung
+                if kunden_nummer2 is not None:
+                    kunde = Kunde.objects.get(nummer=kunden_nummer2)
+                if self.verbosity >= 3:
+                    self.stdout.write("Kunde: %r\n" % kunde)
+            else: # Eingangsrechnung/Ausgaben
+                if kunden_nummer2 is not None:
+                    lieferant = Lieferant.objects.get(nummer=kunden_nummer2)
+                if self.verbosity >= 3:
+                    self.stdout.write("Lieferant: %r\n" % kunde)
 
             #----------------------------------------------------------------------
 
@@ -155,10 +168,16 @@ class Command(BaseCommand):
             #----------------------------------------------------------------------
 
             if summe < 0:
-                self.stdout.write("TODO: Ausgabe - Eingangsrechnung\n")
-                if self.verbosity >= 2:
-                    self.stdout.write("*" * 79)
-                    self.stdout.write("\n")
+                ausgaben = Ausgaben(
+                    lieferant=lieferant,
+                    beschreibung=line["Rechnungstext"],
+                    betrag=summe,
+                    datum=datum,
+                    valuta=valuta,
+                )
+                ausgaben.save()
+                reversion.revision.comment = "KRB import"
+                self.stdout.write("Ausgaben - Rechnung %s erstellt.\n" % ausgaben)
                 continue
 
 
