@@ -68,7 +68,7 @@ def export_rechnung_as_csv(modeladmin, request, queryset):
 
 class RechnungAdmin(VersionAdmin):
     inlines = (PostenInline,)
-    list_display = ("nummer", "kunde", "datum", "print_link", "valuta", "summe", "lastupdatetime")
+    list_display = ("nummer", "kunde", "summe", "print_link", "datum", "valuta", "lastupdatetime")
     list_display_links = ("nummer", "kunde")
     list_filter = ("mahnstufe", "kunde",)
     list_per_page = 20
