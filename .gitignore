@@ -1,9 +1,11 @@
 local_settings.py
-*.pyc
+*.db3
+*.py[co]
 *.log
 *~
+*.egg-info
+/dist
+/build
 /PyRM.egg-info
 .pydevproject
-/dist
-*.db3
 /.settings
