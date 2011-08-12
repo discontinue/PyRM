@@ -1,4 +1,5 @@
 # coding: utf-8
+
 """
     PyRM
     ~~~~
@@ -6,6 +7,8 @@
     :copyleft: 2008-2011 by the PyLucid team, see AUTHORS for more details.
     :license: GNU GPL v3 or above, see LICENSE for more details.
 """
+
+from __future__ import division, absolute_import
 
 import os
 import time

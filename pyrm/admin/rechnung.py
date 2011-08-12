@@ -7,21 +7,17 @@
     :license: GNU GPL v3, see LICENSE.txt for more details.
 """
 
-from django.conf.urls.defaults import patterns, url
-from django.contrib import admin, messages
+from __future__ import division, absolute_import
+
+from django.contrib import admin
 from django.template.loader import render_to_string
-from django.shortcuts import get_object_or_404
+from django_tools.decorators import render_to
 
 from reversion.admin import VersionAdmin
-
-from django_tools.decorators import render_to
 
 from pyrm.models.base_models import BASE_FIELDSET
 from pyrm.models.rechnung import RechnungsPosten, Rechnung
 from pyrm.utils.django_modeladmin import add_missing_fields
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
-from django.core import serializers
 
 
 class RechnungsPostenAdmin(VersionAdmin):

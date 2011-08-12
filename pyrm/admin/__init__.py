@@ -7,6 +7,7 @@
     :license: GNU GPL v3, see LICENSE.txt for more details.
 """
 
+from __future__ import division, absolute_import
 from django.contrib import admin
 from django.http import HttpResponse
 from django.core import serializers

@@ -10,6 +10,7 @@
     :license: GNU GPL v3, see LICENSE.txt for more details.
 """
 
+from __future__ import division, absolute_import
 import os
 import copy
 import datetime
@@ -31,6 +32,7 @@ class QuarterChoiceField(forms.ChoiceField):
     >>> start = datetime.date(2007, 1, 1)
     >>> end = datetime.date(2008, 12, 31)
     
+    
     >>> t = QuarterChoiceField(epoch = (start, end), reverse=True)
     >>> t.choices
     [(0, 'IV.2008'), (1, 'III.2008'), (2, 'II.2008'), (3, 'I.2008'), \
@@ -40,6 +42,7 @@ class QuarterChoiceField(forms.ChoiceField):
     >>> t.clean(7)
     (datetime.date(2007, 1, 1), datetime.date(2007, 3, 31))
     
+    
     >>> t = QuarterChoiceField(epoch = (start, end))
     >>> t.choices
     [(0, 'I.2007'), (1, 'II.2007'), (2, 'III.2007'), (3, 'IV.2007'), \
@@ -47,13 +50,17 @@ class QuarterChoiceField(forms.ChoiceField):
     >>> t.clean(2)
     (datetime.date(2007, 7, 1), datetime.date(2007, 9, 30))
 
+    >>> print "1"
     >>> t = QuarterChoiceField(epoch = (None, None), reverse=True)
     >>> t.choices
+    
+    
+    >>> t = QuarterChoiceField(epoch = (start, start))
+    >>> t.choices
+
 
     >>> t = QuarterChoiceField(epoch = (end, start))
-    Traceback (most recent call last):
-    ...
-    AssertionError
+    >>> t.choices    
     """
     def __init__(self, *args, **kwargs):
         """
@@ -69,12 +76,13 @@ class QuarterChoiceField(forms.ChoiceField):
             delta = datetime.timedelta(days=365)
             self.oldest = self.newest - delta
 
-        assert(self.oldest < self.newest), "Wrong: %r < %r" % (self.oldest, self.newest)
+
+        assert(self.oldest <= self.newest), "Wrong: %r < %r" % (self.oldest, self.newest)
 
         self.reverse = kwargs.pop("reverse", False)
         super(QuarterChoiceField, self).__init__(*args, **kwargs)
 
-        self.time_range = range(self.oldest.year, self.newest.year + 1)
+        self.time_range = range(self.oldest.year, self.newest.year)
 
         self.roman_range = copy.copy(ROMAN_NUMERALS)
         if self.reverse:

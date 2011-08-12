@@ -12,6 +12,7 @@
     :license: GNU GPL v3, see LICENSE.txt for more details.
 """
 
+from __future__ import division, absolute_import
 import sys
 import datetime
 
@@ -23,10 +24,9 @@ from django.template import RequestContext
 from django.conf import settings
 from django import forms
 
-
-from django_addons.forms_addons import QuarterChoiceField
-from pyrm.utils.unicode_stringio import UnicodeStringIO
+from pyrm.django_addons.forms_addons import QuarterChoiceField
 from pyrm.models import Rechnung, RechnungsPosten, Firma, Person, Kunde, Ort
+from pyrm.utils.unicode_stringio import UnicodeStringIO
 
 
 
@@ -35,7 +35,7 @@ AKTIVER_ZEITRAUM = Rechnung.objects.exist_date_range()
 
 
 class EpochSelectForm(forms.Form):
-    quarter = QuarterChoiceField(epoch = AKTIVER_ZEITRAUM, reverse = True)
+    quarter = QuarterChoiceField(epoch=AKTIVER_ZEITRAUM, reverse=True)
 
 
 
@@ -57,7 +57,7 @@ def index(request):
         if form.is_valid():
             start, end = form.cleaned_data["quarter"]
             print start, end
-            
+
             # Geht nicht, warum?
 #            url = reverse(
 #                "pyrm-kontieren-kontieren",
@@ -71,7 +71,7 @@ def index(request):
 #                }
 #            )
             url = "/kontieren/%s.%s.%s-%s.%s.%s/" % (
-                start.day, start.month, start.year, 
+                start.day, start.month, start.year,
                 end.day, end.month, end.year,
             )
             return HttpResponseRedirect(url)
@@ -107,7 +107,7 @@ def kontieren(request, start, end):
         """
         day, month, year = [int(i) for i in date_string.split(".")]
         return datetime.date(year, month, day)
-        
+
     response = HttpResponse(mimetype='text/plain')
 
     old_stdout = sys.stdout

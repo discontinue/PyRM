@@ -8,12 +8,16 @@
     :copyleft: 2008-2011 by the PyRM team, see AUTHORS for more details.
     :license: GNU GPL v3, see LICENSE.txt for more details.
 """
+
+from __future__ import division, absolute_import
+
 from pprint import pprint
 
 from django.core.exceptions import ImproperlyConfigured
 
+
 def add_missing_fields(model_class, fieldsets,
-                    ignore_fields=set(("id",)), field_name = "missing fields"):
+                    ignore_fields=set(("id",)), field_name="missing fields"):
     """
     Util for adding all missing fields in a admin.ModelAdmin.fieldsets
     """

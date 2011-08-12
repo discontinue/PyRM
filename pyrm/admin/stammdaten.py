@@ -7,6 +7,7 @@
     :license: GNU GPL v3, see LICENSE.txt for more details.
 """
 
+from __future__ import division, absolute_import
 
 from django.contrib import admin
 
@@ -67,6 +68,9 @@ class KundeAdmin(VersionAdmin):
 #    inlines = (PersonInline,FirmaInline)
     list_display = ("nummer", "person", "firma", "lastupdatetime", "createtime")
     list_display_links = ("person", "firma")
+
+    # FIXME: search_fields = ("person", "firma")
+
 #    fieldsets = (
 #        ("Basis Daten", {
 #            'fields': (

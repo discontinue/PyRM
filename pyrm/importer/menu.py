@@ -9,6 +9,7 @@
     :license: GNU GPL v3, see LICENSE.txt for more details.
 """
 
+from __future__ import division, absolute_import
 import sys
 
 

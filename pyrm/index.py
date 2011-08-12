@@ -1,5 +1,15 @@
 # coding: utf-8
 
+"""
+    pyrm
+    ~~~~
+
+    :copyleft: 2008-2011 by the PyRM team, see AUTHORS for more details.
+    :license: GNU GPL v3, see LICENSE.txt for more details.
+"""
+
+from __future__ import division, absolute_import
+
 import sys
 
 from django.conf import settings

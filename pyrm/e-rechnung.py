@@ -27,11 +27,11 @@
         - verschieben/umbenennen der Dateien
         - SHA-1 checksum Datei könnte man beim Upload anlegen
 
-
-
     :copyleft: 2008-2011 by the PyRM team, see AUTHORS for more details.
     :license: GNU GPL v3, see LICENSE.txt for more details.
 """
+
+from __future__ import division, absolute_import
 
 import os
 import sys
@@ -47,7 +47,7 @@ from django.template import RequestContext
 from django.conf import settings
 from django import forms
 
-from django_addons.forms_addons import ExtFileField
+from pyrm.django_addons.forms_addons import ExtFileField
 from pyrm.models import Lieferant, Firma
 
 NEU_E_RECHNUNG = os.path.join(settings.PYRM.E_RECHNUNGEN_DIR, "neu")

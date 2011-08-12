@@ -1,7 +1,8 @@
 # coding: utf-8
+
 """
     pyrm - Rechnung
-    ~~~~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~
 
     + RechnungsPosten
     + Rechnung
@@ -10,23 +11,24 @@
     :license: GNU GPL v3, see LICENSE.txt for more details.
 """
 
+from __future__ import division, absolute_import
+
+from decimal import Decimal
 import datetime
+import warnings
+
+import reversion # django-reversion
+from creole import creole2html
 
 from django.conf import settings
+from django.contrib import messages
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
-
-import reversion # django-reversion
-
-from creole import creole2html
+from django_tools.middlewares import ThreadLocal
 
 from pyrm.models.base_models import BaseModel
-from decimal import Decimal
-from django_tools.middlewares import ThreadLocal
-from django.contrib import messages
-from django.core.exceptions import ValidationError
-import warnings
 
 #from pyrm.models.base_models import BASE_FIELDSET
 #from pyrm.utils.django_modeladmin import add_missing_fields
