@@ -9,6 +9,28 @@ function log() {
 log("pyrm_js_tools.js loaded.");
 
 
+function OpenInWindow(link) {
+    /*************************************************************************
+    Open link in a new JavaScript window.
+    Usage e.g.:
+        <a href="/foobar/" onclick="return OpenInWindow(this);">foobar</a>
+	  *************************************************************************/
+    log("OpenInWindow()");
+    var url = $(link).attr("href");
+    log("url:" + url);
+    
+    window_name=url;
+    window_name = window_name.indexOf('?') > -1 ? window_name.substr(0, window_name.indexOf('?')) : window_name;
+    window_name = window_name.indexOf('#') > -1 ? window_name.substr(0, window_name.indexOf('#')) : window_name;
+    log("window name:" + window_name);
+    
+    win = window.open(url, window_name, "width=960, height=760, dependent=yes, resizable=yes, scrollbars=yes");
+    win.focus();
+    return win;
+}
+
+
+
 var MIN_ROWS = 1;
 var MAX_ROWS = 25;
 
