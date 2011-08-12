@@ -10,6 +10,7 @@
 """
 
 import os
+import sys
 
 from setuptools import setup, find_packages
 
@@ -30,6 +31,7 @@ def get_authors():
 
 
 def get_long_description():
+    desc_creole = ""
     try:
         f = file(os.path.join(PACKAGE_ROOT, "README.creole"), "r")
         desc_creole = f.read()
@@ -42,9 +44,9 @@ def get_long_description():
         desc_html = creole2html(desc_creole)
         long_description = html2rest(desc_html)
     except Exception, err:
-        if len(sys.argv) > 1 and sys.argv[1] in ("--long-description", "sdist"):
+        if "sdist" in sys.argv or "--long-description" in sys.argv:
             raise
-        long_description = "[Error: %s]" % err
+        long_description = "[Error: %s]\n%s" % (err, desc_creole)
 
     return long_description
 
