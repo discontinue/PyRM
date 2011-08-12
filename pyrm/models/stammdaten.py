@@ -222,24 +222,32 @@ class Skonto(BaseModel):
 
 reversion.register(Skonto)
 
+
 #______________________________________________________________________________
 
-class KundeBase(BaseModel):
+
+class KundeLieferantStammdaten(BaseModel):
     """
-    Basis Klasse für Kunde und Lieferant
+    Gemeinsame Daten für Kunde (Debitor) und Lieferant (Kreditor).
+    
+    So hat man gemeinsame Daten, wenn ein und die selbe Firma/Person gleichzeitig
+    Kunde und Lieferant ist.
     """
     person = models.ForeignKey(
         Person, null=True, blank=True,
         related_name="%(class)s_person"
+    )
+    anzeigen = models.BooleanField(
+        help_text="Name der Person auf Rechnungen mit anzeigen, wenn es eine Firma ist?"
     )
     firma = models.ForeignKey(
         Firma, null=True, blank=True,
         related_name="%(class)s_firma"
     )
 
-    lieferranten_nr = models.TextField(blank=True, null=True)
-
-    seid = models.DateField(auto_now_add=True, null=True, blank=True)
+    seid = models.DateField(auto_now_add=True, null=True, blank=True,
+        help_text="Datum seid wann die Kunden-/Liefer-Beziehung besteht"
+    )
 
     lieferstop_datum = models.DateField(blank=True, null=True)
     lieferstop_grund = models.TextField(blank=True, null=True)
@@ -250,11 +258,11 @@ class KundeBase(BaseModel):
     )
     skonto = models.ManyToManyField(Skonto, verbose_name="Skonto liste",
         blank=True, null=True,
-        help_text="FIXME"
+        help_text="Skonto des Kunden bzw. beim Lieferanten"
     )
 
     def clean_fields(self, exclude):
-        super(KundeBase, self).clean_fields(exclude)
+        super(KundeLieferantBase, self).clean_fields(exclude)
 
         if "person" not in exclude and "firma" not in exclude:
             if self.person is None and self.firma is None:
@@ -263,30 +271,39 @@ class KundeBase(BaseModel):
                     "person": msg, "firma": msg
                 })
 
+    def __unicode__(self):
+        if self.firma:
+            if self.anzeigen:
+                return u"%s - %s" % (self.firma, self.person)
+            else:
+                return u"%s" % self.firma
+        else:
+            return u"%s" % self.person
+
     class Meta:
-        # http://www.djangoproject.com/documentation/model-api/#abstract-base-classes
-        abstract = True # Abstract base classes
+        app_label = "pyrm"
+        ordering = ('-lastupdatetime',)
+        verbose_name = "Kunde/Lieferant Stammdaten"
+        verbose_name_plural = "Kunde/Lieferant Stammdaten"
 
-#______________________________________________________________________________
 
-
-class Kunde(KundeBase):
+class Kunde(BaseModel):
     """
-    Firmen- und Privat-Kunden für Rechnungen.
+    Kunde (Debitor) an den man Rechnungen schreibt.
     """
-    nummer = models.IntegerField(
-        primary_key=True,
-        help_text="Kundennummer Nummer"
-    )
-    anzeigen = models.BooleanField(
-        help_text="Name der Person mit anzeigen, wenn es eine Firma ist?"
+    kunden_nr = models.AutoField(primary_key=True,
+        help_text="Kundennummer für Rechnungen an den Kunden"
     )
 
-    lieferrantennr = models.CharField(
+    stammdaten = models.ForeignKey(KundeLieferantStammdaten,
+        help_text="Stammdaten des Kunden."
+    )
+
+    lieferranten_nr = models.CharField(
         max_length=128, blank=True, null=True,
         help_text=(
-            "Lieferrantennummer bei dieser Firma, falls vorhanden."
-            " Wird auf jeder Rechnung aufgeführt"
+            "Eigene Lieferrantennummer bei dieser Firma, falls vorhanden."
+            " Wird auf jeder Rechnung an die Firma aufgeführt"
         )
     )
 
@@ -316,13 +333,7 @@ class Kunde(KundeBase):
         return xrange(self.anzahl_rechnungskopie)
 
     def __unicode__(self):
-        if self.firma:
-            if self.anzeigen:
-                return u"%s - %s" % (self.firma, self.person)
-            else:
-                return u"%s" % self.firma
-        else:
-            return u"%s" % self.person
+        return u"Kunde %s" % self.stammdaten
 
     class Meta:
         app_label = "pyrm"
@@ -330,36 +341,35 @@ class Kunde(KundeBase):
         verbose_name = "Kunde"
         verbose_name_plural = "Kunden"
 
-
-
 reversion.register(Kunde)
 
 
-#______________________________________________________________________________
-
-class Lieferant(KundeBase):
+class Lieferant(BaseModel):
     """
-    Lieferanten für die Ausgaben/Eingansrechnungen
+    Lieferant (Kreditor) von dem man Rechnungen erhält.
     """
-    nummer = models.AutoField(
-        primary_key=True,
-        help_text="Lieferranten Nummer"
+    lieferranten_nr = models.AutoField(primary_key=True,
+        help_text="interne Lieferanten Nummer"
     )
-    kundennummer = models.CharField(
-        max_length=128, null=True, blank=True,
-        help_text="Kundennummer bei diesem Lieferrant.",
+
+    stammdaten = models.ForeignKey(KundeLieferantStammdaten,
+        help_text="Stammdaten des Lieferanten."
+    )
+
+    kunden_nr = models.CharField(
+        max_length=128, blank=True, null=True,
+        help_text="Kundennummer die man bei diesem Lieferanten hat."
     )
 
     def __unicode__(self):
-        items = (str(self.nummer), unicode(self.firma), self.person)
-        return u" - ".join([i for i in items if i])
+        return u"Lieferant %s" % self.stammdaten
 
     class Meta:
         app_label = "pyrm"
+        ordering = ('-lastupdatetime',)
         verbose_name = "Lieferant"
         verbose_name_plural = "Lieferanten"
-        ordering = ('-lastupdatetime',)
-#        ordering = ("firma", "person")
-
 
 reversion.register(Lieferant)
+
+

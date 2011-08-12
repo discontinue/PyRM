@@ -57,6 +57,9 @@ print "syncdb..."
 management.call_command('syncdb', verbosity=1, interactive=False)
 print "-" * 80
 
+print "load initial data..."
+management.call_command('loaddata', "pyrm.json", verbosity=1, interactive=False)
+print "-" * 80
 
 USERNAME = "test"
 PASSWORD = "12345678"

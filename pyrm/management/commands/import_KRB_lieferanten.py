@@ -1,5 +1,7 @@
 # coding: utf-8
 
+from __future__ import division, absolute_import
+
 import os
 from datetime import datetime
 import pprint
@@ -8,9 +10,9 @@ from django.core.management.base import BaseCommand, CommandError
 
 import reversion # django-reversion
 
-from pyrm.models import Firma, Person, Kunde, Ort
+from pyrm.models import Firma, Person, Kunde, Lieferant, Ort
 from pyrm.utils.csv_utils import get_dictlist
-from pyrm.models.stammdaten import Lieferant
+from pyrm.models.stammdaten import KundeLieferantStammdaten
 
 
 
@@ -71,13 +73,6 @@ class Command(BaseCommand):
             else:
                 nummer = None
 
-            lieferant, created = Lieferant.objects.get_or_create(nummer=nummer)
-            if created:
-                self.stdout.write("Neuer Lieferant wird erstellt: %s\n" % lieferant)
-            else:
-                self.stdout.write("Lieferant schon vorhanden: %s\n" % lieferant)
-                continue
-
             orts_name = line["Ort"]
             if orts_name:
                 ort, created = Ort.objects.get_or_create(name=orts_name)
@@ -107,6 +102,22 @@ class Command(BaseCommand):
                 self.stdout.write("Vorhandene Firma genutzt: %s\n" % firma)
             firma.save()
             reversion.revision.comment = "KRB lieferanten import"
+
+
+            stammdaten = KundeLieferantStammdaten(firma=firma)
+            stammdaten.save()
+            reversion.revision.comment = "KRB import"
+            print "KundeLieferantStammdaten erstellt:", stammdaten
+
+            lieferant, created = Lieferant.objects.get_or_create(
+                lieferranten_nr=nummer,
+                defaults={"stammdaten":stammdaten}
+            )
+            if created:
+                self.stdout.write("Neuer Lieferant wird erstellt: %s\n" % lieferant)
+            else:
+                self.stdout.write("Lieferant schon vorhanden: %s\n" % lieferant)
+                continue
 
             info = []
             for i in range(2):

@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.conf import settings
 
-from pyrm.models import Firma, Person, Kunde, Ort
+from pyrm.models import Firma, Person, Kunde, Lieferant, Ort
 from pyrm.importer.menu import _sub_menu, _start_view
 
 
@@ -37,6 +37,7 @@ def kundenliste():
     Person.objects.all().delete()
     Firma.objects.all().delete()
     Kunde.objects.all().delete()
+    Lieferant.objects.all().delete()
 
     cursor.execute("SELECT * FROM ADRESSEN;")
     for line in cursor:
@@ -87,39 +88,39 @@ def kundenliste():
 #            print "g:", geschlecht
 
             person, created = Person.objects.get_or_create(
-                vorname = vorname,
-                nachname = nachname,
-                geschlecht = geschlecht,
+                vorname=vorname,
+                nachname=nachname,
+                geschlecht=geschlecht,
 
                 #seid =
 
-                strasse = line["STRASSE"],
-                plz = int(line["PLZ"]),
-                ort = ort,
+                strasse=line["STRASSE"],
+                plz=int(line["PLZ"]),
+                ort=ort,
 
-                internet = line.get("INTERNET"),
-                email = line.get("EMAIL"),
-                telefon = line["TELE1"],
-                fax = line.get("FAX"),
-                mobile = line.get("FUNK"),
+                internet=line.get("INTERNET"),
+                email=line.get("EMAIL"),
+                telefon=line["TELE1"],
+                fax=line.get("FAX"),
+                mobile=line.get("FUNK"),
             )
             person.save()
             #print person
         elif gruppe == 2:
             pprint(line)
             firma = Firma(
-                name1 = line["NAME1"],
-                name2 = line["NAME2"],
+                name1=line["NAME1"],
+                name2=line["NAME2"],
 
-                strasse = line["STRASSE"],
-                plz = int(line["PLZ"]),
-                ort = ort,
+                strasse=line["STRASSE"],
+                plz=int(line["PLZ"]),
+                ort=ort,
 
-                internet = line.get("INTERNET"),
-                email = line.get("EMAIL"),
-                telefon = line["TELE1"],
-                fax = line.get("FAX"),
-                mobile = line.get("FUNK"),
+                internet=line.get("INTERNET"),
+                email=line.get("EMAIL"),
+                telefon=line["TELE1"],
+                fax=line.get("FAX"),
+                mobile=line.get("FUNK"),
             )
             firma.save()
 
@@ -136,7 +137,7 @@ def kundenliste():
 
 
         kundennummer = int(line["KUNNUM1"])
-#        kunde = Kunde(
+#        kunde = KundeLieferant(
 #            id = kundennummer,
 #            person = person,
 #            firma = firma,

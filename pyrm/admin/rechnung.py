@@ -20,6 +20,9 @@ from pyrm.models.rechnung import RechnungsPosten, Rechnung
 from pyrm.utils.django_modeladmin import add_missing_fields
 
 
+class StatusAdmin(VersionAdmin):
+    pass
+
 class RechnungsPostenAdmin(VersionAdmin):
     list_display = (
         "beschreibung", "menge", "einzelpreis", "einheit", "rechnung"
@@ -68,9 +71,9 @@ def export_rechnung_as_csv(modeladmin, request, queryset):
 
 class RechnungAdmin(VersionAdmin):
     inlines = (PostenInline,)
-    list_display = ("nummer", "kunde", "summe", "print_link", "datum", "valuta", "lastupdatetime")
-    list_display_links = ("nummer", "kunde")
-    list_filter = ("mahnstufe", "kunde",)
+    list_display = ("kunde", "summe", "print_link", "datum", "valuta", "lastupdatetime")
+    list_display_links = ("kunde",)
+    list_filter = ("mahnstufe", "status", "rechnungs_typ", "kunde",)
     list_per_page = 20
     list_select_related = True
     search_fields = ['foreign_key__related_fieldname']

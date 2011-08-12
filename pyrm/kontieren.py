@@ -25,7 +25,7 @@ from django.conf import settings
 from django import forms
 
 from pyrm.django_addons.forms_addons import QuarterChoiceField
-from pyrm.models import Rechnung, RechnungsPosten, Firma, Person, Kunde, Ort
+from pyrm.models import Rechnung, RechnungsPosten, Firma, Person, Kunde, Lieferant, Ort
 from pyrm.utils.unicode_stringio import UnicodeStringIO
 
 

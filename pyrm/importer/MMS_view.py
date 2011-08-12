@@ -13,7 +13,7 @@ from django.shortcuts import render_to_response
 
 from django.conf import settings
 
-from pyrm.models import Rechnung, RechnungsPosten, Firma, Person, Kunde, Ort
+from pyrm.models import Rechnung, RechnungsPosten, Firma, Person, Kunde, Lieferant, Ort
 from pyrm.importer.menu import _sub_menu, _start_view
 from pyrm.utils.csv_utils import get_csv_tables, get_dictlist
 
@@ -186,9 +186,9 @@ def transfer_buchungen():
                 # Kunden nummer + Rechnungsnimmer in Kommentar
 #                print kunden_nr, re_nr
                 try:
-                    kunde = Kunde.objects.get(nummer=kunden_nr)
-                except Kunde.DoesNotExist, err:
-                    print "FEHLER: Kunde %s nicht gefunden: %s" % (
+                    kunde = KundeLieferant.objects.get(nummer=kunden_nr)
+                except KundeLieferant.DoesNotExist, err:
+                    print "FEHLER: KundeLieferant %s nicht gefunden: %s" % (
                         kunden_nr, err
                     )
 

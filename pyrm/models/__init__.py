@@ -14,5 +14,4 @@ from __future__ import division, absolute_import
 from django.db.models import signals
 
 from pyrm.models.stammdaten import Ort, Person, Firma, Kunde, Lieferant
-from pyrm.models.rechnung import Rechnung, RechnungsPosten
-from pyrm.models.ausgaben import Ausgaben
+from pyrm.models.rechnung import Rechnung, RechnungsPosten, Status

@@ -13,26 +13,25 @@ from django.contrib import admin
 from django.core import serializers
 from django.http import HttpResponse
 
-from pyrm.admin.ausgaben import AusgabenAdmin
-from pyrm.admin.rechnung import RechnungsPostenAdmin, RechnungAdmin
+from pyrm.admin.rechnung import StatusAdmin, RechnungsPostenAdmin, RechnungAdmin
 from pyrm.admin.stammdaten import OrtAdmin, PersonAdmin, FirmaAdmin, SkontoAdmin, \
-    KundeAdmin, LieferantAdmin
-from pyrm.models.ausgaben import Ausgaben
-from pyrm.models.rechnung import RechnungsPosten, Rechnung
-from pyrm.models.stammdaten import Ort, Person, Firma, Skonto, Kunde, Lieferant
+    KundeLieferantStammdatenAdmin, KundeAdmin, LieferantAdmin
+from pyrm.models.rechnung import Status, RechnungsPosten, Rechnung
+from pyrm.models.stammdaten import Ort, Person, Firma, Skonto, KundeLieferantStammdaten, Kunde, Lieferant
 
 
+admin.site.register(Status, StatusAdmin)
 admin.site.register(RechnungsPosten, RechnungsPostenAdmin)
 admin.site.register(Rechnung, RechnungAdmin)
-admin.site.register(Ausgaben, AusgabenAdmin)
 
 admin.site.register(Ort, OrtAdmin)
 admin.site.register(Person, PersonAdmin)
 admin.site.register(Firma, FirmaAdmin)
 
 admin.site.register(Skonto, SkontoAdmin)
-admin.site.register(Kunde, KundeAdmin)
 
+admin.site.register(KundeLieferantStammdaten, KundeLieferantStammdatenAdmin)
+admin.site.register(Kunde, KundeAdmin)
 admin.site.register(Lieferant, LieferantAdmin)
 
 

@@ -3,9 +3,13 @@
 import os
 import sys
 
+# Used by a few dynamic settings:
+RUN_WITH_DEV_SERVER = "runserver" in sys.argv
+
 _cwd = os.getcwd()
 sys.path.insert(0, _cwd)
-print "Current work dir:", _cwd
+if RUN_WITH_DEV_SERVER:
+    print "Current work dir:", _cwd
 
 try:
     #from django_tools.utils import info_print;info_print.redirect_stdout()
@@ -169,15 +173,17 @@ try:
     from local_settings import *
 except ImportError, err:
     if str(err) == "No module named local_settings":
-        msg = (
-            "You should create a local_settings.py file in '%s' !"
-            " (Original error was: %s)\n"
-        ) % (_cwd, err)
-        sys.stderr.write(msg)
-        #from django.core.exceptions import ImproperlyConfigured
-        #raise ImproperlyConfigured(msg)
+        if RUN_WITH_DEV_SERVER:
+            msg = (
+                "You should create a local_settings.py file in '%s' !"
+                " (Original error was: %s)\n"
+            ) % (_cwd, err)
+            sys.stderr.write(msg)
+            #from django.core.exceptions import ImproperlyConfigured
+            #raise ImproperlyConfigured(msg)
     else:
         raise
 else:
-    print "Use %r, ok." % _local_settings.__file__
+    if RUN_WITH_DEV_SERVER:
+        print "Use %r, ok." % _local_settings.__file__
     del(_local_settings)

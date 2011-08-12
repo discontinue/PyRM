@@ -187,24 +187,62 @@ class RechnungManager(models.Manager):
         return oldest, newest
 
 
+class Status(BaseModel):
+    bezeichnung = models.CharField(
+        max_length=128,
+        help_text="Status Bezeichnung für Ein-/Ausgangsrechnungen"
+    )
+    def __unicode__(self):
+        return self.bezeichnung
+
+    class Meta:
+        app_label = "pyrm"
+        verbose_name = "Rechnungsstaus"
+        verbose_name_plural = "Rechnungsstaus"
+
+
 class Rechnung(BaseModel):
     """
-    Rechnungen die man selber erstellt.
+    Ein- und Ausgangsrechnungen.
     
     TODO:
         * raise ValidationError() wenn eine Rechnung ohne eine RechnungsPosition erstellt wird.
     """
     objects = RechnungManager()
 
-    nummer = models.AutoField(
-        primary_key=True,
-        help_text="Rechnungs Nummer"
+    ausgangs_re_nr = models.PositiveIntegerField(
+        db_index=True, null=True, blank=True,
+        help_text="Rechnungs Nummer bei Ausgangsrechnung für den Kunden."
+    )
+    eingangs_re_nr = models.CharField(
+        max_length=128, null=True, blank=True,
+        help_text="Rechnungs Nummer bei zu bezahlender Eingangsrechnung."
     )
 
-    kunde = models.ForeignKey("Kunde", null=True, blank=True)
+    lieferant = models.ForeignKey("Lieferant", null=True, blank=True,
+        help_text="Lieferant bei zu bezahlender Eingangsrechnung",
+    )
+    kunde = models.ForeignKey("Kunde", null=True, blank=True,
+        help_text="Kunde dieser Ausgangsrechnung",
+    )
     anschrift = models.TextField(
         help_text="Abweichende Anschrift",
         null=True, blank=True
+    )
+
+    EINGANGRE = "E"
+    AUSGANGRE = "A"
+    TYP_CHOICES = (
+        (EINGANGRE, "Eingangsrechnung"),
+        (AUSGANGRE, "Ausgangsrechnung"),
+    )
+    rechnungs_typ = models.CharField(
+        max_length=1, choices=TYP_CHOICES, null=True, blank=True,
+        help_text=(
+            "Legt fest ob dies eine"
+            " zu bezahlender Eingangsrechnung eines Lieferanten"
+            " oder eine Ausgangsrechnung für den Kunden ist."
+        )
     )
 
     bestellnummer = models.CharField(
@@ -227,9 +265,49 @@ class Rechnung(BaseModel):
         help_text="Versanddatum der Rechnung."
     )
 
+    status = models.ForeignKey("Status")
+
     mahnstufe = models.PositiveIntegerField(default=0,
         help_text="Anzahl der verschickten Mahnungen."
     )
+
+    def clean_fields(self, exclude):
+        super(Rechnung, self).clean_fields(exclude)
+
+        if "lieferant" not in exclude and "kunde" not in exclude:
+            msg = None
+            if self.lieferant is None and self.kunde is None:
+                msg = ("Lieferant und Kunde können nicht beide leer sein!",)
+
+            if self.lieferant is not None and self.kunde is not None:
+                msg = ("Lieferant und Kunde können nicht gleichzeitig gesetzt sein!",)
+
+            if msg is not None:
+                raise ValidationError({
+                    "lieferant": msg, "kunde": msg
+                })
+
+        if "rechnungs_typ" not in exclude \
+                and "lieferant" not in exclude \
+                and "kunde" not in exclude:
+            if self.rechnungs_typ is None:
+                raise ValidationError({
+                    "rechnungs_typ": "Sollte Automatisch ausgefüllt werden!",
+                })
+            error_msg = {}
+            if self.rechnungs_typ == self.AUSGANGRE:
+                if self.lieferant is not None:
+                    error_msg["lieferant"] = ("Lieferant darf bei einer Ausgangsrechnung nicht gesetzt sein.")
+                if self.kunde is None:
+                    error_msg["kunde"] = ("Kunde muß bei einer Ausgangsrechnung angegeben werden!")
+            if self.rechnungs_typ == self.EINGANGRE:
+                if self.lieferant is None:
+                    error_msg["lieferant"] = ("Lieferant muß bei Eingangsrechnung gesetzt sein.")
+                if self.kunde is not None:
+                    error_msg["kunde"] = ("Kunde darf bei einer Eingangsrechnung nicht angegeben werden!")
+            if error_msg:
+                raise ValidationError(error_msg)
+
 
     def check_posten(self, rechnungs_posten):
         """
@@ -262,6 +340,8 @@ class Rechnung(BaseModel):
                     warnings.warn("Konvertiere datetime %r zu %r bei %r" % (current_value, new_value, attname))
 
     def save(self, *args, **kwargs):
+#        if self.status == None:
+#            self.status = Status.objects.get(bezeichnung="unbekannt")
         self._fix_date_fields()
         super(Rechnung, self).save(*args, **kwargs)
 
@@ -321,7 +401,10 @@ class Rechnung(BaseModel):
         return render_to_string("pyrm/html_print/rechnung.html", context)
 
     def __unicode__(self):
-        return u"Re.Nr.%s vom %s (valuta: %s) - %i€" % (self.nummer, self.datum, self.valuta, self.summe())
+        if self.rechnungs_typ == self.AUSGANGRE:
+            return u"AusgangsRe.: %r vom %s (valuta: %s) - %i€" % (self.ausgangs_re_nr, self.datum, self.valuta, self.summe())
+        else:
+            return u"EingansRe.: %r vom %s (valuta: %s) - %i€" % (self.eingangs_re_nr, self.datum, self.valuta, self.summe())
 
     class Meta:
         app_label = "pyrm"

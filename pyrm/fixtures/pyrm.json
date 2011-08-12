@@ -1,0 +1,74 @@
+[
+    {
+        "pk": 1, 
+        "model": "pyrm.status", 
+        "fields": {
+            "createby": 1, 
+            "lastupdatetime": "2011-08-12 17:03:13", 
+            "notizen": "Diese Rechnung ist nur ein Entwurf, der noch nicht zum ausdrucken fertig gestellt ist.", 
+            "bezeichnung": "Entwurf", 
+            "lastupdateby": 1, 
+            "createtime": "2011-08-12 17:03:13"
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "pyrm.status", 
+        "fields": {
+            "createby": 1, 
+            "lastupdatetime": "2011-08-12 17:03:41", 
+            "notizen": "Noch nicht bezahlte Rechnung.", 
+            "bezeichnung": "offen", 
+            "lastupdateby": 1, 
+            "createtime": "2011-08-12 17:03:41"
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "pyrm.status", 
+        "fields": {
+            "createby": 1, 
+            "lastupdatetime": "2011-08-12 17:03:53", 
+            "notizen": "Bezahlte Rechnung.", 
+            "bezeichnung": "bezahlt", 
+            "lastupdateby": 1, 
+            "createtime": "2011-08-12 17:03:53"
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "pyrm.status", 
+        "fields": {
+            "createby": 1, 
+            "lastupdatetime": "2011-08-12 17:04:35", 
+            "notizen": "\u00dcberf\u00e4llige Rechnung.", 
+            "bezeichnung": "\u00fcberf\u00e4llig", 
+            "lastupdateby": 1, 
+            "createtime": "2011-08-12 17:04:35"
+        }
+    }, 
+    {
+        "pk": 5, 
+        "model": "pyrm.status", 
+        "fields": {
+            "createby": 1, 
+            "lastupdatetime": "2011-08-12 17:05:00", 
+            "notizen": "Stornierte Rechnung.", 
+            "bezeichnung": "storniert", 
+            "lastupdateby": 1, 
+            "createtime": "2011-08-12 17:05:00"
+        }
+    },
+    {
+        "pk": 6, 
+        "model": "pyrm.status", 
+        "fields": {
+            "createby": 1, 
+            "lastupdatetime": "2011-08-12 17:07:01", 
+            "notizen": "Status der Rechnung ist unbekannt und sollte gepr\u00fcft werden", 
+            "bezeichnung": "unbekannt", 
+            "lastupdateby": 1, 
+            "createtime": "2011-08-12 17:07:01"
+        }
+    }
+]

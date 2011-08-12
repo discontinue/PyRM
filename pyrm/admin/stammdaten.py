@@ -63,11 +63,14 @@ class SkontoAdmin(VersionAdmin):
 
 
 
+class KundeLieferantStammdatenAdmin(VersionAdmin):
+    pass
+
 
 class KundeAdmin(VersionAdmin):
 #    inlines = (PersonInline,FirmaInline)
-    list_display = ("nummer", "person", "firma", "lastupdatetime", "createtime")
-    list_display_links = ("person", "firma")
+    list_display = ("kunden_nr", "stammdaten", "lastupdatetime", "createtime")
+#    list_display_links = ("person", "firma")
 
     # FIXME: search_fields = ("person", "firma")
 

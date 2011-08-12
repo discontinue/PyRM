@@ -1,5 +1,7 @@
 # coding: utf-8
 
+from __future__ import division, absolute_import
+
 import os
 from datetime import datetime
 import pprint
@@ -8,8 +10,9 @@ from django.core.management.base import BaseCommand, CommandError
 
 import reversion # django-reversion
 
-from pyrm.models import Firma, Person, Kunde, Ort
+from pyrm.models import Firma, Person, Kunde, Lieferant, Ort
 from pyrm.utils.csv_utils import get_dictlist
+from pyrm.models.stammdaten import KundeLieferantStammdaten
 
 
 
@@ -43,7 +46,7 @@ class Command(BaseCommand):
 #        Ort.objects.all().delete()
 #        Person.objects.all().delete()
 #        Firma.objects.all().delete()
-#        Kunde.objects.all().delete()
+#        KundeLieferant.objects.all().delete()
 
         for line in _get_dictlist(filepath):
             if self.verbosity >= 3:
@@ -73,19 +76,25 @@ class Command(BaseCommand):
             else:
                 anzeigen = False
 
-            kwargs = {
-                "nummer": kundennummer,
-                "person": person,
-                "firma": firma,
-                "anzeigen": anzeigen,
-            }
-    #        self.stdout.write(repr(kwargs)
-            try:
-                kunde = Kunde(**kwargs)
-                kunde.save()
-                reversion.revision.comment = "KRB import"
-            except Exception, err:
-                self.stdout.write("Fehler: %s\n" % err)
+            stammdaten = KundeLieferantStammdaten(
+                person=person,
+                firma=firma,
+                anzeigen=anzeigen,
+            )
+            stammdaten.save()
+            reversion.revision.comment = "KRB import"
+            print "KundeLieferantStammdaten erstellt:", stammdaten
+
+            kunde, created = Kunde.objects.get_or_create(
+                kunden_nr=kundennummer,
+                defaults={"stammdaten":stammdaten}
+            )
+            if created:
+                self.stdout.write("Neuer Kunde wird erstellt: %s\n" % kunde)
+            else:
+                self.stdout.write("Kunde schon vorhanden: %s\n" % kunde)
+            kunde.save()
+            reversion.revision.comment = "KRB import"
 
     def get_kunden_obj(self, line):
         if line['spezielle Adresszeile']:

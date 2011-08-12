@@ -111,7 +111,7 @@ class Command(BaseCommand):
                     if umsatz == total_brutto:
                         if self.verbosity:
                             self.stdout.write("Rechnung mit richtigem Umsatz gefunden: %s\n" % rechnung)
-                        if str(rechnung.nummer) in line["Vorgang/Verwendungszweck"]:
+                        if str(rechnung.ausgangs_re_nr) in line["Vorgang/Verwendungszweck"]:
                             if self.verbosity:
                                 self.stdout.write("Rechnungsnummer in Verwendungszweck gefunden.\n")
                             matched_rechnungen.append(rechnung)

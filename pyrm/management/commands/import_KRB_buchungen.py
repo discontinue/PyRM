@@ -13,7 +13,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from pyrm.models import Kunde, Lieferant, Rechnung, RechnungsPosten
 from pyrm.utils.csv_utils import get_dictlist
-from pyrm.models.ausgaben import Ausgaben
+from pyrm.models.rechnung import Status
 
 
 
@@ -35,7 +35,7 @@ def _get_decimal(raw_summe):
 
 def _get_datum(raw_datum):
     if raw_datum != "":
-        return datetime.strptime(raw_datum, "%d.%m.%y")
+        return datetime.strptime(raw_datum, "%d.%m.%y").date()
 
 
 RE_TEXT_REXP = re.compile(r"^(\d+)[x ]+(.*?)[a ]+([\d,]+)$")
@@ -83,10 +83,8 @@ class Command(BaseCommand):
         except RechnungsPosten.DoesNotExist:
             pass
 
-        try:
-            Ausgaben.objects.all().delete()
-        except Ausgaben.DoesNotExist:
-            pass
+        status_offen = Status.objects.get(bezeichnung="offen")
+        status_bezahlt = Status.objects.get(bezeichnung="bezahlt")
 
         for line in _get_dictlist(filepath):
             notiz = ""
@@ -124,18 +122,6 @@ class Command(BaseCommand):
             else:
                 kunden_nummer2 = int(kunden_nummer1)
 
-
-            if summe > 0: # Ausgangsrechnung
-                if kunden_nummer2 is not None:
-                    kunde = Kunde.objects.get(nummer=kunden_nummer2)
-                if self.verbosity >= 3:
-                    self.stdout.write("Kunde: %r\n" % kunde)
-            else: # Eingangsrechnung/Ausgaben
-                if kunden_nummer2 is not None:
-                    lieferant = Lieferant.objects.get(nummer=kunden_nummer2)
-                if self.verbosity >= 3:
-                    self.stdout.write("Lieferant: %r\n" % kunde)
-
             #----------------------------------------------------------------------
 
             datum = _get_datum(raw_datum=line["R.Datum"])
@@ -167,32 +153,57 @@ class Command(BaseCommand):
 
             #----------------------------------------------------------------------
 
-            if summe < 0:
-                ausgaben = Ausgaben(
+            if valuta:
+                status = status_bezahlt
+            else:
+                status = status_offen
+
+            kunde = None
+            lieferant = None
+
+            if summe > 0:
+                # Ausgangsrechnung
+                if re_nr == None:
+                    self.stderr.write("Fehler: Rechnung ohne Re.Nummer???\n")
+                    pprint.pprint(line)
+                    continue
+
+                if kunden_nummer2 is not None:
+                    kunde = Kunde.objects.get(kunden_nr=kunden_nummer2)
+                if self.verbosity >= 3:
+                    self.stdout.write("Kunde: %r\n" % kunde)
+
+                rechnung, created = Rechnung.objects.get_or_create(
+                    ausgangs_re_nr=re_nr,
+                    defaults={
+                        "createtime":datum,
+
+                        "rechnungs_typ":Rechnung.AUSGANGRE,
+                        "status":status,
+
+                        "kunde":kunde,
+                        "datum":datum,
+                        "valuta":valuta,
+                    }
+                )
+                if not created:
+                    self.stderr.write("*** Fehler: Re mit Nr. %s schon vorhanden!" % re_nr)
+                    continue
+            else:
+                # Eingangsrechnung/Ausgaben
+                if kunden_nummer2 is not None:
+                    lieferant = Lieferant.objects.get(lieferranten_nr=kunden_nummer2)
+                if self.verbosity >= 3:
+                    self.stdout.write("Lieferant: %r\n" % lieferant)
+                rechnung = Rechnung(
+                    rechnungs_typ=Rechnung.EINGANGRE,
+                    status=status,
+                    createtime=datum,
                     lieferant=lieferant,
-                    beschreibung=line["Rechnungstext"],
-                    betrag=summe,
                     datum=datum,
                     valuta=valuta,
                 )
-                ausgaben.save()
-                reversion.revision.comment = "KRB import"
-                self.stdout.write("Ausgaben - Rechnung %s erstellt.\n" % ausgaben)
-                continue
 
-
-            if re_nr == None:
-                self.stdout.write("Fehler: Rechnung ohne Re.Nummer???\n")
-                continue
-
-            rechnung = Rechnung(
-                createtime=datum,
-
-                nummer=re_nr,
-                kunde=kunde,
-                datum=datum,
-                valuta=valuta,
-            )
             rechnung.save()
             reversion.revision.comment = "KRB import"
 
@@ -206,6 +217,6 @@ class Command(BaseCommand):
                 p.save()
                 reversion.revision.comment = "KRB import"
 
-            self.stdout.write("Einnahme - Rechnung %s erstellt.\n" % rechnung)
+            self.stdout.write("Rechnung %s erstellt.\n" % rechnung)
 
 
