@@ -1,6 +1,10 @@
 <strong>	
-<a href="{% url pyrm-rechnung_drucken instance.pk %}{% if is_copy %}?is_copy=true{% endif %}" target="_blank"
- title="drucken {% if is_copy %}einer Rechnungs *kopie*{% else %}der Rechnung{% endif %} (öffnet neuen Tab/Fenster)">
+<a href="{% url pyrm-rechnung_drucken instance.pk %}" target="_blank"
+ title="drucken (öffnet neuen Tab/Fenster)">
     drucken
 </a>
-</strong>
+</strong><br/>
+<a href="{% url pyrm-rechnung_drucken instance.pk %}?html" target="_blank"
+ title="einfache html Voransicht (öffnet neuen Tab/Fenster)">
+    preview
+</a>
