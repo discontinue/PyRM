@@ -18,7 +18,10 @@ from pyrm.admin.stammdaten import OrtAdmin, PersonAdmin, FirmaAdmin, SkontoAdmin
     KundeLieferantStammdatenAdmin, KundeAdmin, LieferantAdmin
 from pyrm.models.rechnung import Status, RechnungsPosten, Rechnung
 from pyrm.models.stammdaten import Ort, Person, Firma, Skonto, KundeLieferantStammdaten, Kunde, Lieferant
+from pyrm.models.konten import Konto
+from pyrm.admin.konto import KontoAdmin
 
+admin.site.register(Konto, KontoAdmin)
 
 admin.site.register(Status, StatusAdmin)
 admin.site.register(RechnungsPosten, RechnungsPostenAdmin)

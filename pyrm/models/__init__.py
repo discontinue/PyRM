@@ -15,3 +15,4 @@ from django.db.models import signals
 
 from pyrm.models.stammdaten import Ort, Person, Firma, Kunde, Lieferant
 from pyrm.models.rechnung import Rechnung, RechnungsPosten, Status
+from pyrm.models.konten import Konto
