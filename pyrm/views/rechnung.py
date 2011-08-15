@@ -14,7 +14,11 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 
-from xhtml2pdf.document import pisaDocument
+try:
+    from xhtml2pdf.document import pisaDocument
+except ImportError, err:
+    print "Error: xhtml2pdf is not installed!"
+    print "Original error: %s" % err
 
 from pyrm.models.rechnung import Rechnung
 
