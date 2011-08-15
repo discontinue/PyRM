@@ -49,6 +49,17 @@ class RechnungsPosten(BaseModel):
         "Rechnung", #related_name="positionen"
     )
 
+    konto = models.ForeignKey("Konto", null=True, blank=True,
+        related_name='+', # didn't create a backwards relation
+        on_delete=models.PROTECT, # Prevent deletion of the referenced object
+        #help_text=u""
+    )
+    gegenkonto = models.ForeignKey("Konto", null=True, blank=True,
+        related_name='+', # didn't create a backwards relation
+        on_delete=models.PROTECT, # Prevent deletion of the referenced object
+        #help_text=u""
+    )
+
     beschreibung = models.TextField(
         help_text=u"Rechnungstext für diese Position."
     )
@@ -99,9 +110,19 @@ class RechnungsPosten(BaseModel):
                 messages.debug(request, "Auto add order numer %i to %r" % (self.order, self.beschreibung))
 
     def save(self, *args, **kwargs):
+        self.set_rechnung_summe()
         if self.order is None:
             self.auto_order_posten()
         super(RechnungsPosten, self).save(*args, **kwargs)
+
+    def set_rechnung_summe(self):
+        total_summe = self.summe()
+        queryset = RechnungsPosten.objects.filter(rechnung=self.rechnung).exclude(pk=self.pk).only("menge", "einzelpreis")
+        for posten in queryset:
+            total_summe += posten.summe()
+        self.rechnung.summe = total_summe
+        self.rechnung.save()
+#        print "Summe %s bei Rechnung %s gesetzt." % (total_summe, self.rechnung)
 
     def clean(self):
         from django.core.exceptions import ValidationError
@@ -236,6 +257,7 @@ class Rechnung(BaseModel):
         (EINGANGRE, "Eingangsrechnung"),
         (AUSGANGRE, "Ausgangsrechnung"),
     )
+    TYP_DICT = dict(TYP_CHOICES)
     rechnungs_typ = models.CharField(
         max_length=1, choices=TYP_CHOICES, null=True, blank=True,
         help_text=(
@@ -269,6 +291,13 @@ class Rechnung(BaseModel):
 
     mahnstufe = models.PositiveIntegerField(default=0,
         help_text="Anzahl der verschickten Mahnungen."
+    )
+
+    summe = models.DecimalField(
+        # Wichtig, damit man schnell nach einer Rechnung anhand der Summe suchen kann.
+        max_digits=7, decimal_places=2,
+        null=True, blank=True,
+        help_text=u"gesammt Summe Netto (wird automatisch berechnet/aktualisiert!)"
     )
 
     def clean_fields(self, exclude):
@@ -343,6 +372,7 @@ class Rechnung(BaseModel):
 #        if self.status == None:
 #            self.status = Status.objects.get(bezeichnung="unbekannt")
         self._fix_date_fields()
+#        self.summe = self.calc_summe()
         super(Rechnung, self).save(*args, **kwargs)
 
 
@@ -358,15 +388,15 @@ class Rechnung(BaseModel):
         posten = RechnungsPosten.objects.filter(rechnung=self)
         return posten
 
-    def summe(self):
-        """ Rechnungs Summe Netto """
-        posten = RechnungsPosten.objects.filter(rechnung=self).only("menge", "einzelpreis")
-        total_netto = Decimal(0)
-        for item in posten:
-            summe = item.summe()
-            if summe is not None:
-                total_netto += item.summe()
-        return total_netto
+#    def calc_summe(self):
+#        """ Rechnungs Summe Netto """
+#        posten = RechnungsPosten.objects.filter(rechnung=self).only("menge", "einzelpreis")
+#        total_netto = Decimal(0)
+#        for item in posten:
+#            summe = item.summe()
+#            if summe is not None:
+#                total_netto += summe
+#        return total_netto
 
     def get_total(self):
         posten = RechnungsPosten.objects.filter(rechnung=self).only("menge", "einzelpreis", "mwst")
@@ -402,9 +432,9 @@ class Rechnung(BaseModel):
 
     def __unicode__(self):
         if self.rechnungs_typ == self.AUSGANGRE:
-            return u"AusgangsRe.: %r vom %s (valuta: %s) - %i€" % (self.ausgangs_re_nr, self.datum, self.valuta, self.summe())
+            return u"AusgangsRe.: %r vom %s (valuta: %s) - %r€" % (self.ausgangs_re_nr, self.datum, self.valuta, self.summe)
         else:
-            return u"EingansRe.: %r vom %s (valuta: %s) - %i€" % (self.eingangs_re_nr, self.datum, self.valuta, self.summe())
+            return u"EingansRe.: %r vom %s (valuta: %s) - %r€" % (self.eingangs_re_nr, self.datum, self.valuta, self.summe)
 
     class Meta:
         app_label = "pyrm"
