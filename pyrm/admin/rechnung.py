@@ -73,9 +73,12 @@ def export_rechnung_as_csv(modeladmin, request, queryset):
 class RechnungAdmin(VersionAdmin):
 
     def summe2(self, obj):
-        if obj.summe < 0:
-            return u'<span style="color:#ff0000;">%.2f\N{EURO SIGN}</span>' % obj.summe
-        return u"<strong>%.2f\N{EURO SIGN}</strong>" % obj.summe
+        summe = obj.summe
+        if summe is None:
+            return u"-"
+        if summe < 0:
+            return u'<span style="color:#ff0000;">%.2f\N{EURO SIGN}</span>' % summe
+        return u"<strong>%.2f\N{EURO SIGN}</strong>" % summe
     summe2.short_description = "summe"
     summe2.allow_tags = True
 
@@ -90,7 +93,7 @@ class RechnungAdmin(VersionAdmin):
     valuta2.allow_tags = True
 
     inlines = (PostenInline,)
-    list_display = ("kunde", "summe2", "print_link", "datum", "valuta2", "lastupdatetime")
+    list_display = ("kunde", "summary", "summe2", "print_link", "datum", "valuta2", "lastupdatetime")
     list_display_links = ("kunde",)
     list_filter = ("mahnstufe", "status", "rechnungs_typ", "kunde",)
     list_per_page = 20

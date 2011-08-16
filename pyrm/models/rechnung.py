@@ -430,11 +430,15 @@ class Rechnung(BaseModel):
         }
         return render_to_string("pyrm/html_print/rechnung.html", context)
 
+    def summary(self):
+        context = {"rechnung": self}
+        return render_to_string("pyrm/rechnung_summary.html", context)
+
     def __unicode__(self):
         if self.rechnungs_typ == self.AUSGANGRE:
-            return u"AusgangsRe.: %r vom %s (valuta: %s) - %s\N{EURO SIGN}" % (self.ausgangs_re_nr, self.datum, self.valuta, self.summe)
+            return u"AusgangsRe. (Nr: %r) vom %s (valuta: %s) - %s\N{EURO SIGN}" % (self.ausgangs_re_nr, self.datum, self.valuta, self.summe)
         else:
-            return u"EingansRe.: %r vom %s (valuta: %s) - %s\N{EURO SIGN}" % (self.eingangs_re_nr, self.datum, self.valuta, self.summe)
+            return u"EingansRe. (Nr: %r) vom %s (valuta: %s) - %s\N{EURO SIGN}" % (self.eingangs_re_nr, self.datum, self.valuta, self.summe)
 
     class Meta:
         app_label = "pyrm"
