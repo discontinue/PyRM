@@ -33,9 +33,7 @@ def _get_decimal(raw_summe):
     return summe
 
 
-def _get_datum(raw_datum):
-    if raw_datum != "":
-        return datetime.strptime(raw_datum, "%d.%m.%y").date()
+
 
 
 RE_TEXT_REXP = re.compile(r"^(\d+)[x ]+(.*?)[a ]+([\d,]+)$")
@@ -73,15 +71,15 @@ class Command(BaseCommand):
 
         self.verbosity = int(options.get('verbosity', 1))
 
-        try:
-            Rechnung.objects.all().delete()
-        except Rechnung.DoesNotExist:
-            pass
-
-        try:
-            RechnungsPosten.objects.all().delete()
-        except RechnungsPosten.DoesNotExist:
-            pass
+#        try:
+#            Rechnung.objects.all().delete()
+#        except Rechnung.DoesNotExist:
+#            pass
+#
+#        try:
+#            RechnungsPosten.objects.all().delete()
+#        except RechnungsPosten.DoesNotExist:
+#            pass
 
         status_offen = Status.objects.get(bezeichnung="offen")
         status_bezahlt = Status.objects.get(bezeichnung="bezahlt")
@@ -96,7 +94,7 @@ class Command(BaseCommand):
                 self.stdout.write(pprint.pformat(line))
                 self.stdout.write("\n")
             if raw_summe == "" or line["Rechnungstext"].startswith("^^^"):
-                self.stdout.write(" *** SKIP *** \n")
+                self.stdout.write(" *** SKIP: %r *** \n" % line)
                 continue
 
             if self.verbosity >= 3:
@@ -124,13 +122,30 @@ class Command(BaseCommand):
 
             #----------------------------------------------------------------------
 
-            datum = _get_datum(raw_datum=line["R.Datum"])
+            def _get_datum(raw_datum):
+                if raw_datum != "":
+                    try:
+                        return datetime.strptime(raw_datum, "%d.%m.%y").date()
+                    except ValueError:
+                        return datetime.strptime(raw_datum, "%d.%m.%Y").date()
+
+            raw_datum = line["R.Datum"]
+            try:
+                datum = _get_datum(raw_datum)
+            except ValueError, err:
+                self.stderr.write(" *** Re.Datum Fehler: %s\n" % err)
+                self.stdout.write("%s\n" % pprint.pformat(line))
+                datum = None
+                notiz += "\nRaw Datum: %r\n" % raw_datum
+
             raw_valuta_datum = line["gezahlt\nEingang"]
             try:
-                valuta = _get_datum(raw_datum=raw_valuta_datum)
+                valuta = _get_datum(raw_valuta_datum)
             except ValueError, err:
-                self.stdout.write("ValueError: %s\n" % err)
-                notiz += raw_valuta_datum
+                self.stderr.write(" *** ValutaDatum Fehler: %s\n" % err)
+                self.stdout.write("%s\n" % pprint.pformat(line))
+                valuta = None
+                notiz += "\nRaw ValutaDatum: %r\n" % raw_valuta_datum
 
             #----------------------------------------------------------------------
 
@@ -161,15 +176,22 @@ class Command(BaseCommand):
             kunde = None
             lieferant = None
 
-            if summe > 0:
+            if summe > 0 and "Gutschrift" not in line["Rechnungstext"]:
                 # Ausgangsrechnung
                 if re_nr == None:
-                    self.stderr.write("Fehler: Rechnung ohne Re.Nummer???\n")
-                    pprint.pprint(line)
+                    self.stderr.write(" *** Fehler: Ausgangsrechnung ohne Re.Nummer???\n")
+                    if self.verbosity:
+                        pprint.pprint(line)
                     continue
 
                 if kunden_nummer2 is not None:
-                    kunde = Kunde.objects.get(kunden_nr=kunden_nummer2)
+                    try:
+                        kunde = Kunde.objects.get(kunden_nr=kunden_nummer2)
+                    except Kunde.DoesNotExist:
+                        self.stderr.write(" *** Fehler: Kunde mit Nr. %r nicht gefunden!\n" % kunden_nummer2)
+                        if self.verbosity:
+                            pprint.pprint(line)
+                        kunde = None
                 if self.verbosity >= 3:
                     self.stdout.write("Kunde: %r\n" % kunde)
 
@@ -187,7 +209,8 @@ class Command(BaseCommand):
                     }
                 )
                 if not created:
-                    self.stderr.write("*** Fehler: Re mit Nr. %s schon vorhanden!" % re_nr)
+                    if self.verbosity >= 1:
+                        self.stdout.write("schon vorhanden: %s\n" % rechnung)
                     continue
             else:
                 # Eingangsrechnung/Ausgaben
@@ -195,14 +218,22 @@ class Command(BaseCommand):
                     lieferant = Lieferant.objects.get(lieferranten_nr=kunden_nummer2)
                 if self.verbosity >= 3:
                     self.stdout.write("Lieferant: %r\n" % lieferant)
-                rechnung = Rechnung(
-                    rechnungs_typ=Rechnung.EINGANGRE,
-                    status=status,
-                    createtime=datum,
-                    lieferant=lieferant,
+
+                rechnung, created = Rechnung.objects.get_or_create(
                     datum=datum,
-                    valuta=valuta,
+                    summe=summe,
+                    defaults={
+                        "rechnungs_typ":Rechnung.EINGANGRE,
+                        "status":status,
+                        "createtime":datum,
+                        "lieferant":lieferant,
+                        "valuta":valuta,
+                    }
                 )
+                if not created:
+                    if self.verbosity >= 1:
+                        self.stdout.write("schon vorhanden: %s\n" % rechnung)
+                    continue
 
             rechnung.save()
             reversion.revision.comment = "KRB import"
@@ -217,6 +248,6 @@ class Command(BaseCommand):
                 p.save()
                 reversion.revision.comment = "KRB import"
 
-            self.stdout.write("Rechnung %s erstellt.\n" % rechnung)
+            self.stdout.write("%s erstellt.\n" % rechnung)
 
 
