@@ -75,7 +75,7 @@ class Command(BaseCommand):
     def _insert_konten(self, konten):
         dictlist = get_dictlist(konten, used_fieldnames=None)
         for line in dictlist:
-            if self.verbosity >= 3:
+            if self.verbosity >= 4:
                 self.stdout.write("_" * 80)
                 self.stdout.write("\n")
                 self.stdout.write(pprint.pformat(line))
@@ -83,7 +83,9 @@ class Command(BaseCommand):
             nummer = int(line['Konto'])
             konto_name = line['Listenname']
 
-            konto, created = Konto.objects.get_or_create(nummer=nummer)
+            konto, created = Konto.objects.get_or_create(nummer=nummer,
+                defaults={"name":konto_name}
+            )
             if created:
                 if self.verbosity:
                     self.stdout.write("Konto erstellt: %s\n" % konto)
@@ -96,10 +98,10 @@ class Command(BaseCommand):
                     self.stdout.write("Vorhandes Konto genutzt: %s\n" % konto)
 
     def _check_rechnung(self, rechnung, summe_netto):
-        summe_pyrm = rechnung.summe()
+        summe_pyrm = rechnung.summe
         if summe_pyrm != summe_netto:
-            self.stderr.write("Fehler: Rechnungssumme %s (PyRM) ist nicht %s (MMS)" % (
-                summe_pyrm, summe_netto
+            self.stderr.write("Fehler: Rechnungssumme %s (PyRM) ist nicht %s (MMS) Rechnung: %s\n" % (
+                summe_pyrm, summe_netto, rechnung
             ))
             return False
         return True
@@ -109,13 +111,13 @@ class Command(BaseCommand):
 
         if rechnung.valuta == datum:
             if self.verbosity >= 1:
-                self.stdout.write("Rechnungs valuta datum ok")
+                self.stdout.write("Rechnungs valuta datum ok\n")
         else:
             if rechnung.valuta == None:
                 if self.verbosity:
-                    self.stdout.write("Rechnungs valuta datum auf %s gesetzt, ok" % datum)
+                    self.stdout.write("Rechnungs valuta datum auf %s gesetzt, ok\n" % datum)
             else:
-                self.stderr.write("Fehler: Setzte Rechnungs valuta datum von %s (PyRM) auf %s (MMS)" % (
+                self.stderr.write("Fehler: Setzte Rechnungs valuta datum von %s (PyRM) auf %s (MMS)\n" % (
                     rechnung.valuta, datum
                 ))
             rechnung.valuta = datum
@@ -134,10 +136,9 @@ class Command(BaseCommand):
     def _insert_buchungen(self, buchungen):
         dictlist = get_dictlist(buchungen, used_fieldnames=None)
         for line in dictlist:
-            if self.verbosity >= 3:
+            if self.verbosity >= 4:
                 self.stdout.write("_" * 80)
-                self.stdout.write("\n")
-                self.stdout.write(pprint.pformat(line))
+                self.stdout.write("\n%s\n" % pprint.pformat(line))
 
             date_string = line["Datum"]
             #print "date_string:", date_string
@@ -208,7 +209,9 @@ class Command(BaseCommand):
                     print "Keine Re.Nr.: %s" % err
                 else:
                     # Kunden nummer + Rechnungsnummer in Kommentar
-                    print kunden_nr, re_nr
+                    if self.verbosity >= 3:
+                        self.stdout.write("Aus Kommentar: KundenNr: %r, ReNr.: %r\n" % (kunden_nr, re_nr))
+
                     try:
                         kunde = Kunde.objects.get(kunden_nr=kunden_nr)
                     except Kunde.DoesNotExist, err:
@@ -240,9 +243,9 @@ class Command(BaseCommand):
                 if len(rechnungen) == 0:
                     rechnung = None
                 elif len(rechnungen) == 1:
+                    rechnung = rechnungen[0]
                     if self.verbosity >= 3:
                         self.stdout.write("Rechnung über summe+datum gefunden: %s\n" % rechnung)
-                    rechnung = rechnungen[0]
                     self._update_rechnung(rechnung, summe_netto, datum, konto, ggkto)
                     continue
                 else:
