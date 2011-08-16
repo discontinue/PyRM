@@ -230,7 +230,6 @@ class Command(BaseCommand):
                         else:
                             if self.verbosity >= 3:
                                 self.stdout.write("Rechnung über Kommentar gefunden: %s\n" % rechnung)
-                                continue
                             if self._check_rechnung(rechnung, summe_netto) == True:
                                 self._update_rechnung(rechnung, summe_netto, datum, konto, ggkto)
                                 continue
@@ -249,7 +248,7 @@ class Command(BaseCommand):
                     self._update_rechnung(rechnung, summe_netto, datum, konto, ggkto)
                     continue
                 else:
-                    sys.stderr.write("Fehler: Mehrere Rechnungen vom %s mit %s gefunden:\n" % (datum, summe))
+                    sys.stderr.write("Fehler: Mehrere Rechnungen vom %s mit %s€ gefunden:\n" % (datum, summe))
                     print len(rechnungen)
                     for rechnung in rechnungen:
                         print "rechnung: %s" % rechnung
