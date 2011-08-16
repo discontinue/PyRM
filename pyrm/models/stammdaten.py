@@ -333,7 +333,7 @@ class Kunde(BaseModel):
         return xrange(self.anzahl_rechnungskopie)
 
     def __unicode__(self):
-        return u"Kunde %s" % self.stammdaten
+        return u"%s (Kunde)" % self.stammdaten
 
     class Meta:
         app_label = "pyrm"
@@ -362,7 +362,7 @@ class Lieferant(BaseModel):
     )
 
     def __unicode__(self):
-        return u"Lieferant %s" % self.stammdaten
+        return u"%s (Lieferant)" % self.stammdaten
 
     class Meta:
         app_label = "pyrm"
