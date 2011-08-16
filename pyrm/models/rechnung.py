@@ -151,7 +151,7 @@ class RechnungsPosten(BaseModel):
         return html
 
     def __unicode__(self):
-        return "%r - %s - %r x %r" % (self.order, self.beschreibung, self.menge, self.einzelpreis)
+        return "%r - %s - %r x %s\N{EURO SIGN}" % (self.order, self.beschreibung, self.menge, self.einzelpreis)
 
     class Meta:
         app_label = "pyrm"
@@ -432,9 +432,9 @@ class Rechnung(BaseModel):
 
     def __unicode__(self):
         if self.rechnungs_typ == self.AUSGANGRE:
-            return u"AusgangsRe.: %r vom %s (valuta: %s) - %r€" % (self.ausgangs_re_nr, self.datum, self.valuta, self.summe)
+            return u"AusgangsRe.: %r vom %s (valuta: %s) - %s\N{EURO SIGN}" % (self.ausgangs_re_nr, self.datum, self.valuta, self.summe)
         else:
-            return u"EingansRe.: %r vom %s (valuta: %s) - %r€" % (self.eingangs_re_nr, self.datum, self.valuta, self.summe)
+            return u"EingansRe.: %r vom %s (valuta: %s) - %s\N{EURO SIGN}" % (self.eingangs_re_nr, self.datum, self.valuta, self.summe)
 
     class Meta:
         app_label = "pyrm"
