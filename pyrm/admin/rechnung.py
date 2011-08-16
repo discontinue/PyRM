@@ -76,7 +76,11 @@ class RechnungAdmin(VersionAdmin):
     list_filter = ("mahnstufe", "status", "rechnungs_typ", "kunde",)
     list_per_page = 20
     list_select_related = True
-    search_fields = ['foreign_key__related_fieldname']
+    search_fields = [
+        "summe",
+        "kunde__kunden_nr",
+        "rechnungsposten__beschreibung",
+    ]
 
 #    fieldsets = (
 #        (None, {
