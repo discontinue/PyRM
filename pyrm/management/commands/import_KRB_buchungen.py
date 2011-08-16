@@ -2,10 +2,12 @@
 
 from __future__ import division, absolute_import
 
-import os, re
 from datetime import datetime
-import pprint
 from decimal import Decimal
+from xml.sax import saxutils
+import os
+import pprint
+import re
 
 import reversion # django-reversion
 
@@ -14,7 +16,6 @@ from django.core.management.base import BaseCommand, CommandError
 from pyrm.models import Kunde, Lieferant, Rechnung, RechnungsPosten
 from pyrm.utils.csv_utils import get_dictlist
 from pyrm.models.rechnung import Status
-
 
 
 def _get_dictlist(filename):
@@ -33,18 +34,16 @@ def _get_decimal(raw_summe):
     return summe
 
 
-
-
-
 RE_TEXT_REXP = re.compile(r"^(\d+)[x ]+(.*?)[a ]+([\d,]+)$")
 def _get_re_posten(raw_text, summe):
-    text_lines = raw_text.strip().splitlines()
+    text = saxutils.unescape(raw_text.strip(), entities={"&quot;":'"'})
+    text_lines = text.splitlines()
     result = []
     test_summe = Decimal(0)
     for text_line in text_lines:
         get_all_rechnungs_posten = RE_TEXT_REXP.findall(text_line.strip())
         if get_all_rechnungs_posten == []:
-            return [(Decimal(1), raw_text, summe)]
+            return [(Decimal(1), text, summe)]
 
         assert len(get_all_rechnungs_posten) == 1
         get_all_rechnungs_posten = get_all_rechnungs_posten[0]
