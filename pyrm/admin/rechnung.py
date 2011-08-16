@@ -18,6 +18,7 @@ from reversion.admin import VersionAdmin
 from pyrm.models.base_models import BASE_FIELDSET
 from pyrm.models.rechnung import RechnungsPosten, Rechnung
 from pyrm.utils.django_modeladmin import add_missing_fields
+from django.conf import settings
 
 
 class StatusAdmin(VersionAdmin):
@@ -70,8 +71,26 @@ def export_rechnung_as_csv(modeladmin, request, queryset):
 
 
 class RechnungAdmin(VersionAdmin):
+
+    def summe2(self, obj):
+        if obj.summe < 0:
+            return '<span style="color:#ff0000;">%s</span>' % obj.summe
+        return "<strong>%s</strong>" % obj.summe
+    summe2.short_description = "summe"
+    summe2.allow_tags = True
+
+    def valuta2(self, obj):
+        if obj.valuta is None:
+            return '<span style="color:#ff0000;">offen</span>'
+
+        # FIXME: How can we call the existing solution here:
+        return obj.valuta.strftime("%d.%m.%Y")
+
+    valuta2.short_description = "valuta"
+    valuta2.allow_tags = True
+
     inlines = (PostenInline,)
-    list_display = ("kunde", "summe", "print_link", "datum", "valuta", "lastupdatetime")
+    list_display = ("kunde", "summe2", "print_link", "datum", "valuta2", "lastupdatetime")
     list_display_links = ("kunde",)
     list_filter = ("mahnstufe", "status", "rechnungs_typ", "kunde",)
     list_per_page = 20
