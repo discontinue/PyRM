@@ -74,8 +74,8 @@ class RechnungAdmin(VersionAdmin):
 
     def summe2(self, obj):
         if obj.summe < 0:
-            return '<span style="color:#ff0000;">%s</span>' % obj.summe
-        return "<strong>%s</strong>" % obj.summe
+            return u'<span style="color:#ff0000;">%.2f\N{EURO SIGN}</span>' % obj.summe
+        return u"<strong>%.2f\N{EURO SIGN}</strong>" % obj.summe
     summe2.short_description = "summe"
     summe2.allow_tags = True
 
