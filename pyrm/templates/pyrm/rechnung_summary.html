@@ -1,5 +1,5 @@
 {% for item in rechnung.get_all_rechnungs_posten %}
 	{% if item.menge %}{{ item.menge }}x{% endif %}
-	{{ item.beschreibung }}
-	{% if item.summe %}{{ item.summe }}€{% endif %}
+	{% if item.einzelpreis %}{{ item.einzelpreis }}€{% endif %}
+	{{ item.beschreibung }}<br />
 {% endfor %}
