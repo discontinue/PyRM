@@ -79,21 +79,30 @@ class RechnungAdmin(VersionAdmin):
         if summe < 0:
             return u'<span style="color:#ff0000;">%.2f\N{EURO SIGN}</span>' % summe
         return u"<strong>%.2f\N{EURO SIGN}</strong>" % summe
-    summe2.short_description = "summe"
+    summe2.short_description = "Summe"
     summe2.allow_tags = True
+    summe2.admin_order_field = "summe"
 
     def valuta2(self, obj):
         if obj.valuta is None:
             return '<span style="color:#ff0000;">offen</span>'
-
-        # FIXME: How can we call the existing solution here:
-        return obj.valuta.strftime("%d.%m.%Y")
-
-    valuta2.short_description = "valuta"
+        return obj.valuta.strftime("%d.%m.%y")
+    valuta2.short_description = "Valuta"
     valuta2.allow_tags = True
+    valuta2.admin_order_field = "valuta"
+
+    def datum2(self, obj):
+        return obj.datum.strftime("%d.%m.%y")
+    datum2.short_description = "Datum"
+    datum2.admin_order_field = "datum"
+
+    def lastupdatetime2(self, obj):
+        return obj.lastupdatetime.strftime("%d.%m.%y\n%H:%M:%S")
+    lastupdatetime2.short_description = u"letzte Änderung"
+    lastupdatetime2.admin_order_field = "lastupdatetime"
 
     inlines = (PostenInline,)
-    list_display = ("kunde", "summary", "summe2", "print_link", "datum", "valuta2", "lastupdatetime")
+    list_display = ("kunde", "summary", "summe2", "print_link", "datum2", "valuta2", "lastupdatetime2")
     list_display_links = ("kunde",)
     list_filter = ("mahnstufe", "status", "rechnungs_typ", "kunde",)
     list_per_page = 20
