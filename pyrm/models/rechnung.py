@@ -116,13 +116,16 @@ class RechnungsPosten(BaseModel):
         super(RechnungsPosten, self).save(*args, **kwargs)
 
     def set_rechnung_summe(self):
-        total_summe = self.summe()
-        queryset = RechnungsPosten.objects.filter(rechnung=self.rechnung).exclude(pk=self.pk).only("menge", "einzelpreis")
+        # FIXME: Das funktioniert nicht so richtig, weil nicht immer aufgerufen?
+        total_summe = Decimal(0)
+        queryset = RechnungsPosten.objects.filter(rechnung=self.rechnung).only("menge", "einzelpreis")
         for posten in queryset:
-            total_summe += posten.summe()
+            summe = posten.summe()
+            if summe is not None:
+                total_summe += summe
         self.rechnung.summe = total_summe
         self.rechnung.save()
-#        print "Summe %s bei Rechnung %s gesetzt." % (total_summe, self.rechnung)
+        #print "Summe %s bei Rechnung %s gesetzt." % (total_summe, self.rechnung)
 
     def clean(self):
         from django.core.exceptions import ValidationError
@@ -430,11 +433,17 @@ class Rechnung(BaseModel):
         }
         return render_to_string("pyrm/html_print/rechnung.html", context)
 
+    def summary(self):
+        context = {"rechnung": self}
+        return render_to_string("pyrm/rechnung_summary.html", context)
+    summary.short_description = "Re.Positionen Übersicht"
+    summary.allow_tags = True
+
     def __unicode__(self):
         if self.rechnungs_typ == self.AUSGANGRE:
-            return u"AusgangsRe.: %r vom %s (valuta: %s) - %s\N{EURO SIGN}" % (self.ausgangs_re_nr, self.datum, self.valuta, self.summe)
+            return u"AusgangsRe. (Nr: %r) vom %s (valuta: %s) - %s\N{EURO SIGN}" % (self.ausgangs_re_nr, self.datum, self.valuta, self.summe)
         else:
-            return u"EingansRe.: %r vom %s (valuta: %s) - %s\N{EURO SIGN}" % (self.eingangs_re_nr, self.datum, self.valuta, self.summe)
+            return u"EingansRe. (Nr: %r) vom %s (valuta: %s) - %s\N{EURO SIGN}" % (self.eingangs_re_nr, self.datum, self.valuta, self.summe)
 
     class Meta:
         app_label = "pyrm"
