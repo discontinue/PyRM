@@ -18,7 +18,7 @@ import datetime
 import warnings
 
 import reversion # django-reversion
-from creole import creole2html
+from creole import creole2html # python-creole
 
 from django.conf import settings
 from django.contrib import messages
