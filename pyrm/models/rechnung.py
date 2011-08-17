@@ -18,6 +18,7 @@ import datetime
 import warnings
 
 import reversion # django-reversion
+
 from creole import creole2html # python-creole
 
 from django.conf import settings
@@ -110,13 +111,13 @@ class RechnungsPosten(BaseModel):
                 messages.debug(request, "Auto add order numer %i to %r" % (self.order, self.beschreibung))
 
     def save(self, *args, **kwargs):
-        self.set_rechnung_summe()
         if self.order is None:
             self.auto_order_posten()
         super(RechnungsPosten, self).save(*args, **kwargs)
+        self.set_rechnung_summe()
 
     def set_rechnung_summe(self):
-        # FIXME: Das funktioniert nicht so richtig, weil nicht immer aufgerufen?
+        # FIXME: Eigentlich müßte das erst dann gemacht werden, wenn alle RechnungsPosten gespeichert wurden.
         total_summe = Decimal(0)
         queryset = RechnungsPosten.objects.filter(rechnung=self.rechnung).only("menge", "einzelpreis")
         for posten in queryset:
