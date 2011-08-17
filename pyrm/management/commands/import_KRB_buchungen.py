@@ -2,10 +2,12 @@
 
 from __future__ import division, absolute_import
 
-import os, re
 from datetime import datetime
-import pprint
 from decimal import Decimal
+import os
+import pprint
+import re
+import sys
 
 import reversion # django-reversion
 
@@ -14,6 +16,7 @@ from django.core.management.base import BaseCommand, CommandError
 from pyrm.models import Kunde, Lieferant, Rechnung, RechnungsPosten
 from pyrm.utils.csv_utils import get_dictlist
 from pyrm.models.rechnung import Status
+
 
 
 
@@ -34,8 +37,24 @@ def _get_decimal(raw_summe):
 
 
 def _get_datum(raw_datum):
-    if raw_datum != "":
-        return datetime.strptime(raw_datum, "%d.%m.%y").date()
+    if raw_datum == "":
+        return
+
+    if len(raw_datum) == 8:
+        try:
+            return datetime.strptime(raw_datum, "%d.%m.%y").date()
+        except Exception, err:
+            sys.stderr.write("*** Fehler 1: %s bei Datum: %r\n" % (err, raw_datum))
+    elif len(raw_datum) == 10:
+        try:
+            return datetime.strptime(raw_datum, "%d.%m.%Y").date()
+        except ValueError, err:
+            sys.stderr.write("*** Fehler 2: %s bei Datum: %r\n" % (err, raw_datum))
+    else:
+        sys.stderr.write("*** Fehler: Ungültiges Datum: %r\n" % raw_datum)
+
+
+
 
 
 RE_TEXT_REXP = re.compile(r"^(\d+)[x ]+(.*?)[a ]+([\d,]+)$")
@@ -73,6 +92,7 @@ class Command(BaseCommand):
 
         self.verbosity = int(options.get('verbosity', 1))
 
+        print "Lösche alte Einträge...",
         try:
             Rechnung.objects.all().delete()
         except Rechnung.DoesNotExist:
@@ -82,6 +102,7 @@ class Command(BaseCommand):
             RechnungsPosten.objects.all().delete()
         except RechnungsPosten.DoesNotExist:
             pass
+        print "OK"
 
         status_offen = Status.objects.get(bezeichnung="offen")
         status_bezahlt = Status.objects.get(bezeichnung="bezahlt")
@@ -90,16 +111,16 @@ class Command(BaseCommand):
             notiz = ""
             raw_summe = line["Wert"]
 
-            if self.verbosity >= 3:
+            if self.verbosity >= 4:
                 self.stdout.write("_" * 80)
                 self.stdout.write("\n")
                 self.stdout.write(pprint.pformat(line))
                 self.stdout.write("\n")
             if raw_summe == "" or line["Rechnungstext"].startswith("^^^"):
-                self.stdout.write(" *** SKIP *** \n")
+                self.stdout.write(" *** SKIP %r *** \n" % line)
                 continue
 
-            if self.verbosity >= 3:
+            if self.verbosity >= 4:
                 self.stdout.write(" -" * 40)
                 self.stdout.write("\n")
 
