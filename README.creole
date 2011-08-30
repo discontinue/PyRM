@@ -62,4 +62,6 @@ You must create a own local_settings.py in you project directory. e.g.:
 | GitHub      | https://github.com/jedie/PyRM
 | PyPi        | http://pypi.python.org/pypi/PyRM/
 | Sourceforge | http://sourceforge.net/projects/pyrm/
+| IRC         | [[http://www.pylucid.org/permalink/304/irc-channel|#pylucid on freenode.net]]
+
 | Google code | https://code.google.com/p/pyrm/
